@@ -42,8 +42,10 @@ import BlankLayout from "src/@core/layouts/BlankLayout";
 import FooterIllustrationsV1 from "src/views/pages/auth/FooterIllustration";
 
 interface State {
+  email: string;
   password: string;
   showPassword: boolean;
+  rememberMe: boolean;
 }
 
 // ** Styled Components
@@ -69,18 +71,21 @@ const FormControlLabel = styled(MuiFormControlLabel)<FormControlLabelProps>(
 const LoginPage = () => {
   // ** State
   const [values, setValues] = useState<State>({
+    email: "",
     password: "",
     showPassword: false,
+    rememberMe: false,
   });
 
   // ** Hook
   const theme = useTheme();
   const router = useRouter();
 
-  const handleChange =
-    (prop: keyof State) => (event: ChangeEvent<HTMLInputElement>) => {
-      setValues({ ...values, [prop]: event.target.value });
-    };
+  const handleChange = (prop: keyof State) => (
+    event: ChangeEvent<HTMLInputElement>
+  ) => {
+    setValues({ ...values, [prop]: event.target.value });
+  };
 
   const handleClickShowPassword = () => {
     setValues({ ...values, showPassword: !values.showPassword });
@@ -88,6 +93,15 @@ const LoginPage = () => {
 
   const handleMouseDownPassword = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
+  };
+
+  const handleRememberMeChange = () => {
+    setValues({ ...values, rememberMe: !values.rememberMe });
+  };
+
+  const handleLogin = () => {
+    // TODO: Implement login logic here
+    router.push("/dashboard");
   };
 
   return (
@@ -144,17 +158,15 @@ const LoginPage = () => {
               Sign in ⛽
             </Typography>
           </Box>
-          <form
-            noValidate
-            autoComplete="off"
-            onSubmit={(e) => e.preventDefault()}
-          >
+          <form noValidate autoComplete="off" onSubmit={(e) => e.preventDefault()}>
             <TextField
               autoFocus
               fullWidth
               id="email"
               label="Email"
               sx={{ marginBottom: 4 }}
+              value={values.email}
+              onChange={handleChange("email")}
             />
             <FormControl fullWidth>
               <InputLabel htmlFor="auth-login-password">Password</InputLabel>
@@ -187,7 +199,15 @@ const LoginPage = () => {
                 justifyContent: "space-between",
               }}
             >
-              <FormControlLabel control={<Checkbox />} label="Remember Me" />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={values.rememberMe}
+                    onChange={handleRememberMeChange}
+                  />
+                }
+                label="Remember Me"
+              />
               <Link passHref href="/">
                 <LinkStyled onClick={(e) => e.preventDefault()}>
                   Forgot Password?
@@ -199,7 +219,7 @@ const LoginPage = () => {
               size="large"
               variant="contained"
               sx={{ marginBottom: 7 }}
-              onClick={() => router.push("/dashboard")}
+              onClick={handleLogin}
             >
               Login
             </Button>

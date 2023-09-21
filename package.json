@@ -52,6 +52,7 @@
     "@mui/material": "^5.4.3",
     "@popperjs/core": "^2.11.2",
     "apexcharts-clevision": "3.28.5",
+    "axios": "^1.5.0",
     "clsx": "^1.1.1",
     "mdi-material-ui": "^7.1.0",
     "next": "^12.3.4",
@@ -64,7 +65,8 @@
     "react-popper": "^2.2.5"
   },
   "devDependencies": {
-    "@types/node": "16.11.11",
+    "@types/axios": "^0.14.0",
+    "@types/node": "^16.11.11",
     "@types/nprogress": "^0.2.0",
     "@types/react": "17.0.37",
     "@types/react-datepicker": "^4.3.2",

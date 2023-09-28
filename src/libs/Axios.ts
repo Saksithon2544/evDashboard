@@ -1,31 +1,48 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 
-const instance = axios.create({
-  baseURL: 'https://api.example.com',
+const API_URL = 'http://localhost/api/v1';
+
+// Create a global Axios instance with default settings
+const Axios = axios.create({
+  baseURL: API_URL,
   timeout: 10000,
 });
 
-instance.interceptors.request.use(
-    // @ts-ignore
-    (config: AxiosRequestConfig) => {
-       
-        return config;
-    },
-    (error) => {
-       
-        return Promise.reject(error);
+// Add response interceptors to handle 401 and 403 errors
+Axios.interceptors.response.use(
+  (response: AxiosResponse) => response,
+  (error: any) => {
+    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+      // Handle unauthorized and forbidden errors here (e.g., redirect to login page)
+      handleUnauthorizedOrForbiddenError();
     }
-);
 
-instance.interceptors.response.use(
-  (response: AxiosResponse) => {
-    
-    return response;
-  },
-  (error) => {
     return Promise.reject(error);
   }
 );
 
+// Function to handle unauthorized and forbidden errors
+function handleUnauthorizedOrForbiddenError() {
+  // Remove the token from local storage
+  localStorage.removeItem('token');
+  
+  // Redirect to the login page (adjust the URL as needed)
+  window.location.href = '/login';
+}
 
-export default instance;
+// Add request interceptor to include authorization headers if a token is present in local storage
+Axios.interceptors.request.use(
+  //@ts-ignore
+  (config: AxiosRequestConfig) => {
+    const token = localStorage.getItem('token');
+    // if (token) {
+    //   config.headers['Authorization'] = `Bearer ${token}`;
+    // }
+
+    return config;
+  },
+  (error: any) => Promise.reject(error)
+);
+
+// Export the Axios instance
+export default Axios;

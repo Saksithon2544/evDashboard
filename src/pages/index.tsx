@@ -1,5 +1,6 @@
 // ** React Imports
 import { ChangeEvent, MouseEvent, ReactNode, useState } from "react";
+import axios from "../libs/Axios";
 
 // ** Next Imports
 import Link from "next/link";
@@ -42,7 +43,7 @@ import BlankLayout from "src/@core/layouts/BlankLayout";
 import FooterIllustrationsV1 from "src/views/pages/auth/FooterIllustration";
 
 interface State {
-  email: string;
+  email: string; // Change "email" to "email"
   password: string;
   showPassword: boolean;
   rememberMe: boolean;
@@ -71,7 +72,7 @@ const FormControlLabel = styled(MuiFormControlLabel)<FormControlLabelProps>(
 const LoginPage = () => {
   // ** State
   const [values, setValues] = useState<State>({
-    email: "",
+    email: "", // Change "email" to "email"
     password: "",
     showPassword: false,
     rememberMe: false,
@@ -81,11 +82,10 @@ const LoginPage = () => {
   const theme = useTheme();
   const router = useRouter();
 
-  const handleChange = (prop: keyof State) => (
-    event: ChangeEvent<HTMLInputElement>
-  ) => {
-    setValues({ ...values, [prop]: event.target.value });
-  };
+  const handleChange =
+    (prop: keyof State) => (event: ChangeEvent<HTMLInputElement>) => {
+      setValues({ ...values, [prop]: event.target.value });
+    };
 
   const handleClickShowPassword = () => {
     setValues({ ...values, showPassword: !values.showPassword });
@@ -100,8 +100,29 @@ const LoginPage = () => {
   };
 
   const handleLogin = () => {
-    // TODO: Implement login logic here
-    router.push("/dashboard");
+    const params = new URLSearchParams();
+    params.append("username", values.email);
+    params.append("password", values.password);
+    axios
+      .post(
+        "/login/oauth",
+        params, // data,
+        {
+          // @ts-ignore
+          headers: {
+            // "Content-Type": "application/json",
+            // contentType: "application/x-www-form-urlencoded:charset=UTF-8",
+            "Content-Disposition": params
+          },
+        }
+      )
+      .then((response) => {
+        localStorage.setItem("token", response.data.token);
+        router.push("/dashboard");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   return (
@@ -158,15 +179,19 @@ const LoginPage = () => {
               Sign in ⛽
             </Typography>
           </Box>
-          <form noValidate autoComplete="off" onSubmit={(e) => e.preventDefault()}>
+          <form
+            noValidate
+            autoComplete="off"
+            onSubmit={(e) => e.preventDefault()}
+          >
             <TextField
               autoFocus
               fullWidth
-              id="email"
-              label="Email"
+              id="email" // Change the ID to "email"
+              label="email" // Change the label to "email"
               sx={{ marginBottom: 4 }}
-              value={values.email}
-              onChange={handleChange("email")}
+              value={values.email} // Update to use values.email
+              onChange={handleChange("email")} // Update the handleChange function
             />
             <FormControl fullWidth>
               <InputLabel htmlFor="auth-login-password">Password</InputLabel>

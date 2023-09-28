@@ -117,7 +117,9 @@ const LoginPage = () => {
         }
       )
       .then((response) => {
-        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("access_token", response.data.access_token);
+        localStorage.setItem("refresh_token", response.data.refresh_token);
+        localStorage.setItem("token_type", response.data.token_type);
         router.push("/dashboard");
       })
       .catch((error) => {

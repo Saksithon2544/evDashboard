@@ -24,7 +24,7 @@ Axios.interceptors.response.use(
 // Function to handle unauthorized and forbidden errors
 function handleUnauthorizedOrForbiddenError() {
   // Remove the token from local storage
-  localStorage.removeItem('token');
+  localStorage.removeItem('access_token');
   
   // Redirect to the login page (adjust the URL as needed)
   window.location.href = '/login';
@@ -34,7 +34,7 @@ function handleUnauthorizedOrForbiddenError() {
 Axios.interceptors.request.use(
   //@ts-ignore
   (config: AxiosRequestConfig) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('access_token');
     // if (token) {
     //   config.headers['Authorization'] = `Bearer ${token}`;
     // }

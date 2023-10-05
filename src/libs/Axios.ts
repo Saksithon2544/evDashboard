@@ -32,7 +32,7 @@ function handleUnauthorizedOrForbiddenError() {
 
 // Add request interceptor to include authorization headers if a token is present in local storage
 Axios.interceptors.request.use(
-  //@ts-ignore
+  // @ts-ignore
   (config: AxiosRequestConfig) => {
     const token = localStorage.getItem('access_token');
     // if (token) {

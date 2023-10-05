@@ -3,6 +3,8 @@ import { useState, SyntheticEvent, Fragment } from 'react'
 
 // ** Next Import
 import { useRouter } from 'next/router'
+import axios from '@/libs/Axios'
+import Swal from 'sweetalert2'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
@@ -47,6 +49,32 @@ const UserDropdown = () => {
       router.push(url)
     }
     setAnchorEl(null)
+  }
+
+  const handleLogout = async () => {
+    setAnchorEl(null)
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'You will be logged out!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes',
+      cancelButtonText: 'No',
+      cancelButtonColor: 'red',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await axios.get('/logout')
+          if (response.data.ok) {
+            router.push('/')
+          }
+        } catch (error) {
+          // console.log(error)
+          router.push('/')
+        }
+      }
+    })
+  
   }
 
   const styles = {
@@ -137,7 +165,7 @@ const UserDropdown = () => {
           </Box>
         </MenuItem>
         <Divider />
-        <MenuItem sx={{ py: 2 }} onClick={() => handleDropdownClose('/')}>
+        <MenuItem sx={{ py: 2 }} onClick={() => handleLogout()}>
           <LogoutVariant sx={{ marginRight: 2, fontSize: '1.375rem', color: 'text.secondary' }} />
           Logout
         </MenuItem>

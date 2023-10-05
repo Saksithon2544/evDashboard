@@ -21,16 +21,22 @@
     "jsx": "preserve",
     "incremental": true,
     "paths": {
+      "@/*": [
+        "./src/*" // Update the path to match your project structure
+      ],
       "apexcharts": [
         "./node_modules/apexcharts-clevision"
       ],
       "apexcharts/*": [
         "./node_modules/apexcharts-clevision/*"
-      ],
+      ]
     }
   },
   "include": [
-    "src"
+    "src",
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx"
   ],
   "exclude": [
     "node_modules"

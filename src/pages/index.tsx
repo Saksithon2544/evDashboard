@@ -1,6 +1,7 @@
 // ** React Imports
 import { ChangeEvent, MouseEvent, ReactNode, useState } from "react";
-import axios from "../libs/Axios";
+import axios from "@/libs/Axios";
+import Swal from "sweetalert2";
 
 // ** Next Imports
 import Link from "next/link";
@@ -100,6 +101,16 @@ const LoginPage = () => {
   };
 
   const handleLogin = () => {
+    // Data validation
+    if (!values.email || !values.password) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Login Error',
+        text: 'Please enter both email and password.',
+      });
+      return; // Exit the function if validation fails
+    } 
+    
     const params = new URLSearchParams();
     params.append("username", values.email);
     params.append("password", values.password);
@@ -120,10 +131,22 @@ const LoginPage = () => {
         localStorage.setItem("access_token", response.data.access_token);
         localStorage.setItem("refresh_token", response.data.refresh_token);
         localStorage.setItem("token_type", response.data.token_type);
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Login Success',
+          text: 'You have successfully logged in.',
+        });
+        
         router.push("/dashboard");
       })
       .catch((error) => {
-        console.log(error);
+        // console.log(error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Login Error',
+          text: error.response.data.detail,
+        });
       });
   };
 
@@ -193,6 +216,7 @@ const LoginPage = () => {
               label="email" // Change the label to "email"
               sx={{ marginBottom: 4 }}
               value={values.email} // Update to use values.email
+              autoComplete="email"
               onChange={handleChange("email")} // Update the handleChange function
             />
             <FormControl fullWidth>
@@ -200,6 +224,7 @@ const LoginPage = () => {
               <OutlinedInput
                 label="Password"
                 value={values.password}
+                autoComplete="current-password"
                 id="auth-login-password"
                 onChange={handleChange("password")}
                 type={values.showPassword ? "text" : "password"}

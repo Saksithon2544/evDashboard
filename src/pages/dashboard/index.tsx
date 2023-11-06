@@ -18,7 +18,8 @@ import Table from 'src/views/dashboard/Table'
 import Trophy from 'src/views/dashboard/Trophy'
 import TotalEarning from 'src/views/dashboard/TotalEarning'
 import StatisticsCard from 'src/views/dashboard/StatisticsCard'
-import WeeklyOverview from 'src/views/dashboard/WeeklyOverview'
+// import WeeklyOverview from 'src/views/dashboard/WeeklyOverview'
+import ChargerStatus from 'src/views/dashboard/ChargerStatus'
 import SalesByCountries from 'src/views/dashboard/SalesByCountries'
 
 const Dashboard = () => {
@@ -32,7 +33,8 @@ const Dashboard = () => {
           <StatisticsCard />
         </Grid>
         <Grid item xs={12} md={4} lg={4}>
-          <WeeklyOverview />
+          {/* <WeeklyOverview /> */}
+          <ChargerStatus />
         </Grid>
         <Grid item xs={12} md={4} lg={4}>
           <TotalEarning />

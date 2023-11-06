@@ -115,21 +115,40 @@ const LoginPage = () => {
     const params = new URLSearchParams();
     params.append("username", values.email);
     params.append("password", values.password);
-    
-    if (values.email === "admin@gmail.com" && values.password === "admin") {
-      Swal.fire({
-        icon: 'success',
-        title: 'Login Success',
-        text: 'You have successfully logged in.',
+    axios
+      .post(
+        "/login/oauth",
+        params, // data,
+        {
+          // @ts-ignore
+          headers: {
+            // "Content-Type": "application/json",
+            // contentType: "application/x-www-form-urlencoded:charset=UTF-8",
+            "Content-Disposition": params
+          },
+        }
+      )
+      .then((response) => {
+        localStorage.setItem("access_token", response.data.access_token);
+        localStorage.setItem("refresh_token", response.data.refresh_token);
+        localStorage.setItem("token_type", response.data.token_type);
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Login Success',
+          text: 'You have successfully logged in.',
+        });
+        
+        router.push("/dashboard");
+      })
+      .catch((error) => {
+        // console.log(error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Login Error',
+          text: error.response.data.detail,
+        });
       });
-      router.push("/dashboard");
-    } else if (values.email !== "admin@gmail.com" || values.password !== "admin") {
-      Swal.fire({
-        icon: 'error',
-        title: 'Login Error',
-        text: 'Invalid email or password.',
-      });
-    }
   };
 
   return (

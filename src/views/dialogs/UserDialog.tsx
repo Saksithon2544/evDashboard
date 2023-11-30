@@ -11,6 +11,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { Station } from "@/pages/api/stations";
+import { User } from "@/pages/api/user";
 
 // ** Icons Imports
 import AddIcon from "@mui/icons-material/Add";
@@ -19,13 +20,39 @@ import AddIcon from "@mui/icons-material/Add";
 import { useForm, Controller } from "react-hook-form";
 
 // ** Query Client Provider
-import { useQuery } from "react-query";
+import axios from "axios";
+import { useQuery, useMutation, QueryClient } from "react-query";
 
-export default function UserDialog() {
+type Props = {
+  callback?: () => void;
+};
+
+export default function UserDialog({ callback }) {
+  //ดึงข้อมูลจาก api/stations มาแสดง
   const { data: Stations, isLoading } = useQuery<Station[]>("stations", () => {
     return fetch("/api/stations")
       .then((res) => res.json())
       .then((data) => data);
+  });
+
+  // สร้าง queryClient ขึ้นมา เพื่อใช้ในการ invalidateQueries หลังจาก mutate แล้ว จะได้ render ใหม่ แสดงข้อมูลล่าสุด
+  const queryClient = new QueryClient();
+
+  // สร้าง mutation ขึ้นมา เพื่อใช้ในการเรียก api/user และ invalidateQueries เพื่อให้ render ใหม่
+  const { mutate } = useMutation<User>({
+    mutationFn: async (article) => {
+      return await axios.post("/api/user", article);
+    },
+    onSuccess: async (data) => {
+      console.log("data", data); // data is displayed, onSuccess is called
+      // refetch data after mutation other queries
+      
+      await queryClient.refetchQueries(["posts"], { active: true });
+      
+      if(callback) callback(true);
+
+      handleClose();
+    },
   });
 
   const { control, reset, handleSubmit, watch, setValue } = useForm();
@@ -51,12 +78,19 @@ export default function UserDialog() {
     setOpen(false);
   };
 
-  const onSubmit = handleSubmit((data) => {
-    console.log(data);
+  const onSubmit = handleSubmit((data: User) => {
+    const payload: User = {
+      ...data,
+    };
+
+    console.log(payload);
+
+    //@ts-ignore
+    mutate(payload);
   });
 
   React.useEffect(() => {
-    if (roleWatch != "adminstation") {
+    if (roleWatch !== "adminstation") {
       setValue("station", "");
     }
   }, [roleWatch]);
@@ -74,7 +108,6 @@ export default function UserDialog() {
       <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
         <DialogTitle>Add User</DialogTitle>
         <DialogContent>
-          {JSON.stringify(Stations)}
           <Controller
             name="firstName"
             control={control}
@@ -171,7 +204,8 @@ export default function UserDialog() {
                         key={station.stationId}
                         value={station.stationId}
                       >
-                        {station.name} ( {station.location.lat} ,{" "} {station.location.lng})
+                        {station.name} ( {station.location.lat} ,{" "}
+                        {station.location.lng})
                       </MenuItem>
                     ))}
                   </Select>

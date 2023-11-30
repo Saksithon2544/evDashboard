@@ -21,24 +21,12 @@ import EditIcon from "@mui/icons-material/Edit";
 
 import { visuallyHidden } from "@mui/utils";
 
+
+import { User as UserData } from "@/pages/api/user";
+
 function createData(id, name, email, role) {
-  return {
-    id,
-    name,
-    email,
-    role,
-  };
+  return { id, name, email, role };
 }
-
-const rows = [
-  createData(1, "John Doe", "john.doe@example.com", "User"),
-  createData(2, "Jane Smith", "jane.smith@example.com", "Admin"),
-  createData(3, "Bob Johnson", "bob.johnson@example.com", "User"),
-  createData(4, "Alice Brown", "alice.brown@example.com", "Admin"),
-  createData(5, "Charlie Davis", "charlie.davis@example.com", "User"),
-  createData(6, "Eva Wilson", "eva.wilson@example.com", "Admin"),
-];
-
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -132,8 +120,6 @@ function EnhancedTableHead(props) {
   );
 }
 
-
-
 EnhancedTableHead.propTypes = {
   numSelected: PropTypes.number.isRequired,
   onRequestSort: PropTypes.func.isRequired,
@@ -175,9 +161,7 @@ function EnhancedTableToolbar(props) {
           variant="h6"
           id="tableTitle"
           component="div"
-        >
-          
-        </Typography>
+        ></Typography>
       )}
     </Toolbar>
   );
@@ -186,61 +170,78 @@ function EnhancedTableToolbar(props) {
 EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
 };
+// ... (your imports remain unchanged)
 
-function TableMember() {
-  const [order, setOrder] = React.useState("asc");
-  const [orderBy, setOrderBy] = React.useState("name");
-  const [selected, setSelected] = React.useState([]);
-  const [page, setPage] = React.useState(0);
-  const [dense, setDense] = React.useState(false);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+type Props = {
+  Users: UserData[];
+  isLoading?: boolean;
+  refetch?: () => void;
+};
 
-  const handleRequestSort = (event, property) => {
+function TableMember({ Users, isLoading, refetch }: Props) {
+  const [order, setOrder] = React.useState<"asc" | "desc">("asc");
+  const [orderBy, setOrderBy] = React.useState<string>("name");
+  const [selected, setSelected] = React.useState<number[]>([]);
+  const [page, setPage] = React.useState<number>(0);
+  const [dense, setDense] = React.useState<boolean>(false);
+  const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
+
+  const handleRequestSort = (event: React.MouseEvent, property: string) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
   };
 
-  const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelected = rows.map((n) => n.id);
-      setSelected(newSelected);
-      return;
-    }
-    setSelected([]);
-  };
+  // const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   if (event.target.checked) {
+  //     const newSelected = Users.map((user) => user.userId);
+  //     setSelected(
+  //       newSelected.filter((item, index) => newSelected.indexOf(item) === index)
+  //     );
+  //     return;
+  //   }
+  //   setSelected([]);
+  // };
 
-  const handleChangePage = (event, newPage) => {
+  const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (event) => {
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
-  const handleChangeDense = (event) => {
+  const handleChangeDense = (event: React.ChangeEvent<HTMLInputElement>) => {
     setDense(event.target.checked);
   };
 
-  const isSelected = (id) => selected.indexOf(id) !== -1;
+  // const isSelected = (id: string) => selected.indexOf(id) !== -1;
 
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+    page > 0
+      ? Math.max(0, (1 + page) * rowsPerPage - (Users ? Users.length : 0))
+      : 0;
 
   const visibleRows = React.useMemo(
     () =>
-      stableSort(rows, getComparator(order, orderBy)).slice(
+      stableSort(Users || [], getComparator(order, orderBy)).slice(
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage
       ),
-    [order, orderBy, page, rowsPerPage]
+    [Users, order, orderBy, page, rowsPerPage]
   );
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Box style={{ width: "100%" }}>
       <Paper style={{ width: "100%", marginBottom: 2 }}>
-{/* <EnhancedTableToolbar numSelected={selected.length} /> */}
+        {/* <EnhancedTableToolbar numSelected={selected.length} /> */}
         <TableContainer component={Paper}>
           <Table
             style={{ minWidth: 750 }}
@@ -251,23 +252,50 @@ function TableMember() {
               numSelected={selected.length}
               order={order}
               orderBy={orderBy}
-              onSelectAllClick={handleSelectAllClick}
+              // onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
               rowCount={visibleRows.length}
             />
             <TableBody>
-              {visibleRows.map((row) => {
-                const labelId = `enhanced-table-checkbox-${row.id}`;
+              {visibleRows.map((row: UserData) => {
+                // const isSelectedRow = isSelected(row.userId);
+                const labelId = `enhanced-table-checkbox-${row.userId}`;
 
                 return (
-                  <TableRow >
-                    <TableCell 
+                  <TableRow
+                    hover
+                    // onClick={() => {
+                    //   const selectedIndex = selected.indexOf(row.userId);
+                    //   let newSelected = [];
+
+                    //   if (selectedIndex === -1) {
+                    //     newSelected = newSelected.concat(selected, row.userId);
+                    //   } else if (selectedIndex === 0) {
+                    //     newSelected = newSelected.concat(selected.slice(1));
+                    //   } else if (selectedIndex === selected.length - 1) {
+                    //     newSelected = newSelected.concat(selected.slice(0, -1));
+                    //   } else if (selectedIndex > 0) {
+                    //     newSelected = newSelected.concat(
+                    //       selected.slice(0, selectedIndex),
+                    //       selected.slice(selectedIndex + 1)
+                    //     );
+                    //   }
+
+                    //   setSelected(newSelected);
+                    // }}
+                    role="checkbox"
+                    // aria-checked={isSelectedRow}
+                    tabIndex={-1}
+                    key={row.userId}
+                    // selected={isSelectedRow}
+                  >
+                    <TableCell
                       component="th"
                       id={labelId}
                       scope="row"
                       padding="none"
                     >
-                      {row.name}
+                      {row.firstName + " " + row.lastName}
                     </TableCell>
                     <TableCell>{row.email}</TableCell>
                     <TableCell>{row.role}</TableCell>
@@ -297,7 +325,7 @@ function TableMember() {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={rows.length}
+          count={0 || Users.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}

@@ -21,12 +21,13 @@ import EditIcon from "@mui/icons-material/Edit";
 
 import { visuallyHidden } from "@mui/utils";
 
-
 import { User as UserData } from "@/pages/api/user";
+
 
 function createData(id, name, email, role) {
   return { id, name, email, role };
 }
+
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -170,15 +171,20 @@ function EnhancedTableToolbar(props) {
 EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
 };
-// ... (your imports remain unchanged)
+
+export type CallBack = {
+  action: "edit" | "delete";
+  user: UserData | null | any;
+};
 
 type Props = {
   Users: UserData[];
   isLoading?: boolean;
   refetch?: () => void;
+  callback?: (data: CallBack) => void;
 };
 
-function TableMember({ Users, isLoading, refetch }: Props) {
+function TableMember({ Users, isLoading, refetch, callback }: Props) {
   const [order, setOrder] = React.useState<"asc" | "desc">("asc");
   const [orderBy, setOrderBy] = React.useState<string>("name");
   const [selected, setSelected] = React.useState<number[]>([]);
@@ -186,22 +192,21 @@ function TableMember({ Users, isLoading, refetch }: Props) {
   const [dense, setDense] = React.useState<boolean>(false);
   const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
 
+  const [selectedUser, setSelectedUser] = React.useState<UserData | null>(null);
+
+  const handleEditClick = (user: UserData) => {
+    // console.log("user", user);
+    callback({
+      action: "edit",
+      user,
+    })
+  };
+
   const handleRequestSort = (event: React.MouseEvent, property: string) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
   };
-
-  // const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   if (event.target.checked) {
-  //     const newSelected = Users.map((user) => user.userId);
-  //     setSelected(
-  //       newSelected.filter((item, index) => newSelected.indexOf(item) === index)
-  //     );
-  //     return;
-  //   }
-  //   setSelected([]);
-  // };
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -264,30 +269,9 @@ function TableMember({ Users, isLoading, refetch }: Props) {
                 return (
                   <TableRow
                     hover
-                    // onClick={() => {
-                    //   const selectedIndex = selected.indexOf(row.userId);
-                    //   let newSelected = [];
-
-                    //   if (selectedIndex === -1) {
-                    //     newSelected = newSelected.concat(selected, row.userId);
-                    //   } else if (selectedIndex === 0) {
-                    //     newSelected = newSelected.concat(selected.slice(1));
-                    //   } else if (selectedIndex === selected.length - 1) {
-                    //     newSelected = newSelected.concat(selected.slice(0, -1));
-                    //   } else if (selectedIndex > 0) {
-                    //     newSelected = newSelected.concat(
-                    //       selected.slice(0, selectedIndex),
-                    //       selected.slice(selectedIndex + 1)
-                    //     );
-                    //   }
-
-                    //   setSelected(newSelected);
-                    // }}
                     role="checkbox"
-                    // aria-checked={isSelectedRow}
                     tabIndex={-1}
                     key={row.userId}
-                    // selected={isSelectedRow}
                   >
                     <TableCell
                       component="th"
@@ -300,7 +284,7 @@ function TableMember({ Users, isLoading, refetch }: Props) {
                     <TableCell>{row.email}</TableCell>
                     <TableCell>{row.role}</TableCell>
                     <TableCell>
-                      <IconButton aria-label="edit">
+                      <IconButton aria-label="edit" onClick={() => handleEditClick(row)}>
                         <EditIcon />
                       </IconButton>
                       <IconButton aria-label="delete">

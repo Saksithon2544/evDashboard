@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 
-const API_URL = 'http://localhost/api/v1';
+const API_URL = 'http://localhost:3000/api';
 
 // Create a global Axios instance with default settings
 const Axios = axios.create({

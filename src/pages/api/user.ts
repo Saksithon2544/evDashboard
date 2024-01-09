@@ -5,7 +5,7 @@ export type User = {
     firstName: string,
     lastName: string,
     password: string,
-    email: string,
+        email: string,
     phone: string,
     role: string,
     is_deleted?: boolean
@@ -177,7 +177,13 @@ export default function handler(
             }
             users.push(newUser)
             res.status(201).json(users)
-            break
+            break;
+        case 'PUT':
+            const userIndex = users.findIndex((user) => user.userId === req.body.userId)
+            users[userIndex] = req.body
+            res.status(200).json(users)
+            break;
+
         case 'GET':
             res.status(200).json(users)
         default:

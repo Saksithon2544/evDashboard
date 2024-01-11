@@ -8,10 +8,10 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { Station } from "@/pages/api/stations";
 import { User } from "@/pages/api/user";
+import Swal from "sweetalert2";
 
 // ** Icons Imports
 import AddIcon from "@mui/icons-material/Add";
@@ -29,10 +29,10 @@ type Props = {
 
 export default function UserDialog({ callback }) {
   //ดึงข้อมูลจาก api/stations มาแสดง
-  const { data: Stations, isLoading } = useQuery<Station[]>("stations", () => {
-    return fetch("/api/stations")
-      .then((res) => res.json())
-      .then((data) => data);
+  const { data: Stations, isLoading } = useQuery<Station[]>("stations", async () => {
+    const res = await fetch("/api/stations");
+    const data = await res.json();
+    return data;
   });
 
   // สร้าง queryClient ขึ้นมา เพื่อใช้ในการ invalidateQueries หลังจาก mutate แล้ว จะได้ render ใหม่ แสดงข้อมูลล่าสุด
@@ -79,14 +79,28 @@ export default function UserDialog({ callback }) {
   };
 
   const onSubmit = handleSubmit((data: User) => {
-    const payload: User = {
-      ...data,
-    };
+    try {
+      const payload: User = {
+        ...data,
+      };
+      console.log(payload);
 
-    console.log(payload);
+      //@ts-ignore
+      mutate(payload);
 
-    //@ts-ignore
-    mutate(payload);
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: "User has been added.",
+      });
+    } catch (error) {
+      console.log(error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Something went wrong.",
+      });
+    }
   });
 
   React.useEffect(() => {

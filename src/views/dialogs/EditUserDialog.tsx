@@ -8,13 +8,10 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { type Station } from "@/pages/api/stations";
 import { type User } from "@/pages/api/user";
-
-// ** Icons Imports
-import AddIcon from "@mui/icons-material/Add";
+import Swal from "sweetalert2";
 
 // ** Form Imports
 import { useForm, Controller } from "react-hook-form";
@@ -36,13 +33,25 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({
 }) => {
   const handleSave = (dataForm: User) => {
     onSave(dataForm)
+    Swal.fire({
+      icon: "success",
+      title: "Success!",
+      text: "User has been updated.",
+    });
+
     onClose();
   };
 
-  const { data: Stations, isLoading } = useQuery<Station[]>("stations", () => {
-    return fetch("/api/stations")
-      .then((res) => res.json())
-      .then((data) => data);
+  // const { data: Stations, isLoading } = useQuery<Station[]>("stations", () => {
+  //   return fetch("/api/stations")
+  //     .then((res) => res.json())
+  //     .then((data) => data);
+  // });
+
+  const { data: Stations, isLoading } = useQuery<Station[]>("stations", async () => {
+    const res = await axios.put("/api/stations");
+    const data = res.data;
+    return data;
   });
 
   const { control, reset, handleSubmit, watch, setValue } = useForm();

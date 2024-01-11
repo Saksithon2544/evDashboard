@@ -25,7 +25,7 @@ let users: User[] = [
         password: '1234',
         email: 'user01@gmail.com',
         phone: '1234567890',
-        role: 'admin',
+        role: 'adminstation',
         is_deleted: false,
         is_active: true,
         created: '2021-09-01T00:00:00.000Z',
@@ -181,6 +181,12 @@ export default function handler(
         case 'PUT':
             const userIndex = users.findIndex((user) => user.userId === req.body.userId)
             users[userIndex] = req.body
+            res.status(200).json(users)
+            break;
+        
+        case 'DELETE':
+            const deletedUserIndex = users.findIndex((user) => user.userId === req.body.userId)
+            users[deletedUserIndex].is_deleted = true
             res.status(200).json(users)
             break;
 

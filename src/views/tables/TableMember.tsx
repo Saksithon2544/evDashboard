@@ -202,6 +202,14 @@ function TableMember({ Users, isLoading, refetch, callback }: Props) {
     })
   };
 
+  const handleDeleteClick = (user: UserData) => {
+    // console.log("user", user);
+    callback({
+      action: "delete",
+      user,
+    })
+  };
+
   const handleRequestSort = (event: React.MouseEvent, property: string) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
@@ -287,7 +295,7 @@ function TableMember({ Users, isLoading, refetch, callback }: Props) {
                       <IconButton aria-label="edit" onClick={() => handleEditClick(row)}>
                         <EditIcon />
                       </IconButton>
-                      <IconButton aria-label="delete">
+                      <IconButton aria-label="delete" onClick={() => handleDeleteClick(row)}>
                         <DeleteIcon />
                       </IconButton>
                     </TableCell>

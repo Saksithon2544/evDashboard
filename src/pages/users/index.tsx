@@ -20,10 +20,10 @@ const MUITable = () => {
     data: Users,
     isLoading,
     refetch,
-  } = useQuery<UserData[]>("users", () => {
-    return fetch("/api/user/")
-      .then((res) => res.json())
-      .then((data: UserData[]) => data);
+  } = useQuery<UserData[]>("users", async () => {
+    const res = await fetch("/api/user/");
+    const data = await res.json();
+    return data;
   });
 
   function handleCloseMoadal() {

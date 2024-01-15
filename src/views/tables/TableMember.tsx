@@ -18,11 +18,10 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import Swal from "sweetalert2";
 
 import { visuallyHidden } from "@mui/utils";
-
 import { User as UserData } from "@/pages/api/user";
-
 
 function createData(id, name, email, role) {
   return { id, name, email, role };
@@ -199,15 +198,54 @@ function TableMember({ Users, isLoading, refetch, callback }: Props) {
     callback({
       action: "edit",
       user,
-    })
+    });
   };
 
   const handleDeleteClick = (user: UserData) => {
     // console.log("user", user);
+    try {
+      Swal.fire({
+        title: "Are you sure?",
+        html:
+          "Do you want to remove " +
+          "<span style='color:red;'>" +
+          user.firstName +
+          " " +
+          user.lastName +
+          "</span> from the system ?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          const res = await fetch(`/api/user`, {
+            method: "DELETE",
+            body: JSON.stringify({
+              userId: user.userId,
+            }),
+          });
+          const data = await res.json();
+          console.log("data", data);
+
+          if (data) {
+            Swal.fire(
+              "Success!",
+              "Your imaginary file has been deleted.",
+              "success"
+            );
+            if (refetch) refetch();
+          }
+        }
+      });
+    } catch (error) {
+      console.log("error", error);
+    }
+
     callback({
       action: "delete",
       user,
-    })
+    });
   };
 
   const handleRequestSort = (event: React.MouseEvent, property: string) => {
@@ -292,10 +330,16 @@ function TableMember({ Users, isLoading, refetch, callback }: Props) {
                     <TableCell>{row.email}</TableCell>
                     <TableCell>{row.role}</TableCell>
                     <TableCell>
-                      <IconButton aria-label="edit" onClick={() => handleEditClick(row)}>
+                      <IconButton
+                        aria-label="edit"
+                        onClick={() => handleEditClick(row)}
+                      >
                         <EditIcon />
                       </IconButton>
-                      <IconButton aria-label="delete" onClick={() => handleDeleteClick(row)}>
+                      <IconButton
+                        aria-label="delete"
+                        onClick={() => handleDeleteClick(row)}
+                      >
                         <DeleteIcon />
                       </IconButton>
                     </TableCell>

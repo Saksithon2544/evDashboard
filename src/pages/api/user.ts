@@ -17,8 +17,6 @@ export type User = {
     balance?: number
 }
 
-
-
 interface ResponseData extends NextApiRequest {
     method: string
     body: User

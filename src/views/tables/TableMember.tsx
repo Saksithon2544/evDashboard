@@ -226,7 +226,7 @@ function TableMember({ Users, isLoading, refetch, callback }: Props) {
             }),
           });
           const data = await res.json();
-          console.log("data", data);
+          // console.log("data", data);
 
           if (data) {
             Swal.fire(

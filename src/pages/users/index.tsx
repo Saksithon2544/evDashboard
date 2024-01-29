@@ -33,11 +33,11 @@ const MUITable = () => {
   function handleTable(data: CallBack) {
     switch (data.action) {
       case "edit":
-        console.log("edit", data.user);
+        // console.log("edit", data.user);
         setSelectedUser(data.user);
         break;
       case "delete":
-        console.log("delete", data.user);
+        // console.log("delete", data.user);
         break;
       default:
         break;
@@ -45,12 +45,12 @@ const MUITable = () => {
   }
 
   async function handleSave(data: UserData) {
-    console.log("save", data);
+    // console.log("save", data);
     try {
       const res = await axios.put(`/user`, data);
       const resData = await res.data;
 
-      console.log("resData", resData);
+      // console.log("resData", resData);
 
       refetch();
     } catch (error) {}

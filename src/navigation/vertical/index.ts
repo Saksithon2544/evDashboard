@@ -5,6 +5,7 @@ import AccountCogOutline from 'mdi-material-ui/AccountCogOutline'
 import AccountPlusOutline from 'mdi-material-ui/AccountPlusOutline'
 import AlertCircleOutline from 'mdi-material-ui/AlertCircleOutline'
 import AccountGroupOutline from 'mdi-material-ui/AccountGroupOutline'
+import { EvStationOutlined } from '@mui/icons-material'
 
 import FormatLetterCase from 'mdi-material-ui/FormatLetterCase'
 import GoogleCirclesExtended from 'mdi-material-ui/GoogleCirclesExtended'
@@ -35,6 +36,14 @@ const navigation = (): VerticalNavItemsType => {
       title: 'User',
       icon: AccountGroupOutline,
       path: '/users',
+    },
+    {
+      sectionTitle: 'Station Management'
+    },
+    {
+      title: 'Station',
+      icon: EvStationOutlined,
+      path: '/stations',
     },
     {
       sectionTitle: 'Pages'

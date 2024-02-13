@@ -186,9 +186,9 @@ export default function handler(
 
         case 'DELETE':
             const userIdToDelete = req.body.userId;
-            console.log(req.method, req.body);
+            // console.log(req.method, req.body);
             users = users.filter((user) => user.userId !== userIdToDelete)
-            console.log(users);
+            // console.log(users);
             res.status(200).json(users)
             break;
 

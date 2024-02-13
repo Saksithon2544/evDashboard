@@ -13,7 +13,7 @@ import { User as UserData } from "@/pages/api/user";
 import { useState } from "react";
 import axios from "@/libs/Axios";
 
-const UsersAllTable = () => {
+const StationsAllTable = () => {
   const [selectedUser, setSelectedUser] = useState<UserData>();
 
   const {
@@ -78,4 +78,4 @@ const UsersAllTable = () => {
   );
 };
 
-export default UsersAllTable;
+export default StationsAllTable;

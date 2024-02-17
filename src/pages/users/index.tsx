@@ -5,8 +5,8 @@ import CardHeader from "@mui/material/CardHeader";
 
 // ** Demo Components Imports
 import TableMember, { type CallBack } from "src/views/tables/TableMember";
-import UserDialog from "@/views/dialogs/UserDialog";
-import EditUserDialog from "@/views/dialogs/EditUserDialog";
+import UserDialog from "@/views/dialogs/user-dialogs/UserDialog";
+import EditUserDialog from "@/views/dialogs/user-dialogs/EditUserDialog";
 
 import { useQuery } from "react-query";
 import { User as UserData } from "@/pages/api/user";

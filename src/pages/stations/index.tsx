@@ -5,8 +5,8 @@ import CardHeader from "@mui/material/CardHeader";
 
 // ** Demo Components Imports
 import TableStation, { type CallBack } from "src/views/tables/TableStation";
-import UserDialog from "@/views/dialogs/user-dialogs/UserDialog";
-import EditUserDialog from "@/views/dialogs/user-dialogs/EditUserDialog";
+import AddStationDialog from "@/views/dialogs/station-dialogs/AddStationDialog";
+import EditStationDialog from "@/views/dialogs/station-dialogs/EditStationDialog";
 
 import { useQuery } from "react-query";
 import { Station as StationData } from "@/pages/api/stations";
@@ -14,7 +14,7 @@ import { useState } from "react";
 import axios from "@/libs/Axios";
 
 const StationsAllTable = () => {
-  const [selectedUser, setSelectedUser] = useState<StationData>();
+  const [selectedStation, setSelectedStation] = useState<StationData>();
 
   const {
     data: Stations,
@@ -27,14 +27,14 @@ const StationsAllTable = () => {
   });
 
   function handleCloseMoadal() {
-    setSelectedUser(undefined);
+    setSelectedStation(undefined);
   }
 
   function handleTable(data: CallBack) {
     switch (data.action) {
       case "edit":
         // console.log("edit", data.station);
-        setSelectedUser(data.station);
+        setSelectedStation(data.station);
         break;
       case "delete":
         // console.log("delete", data.station);
@@ -59,12 +59,12 @@ const StationsAllTable = () => {
   return (
     <Grid container>
       <Grid item xs={12}>
-        {/* {JSON.stringify(selectedUser)} */}
-        <UserDialog callback={refetch} />
-        <EditUserDialog
-          station={selectedUser}
+        {/* {JSON.stringify(selectedStation)} */}
+        <AddStationDialog callback={refetch} />
+        <EditStationDialog
+          station={selectedStation}
           onClose={handleCloseMoadal}
-          onSave={handleSave}
+          onSave={handleSave} 
         />
       </Grid>
       <Grid item xs={12}>

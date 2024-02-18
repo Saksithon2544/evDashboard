@@ -2,6 +2,7 @@ import * as React from "react";
 import PropTypes from "prop-types";
 import { alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
+import Badge from "@mui/material/Badge";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -63,16 +64,28 @@ const headCells = [
     label: "Name",
   },
   {
-    id: "email",
+    id: "location",
     numeric: false,
     disablePadding: false,
-    label: "Email",
+    label: "Location",
   },
   {
-    id: "role",
+    id: "status",
     numeric: false,
     disablePadding: false,
-    label: "Role",
+    label: "Status",
+  },
+  {
+    id: "created",
+    numeric: false,
+    disablePadding: false,
+    label: "Created",
+  },
+  {
+    id: "actions",
+    numeric: false,
+    disablePadding: false,
+    label: "Actions",
   },
 ];
 
@@ -114,7 +127,6 @@ function EnhancedTableHead(props) {
             </TableSortLabel>
           </TableCell>
         ))}
-        <TableCell align="left">Actions</TableCell>
       </TableRow>
     </TableHead>
   );
@@ -191,7 +203,9 @@ function TableStation({ Stations, isLoading, refetch, callback }: Props) {
   const [dense, setDense] = React.useState<boolean>(false);
   const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
 
-  const [selectedUser, setSelectedUser] = React.useState<StationData | null>(null);
+  const [selectedUser, setSelectedUser] = React.useState<StationData | null>(
+    null
+  );
 
   const handleEditClick = (station: StationData) => {
     // console.log("station", station);
@@ -325,8 +339,24 @@ function TableStation({ Stations, isLoading, refetch, callback }: Props) {
                     >
                       {row.name}
                     </TableCell>
-                    <TableCell>{row.location.lat}</TableCell>
-                    <TableCell>{row.status}</TableCell>
+                    <TableCell>
+                      {row.location.lat},{row.location.lng}
+
+                    </TableCell>
+                    {row.status === "online" ? (
+                      <TableCell>
+                        <Badge color="success" variant="dot" sx={{mr:2}} />
+                        {row.status}
+                      </TableCell>
+                    ) : (
+                      <TableCell>
+                        <Badge color="error" variant="dot" sx={{mr:2}} />
+                        {row.status}
+                      </TableCell>
+                    )}
+                    
+                    {/* <TableCell>{row.status}</TableCell> */}
+                    <TableCell>{row.created}</TableCell>
                     <TableCell>
                       <IconButton
                         aria-label="edit"

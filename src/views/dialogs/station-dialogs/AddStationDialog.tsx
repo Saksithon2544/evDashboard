@@ -41,7 +41,7 @@ export default function StationDialog({ callback }) {
   // สร้าง mutation ขึ้นมา เพื่อใช้ในการเรียก api/user และ invalidateQueries เพื่อให้ render ใหม่
   const { mutate } = useMutation<Station>({
     mutationFn: async (article) => {
-      return await axios.post("/api/user", article);
+      return await axios.post("/api/stations", article);
     },
     onSuccess: async (data) => {
       console.log("data", data); // data is displayed, onSuccess is called
@@ -67,13 +67,13 @@ export default function StationDialog({ callback }) {
 
   const handleClose = () => {
     reset({
-      firstName: "",
-      lastName: "",
-      email: "",
-      phone: "",
-      role: "superadmin",
-      station: "",
-      password: "",
+      name: "",
+      location: {
+        lat: "",
+        lng: "",
+      },
+      status: "online",
+      created: "",
     });
     setOpen(false);
   };
@@ -122,14 +122,14 @@ export default function StationDialog({ callback }) {
       <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
         <DialogTitle>Add Station</DialogTitle>
         <DialogContent>
-          <Controller
-            name="firstName"
+         <Controller 
+            name="name"
             control={control}
             render={({ field }) => (
               <TextField
                 autoFocus
                 margin="dense"
-                label="First Name*"
+                label="Name"
                 type="text"
                 fullWidth
                 {...field}
@@ -137,12 +137,12 @@ export default function StationDialog({ callback }) {
             )}
           />
           <Controller
-            name="lastName"
+            name="location.lat"
             control={control}
             render={({ field }) => (
               <TextField
                 margin="dense"
-                label="Last Name*"
+                label="Latitude"
                 type="text"
                 fullWidth
                 {...field}
@@ -150,25 +150,12 @@ export default function StationDialog({ callback }) {
             )}
           />
           <Controller
-            name="email"
+            name="location.lng"
             control={control}
             render={({ field }) => (
               <TextField
                 margin="dense"
-                label="Email Address*"
-                type="email"
-                fullWidth
-                {...field}
-              />
-            )}
-          />
-          <Controller
-            name="phone"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                margin="dense"
-                label="Phone Number*"
+                label="Longitude"
                 type="text"
                 fullWidth
                 {...field}
@@ -176,70 +163,28 @@ export default function StationDialog({ callback }) {
             )}
           />
           <Controller
-            name="role"
+            name="status"
             control={control}
-            defaultValue={"superadmin"}
+            defaultValue={"online"}
             render={({ field }) => (
-              <FormControl fullWidth style={{ marginTop: ".5rem" }}>
-                <InputLabel id="demo-simple-select-role">Role*</InputLabel>
+              <FormControl fullWidth margin="dense">
+                <InputLabel id="status">Status</InputLabel>
                 <Select
-                  labelId="demo-simple-select-role"
-                  label="Role*"
-                  id="demo-simple-select"
+                  labelId="status"
+                  label="Status"
                   variant="outlined"
                   {...field}
+                  onChange={(e: SelectChangeEvent) => {
+                    field.onChange(e.target.value);
+                  }}
                 >
-                  <MenuItem value={"superadmin"}>Super Admin</MenuItem>
-                  <MenuItem value={"adminstation"}>Admin Station</MenuItem>
-                  <MenuItem value={"user"}>Station</MenuItem>
+                  <MenuItem value="online">Online</MenuItem>
+                  <MenuItem value="offline">Offline</MenuItem>
                 </Select>
               </FormControl>
             )}
           />
-          {roleWatch === "adminstation" && (
-            <Controller
-              name="station"
-              control={control}
-              render={({ field }) => (
-                <FormControl fullWidth style={{ marginTop: ".5rem" }}>
-                  <InputLabel id="demo-simple-select-station">
-                    Station*
-                  </InputLabel>
-                  <Select
-                    labelId="demo-simple-select-station"
-                    label="Station*"
-                    id="demo-simple-select"
-                    defaultValue={"station1"}
-                    variant="outlined"
-                    {...field}
-                  >
-                    {Stations?.map((station) => (
-                      <MenuItem
-                        key={station.stationId}
-                        value={station.stationId}
-                      >
-                        {station.name} ( {station.location.lat} ,{" "}
-                        {station.location.lng})
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )}
-            />
-          )}
-          <Controller
-            name="password"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                margin="dense"
-                label="Password*"
-                type="password"
-                fullWidth
-                {...field}
-              />
-            )}
-          />
+         
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>

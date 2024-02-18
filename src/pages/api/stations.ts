@@ -26,7 +26,7 @@ let stations: Station[] = [
             lat: 13.7563,
             lng: 100.5018
         },
-        status: 'active',
+        status: 'online',
         created: '2021-09-01T00:00:00.000Z',
         adminStationId: '1',
         isDeleted: false
@@ -38,7 +38,7 @@ let stations: Station[] = [
             lat: 13.7563,
             lng: 100.5018
         },
-        status: 'active',
+        status: 'online',
         created: '2021-09-01T00:00:00.000Z',
         adminStationId: '1',
         isDeleted: false
@@ -50,7 +50,7 @@ let stations: Station[] = [
             lat: 13.7563,
             lng: 100.5018
         },
-        status: 'active',
+        status: 'offline',
         created: '2021-09-01T00:00:00.000Z',
         adminStationId: '1',
         isDeleted: false

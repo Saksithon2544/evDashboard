@@ -13,13 +13,13 @@ import { Station } from "@/pages/api/stations";
 import { User } from "@/pages/api/user";
 import Swal from "sweetalert2";
 
-// ** Icons Imports
+//  Icons Imports
 import AddIcon from "@mui/icons-material/Add";
 
-// ** Form Imports
+//  Form Imports
 import { useForm, Controller } from "react-hook-form";
 
-// ** Query Client Provider
+//  Query Client Provider
 import axios from "axios";
 import { useQuery, useMutation, QueryClient } from "react-query";
 
@@ -129,7 +129,7 @@ export default function UserDialog({ callback }) {
               <TextField
                 autoFocus
                 margin="dense"
-                label="First Name*"
+                label="First Name"
                 type="text"
                 fullWidth
                 {...field}
@@ -142,7 +142,7 @@ export default function UserDialog({ callback }) {
             render={({ field }) => (
               <TextField
                 margin="dense"
-                label="Last Name*"
+                label="Last Name"
                 type="text"
                 fullWidth
                 {...field}
@@ -155,7 +155,7 @@ export default function UserDialog({ callback }) {
             render={({ field }) => (
               <TextField
                 margin="dense"
-                label="Email Address*"
+                label="Email Address"
                 type="email"
                 fullWidth
                 {...field}
@@ -168,7 +168,7 @@ export default function UserDialog({ callback }) {
             render={({ field }) => (
               <TextField
                 margin="dense"
-                label="Phone Number*"
+                label="Phone Number"
                 type="text"
                 fullWidth
                 {...field}
@@ -178,14 +178,14 @@ export default function UserDialog({ callback }) {
           <Controller
             name="role"
             control={control}
-            defaultValue={"superadmin"}
+            defaultValue={" "}
             render={({ field }) => (
               <FormControl fullWidth style={{ marginTop: ".5rem" }}>
-                <InputLabel id="demo-simple-select-role">Role*</InputLabel>
+                <InputLabel id="select-role">Role</InputLabel>
                 <Select
-                  labelId="demo-simple-select-role"
-                  label="Role*"
-                  id="demo-simple-select"
+                  labelId="select-role"
+                  label="Role"
+                  id="select"
                   variant="outlined"
                   {...field}
                 >
@@ -202,13 +202,13 @@ export default function UserDialog({ callback }) {
               control={control}
               render={({ field }) => (
                 <FormControl fullWidth style={{ marginTop: ".5rem" }}>
-                  <InputLabel id="demo-simple-select-station">
-                    Station*
+                  <InputLabel id="select-station">
+                    Station
                   </InputLabel>
                   <Select
-                    labelId="demo-simple-select-station"
-                    label="Station*"
-                    id="demo-simple-select"
+                    labelId="select-station"
+                    label="Station"
+                    id="select"
                     defaultValue={"station1"}
                     variant="outlined"
                     {...field}
@@ -233,7 +233,7 @@ export default function UserDialog({ callback }) {
             render={({ field }) => (
               <TextField
                 margin="dense"
-                label="Password*"
+                label="Password"
                 type="password"
                 fullWidth
                 {...field}

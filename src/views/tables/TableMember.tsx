@@ -74,6 +74,12 @@ const headCells = [
     disablePadding: false,
     label: "Role",
   },
+  {
+    id: "action",
+    numeric: false,
+    disablePadding: false,
+    label: "Action",
+  },
 ];
 
 function EnhancedTableHead(props) {
@@ -114,7 +120,6 @@ function EnhancedTableHead(props) {
             </TableSortLabel>
           </TableCell>
         ))}
-        <TableCell align="left">Actions</TableCell>
       </TableRow>
     </TableHead>
   );

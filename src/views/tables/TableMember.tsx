@@ -22,6 +22,7 @@ import Swal from "sweetalert2";
 
 import { visuallyHidden } from "@mui/utils";
 import { User as UserData } from "@/pages/api/user";
+import axios from "@/libs/Axios";
 
 function createData(id, name, email, role) {
   return { id, name, email, role };
@@ -207,7 +208,7 @@ function TableMember({ Users, isLoading, refetch, callback }: Props) {
   };
 
   const handleDeleteClick = (user: UserData) => {
-    // console.log("user", user);
+    console.log("user", user);
     try {
       Swal.fire({
         title: "Are you sure?",
@@ -224,14 +225,7 @@ function TableMember({ Users, isLoading, refetch, callback }: Props) {
         cancelButtonText: "No",
       }).then(async (result) => {
         if (result.isConfirmed) {
-          const res = await fetch(`/api/user`, {
-            method: "DELETE",
-            body: JSON.stringify({
-              userId: user.userId,
-            }),
-          });
-          const data = await res.json();
-          // console.log("data", data);
+          const { data } = await axios.put(`/users/${user.id}/disable`);
 
           if (data) {
             Swal.fire(

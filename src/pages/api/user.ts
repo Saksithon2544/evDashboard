@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
 export type User = {
+    id?: string,
     userId?: string,
     firstName: string,
     lastName: string,

@@ -21,8 +21,9 @@ const UsersAllTable = () => {
     isLoading,
     refetch,
   } = useQuery<UserData[]>("users", async () => {
-    const res = await fetch("/api/user/");
-    const data = await res.json();
+    const res = await axios.get("/users");
+    const data = await res.data;
+
     return data;
   });
 
@@ -44,13 +45,13 @@ const UsersAllTable = () => {
     }
   }
 
-  async function handleSave(data: UserData) {
+  async function handleUpdate(data: UserData) {
     // console.log("save", data);
     try {
-      const res = await axios.put(`/user`, data);
-      const resData = await res.data;
-
-      // console.log("resData", resData);
+      await axios.put(`/users`, {
+        ...data,
+        confirmPassword: data.password, // TODO: remove this line
+      });
 
       refetch();
     } catch (error) {}
@@ -64,7 +65,7 @@ const UsersAllTable = () => {
         <EditUserDialog
           user={selectedUser}
           onClose={handleCloseMoadal}
-          onSave={handleSave}
+          onSave={handleUpdate}
         />
       </Grid>
       <Grid item xs={12}>

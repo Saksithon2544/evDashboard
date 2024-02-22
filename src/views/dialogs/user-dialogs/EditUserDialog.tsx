@@ -17,7 +17,7 @@ import Swal from "sweetalert2";
 import { useForm, Controller } from "react-hook-form";
 
 // ** Query Client Provider
-import axios from "axios";
+import axios from "@/libs/Axios";
 import { useQuery, useMutation, QueryClient } from "react-query";
 
 type EditUserDialogProps = {
@@ -32,7 +32,7 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({
   onSave,
 }) => {
   const handleSave = (dataForm: User) => {
-    onSave(dataForm)
+    onSave(dataForm);
     Swal.fire({
       icon: "success",
       title: "Success!",
@@ -42,16 +42,8 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({
     onClose();
   };
 
-  // const { data: Stations, isLoading } = useQuery<Station[]>("stations", () => {
-  //   return fetch("/api/stations")
-  //     .then((res) => res.json())
-  //     .then((data) => data);
-  // });
-
-  const { data: Stations, isLoading } = useQuery<Station[]>("stations", async () => {
-    const res = await axios.put("/api/stations");
-    const data = res.data;
-    return data;
+  const { data: Stations, isLoading } = useQuery<Station[]>("stations", () => {
+    return axios.get("/stations").then((res) => res.data);
   });
 
   const { control, reset, handleSubmit, watch, setValue } = useForm();

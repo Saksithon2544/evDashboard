@@ -121,6 +121,21 @@ const LoginPage = () => {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       });
+
+      if (response.status === 200) {
+        // Store the token in local storage
+        localStorage.setItem('access_token', response.data.access_token);
+        localStorage.setItem('token_type', response.data.token_type);
+        
+        Swal.fire({
+          icon: 'success',
+          title: 'Login Successful',
+          text: 'You have been logged in successfully.',
+        });
+
+        // Redirect to the dashboard page
+        router.push('/dashboard');
+      }
       
       // Handle the response
       console.log(response.data); // Assuming the server returns some data upon successful login

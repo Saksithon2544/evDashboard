@@ -9,8 +9,8 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import { type Station } from "@/pages/api/stations";
-// import { type Station } from "@/pages/api/station";
+import { type Transactions, transactions } from "@/pages/api/transactions";
+// import { type Transaction } from "@/pages/api/transaction";
 import Swal from "sweetalert2";
 
 // ** Form Imports
@@ -20,56 +20,56 @@ import { useForm, Controller } from "react-hook-form";
 import axios from "axios";
 import { useQuery, useMutation, QueryClient } from "react-query";
 
-type EditStationDialogProps = {
-  station: Station;
+type EditTransactionDialogProps = {
+  transaction: Transactions;
   onClose?: () => void;
-  onSave?: (updatedStation: Station) => void;
+  onSave?: (updatedTransaction: Transactions) => void;
 };
 
-const EditStationDialog: React.FC<EditStationDialogProps> = ({
-  station,
+const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
+  transaction,
   onClose,
   onSave,
 }) => {
-  const handleSave = (dataForm: Station) => {
+  const handleSave = (dataForm: Transactions) => {
     onSave(dataForm);
     Swal.fire({
       icon: "success",
       title: "Success!",
-      text: "Station has been updated.",
+      text: "Transaction has been updated.",
     });
 
     onClose();
   };
 
-  // const { data: Stations, isLoading } = useQuery<Station[]>("stations", () => {
-  //   return fetch("/api/stations")
-  //     .then((res) => res.json())
-  //     .then((data) => data);
-  // });
+  // // const { data: Transactions, isLoading } = useQuery<Transaction[]>("transactions", () => {
+  // //   return fetch("/api/transactions")
+  // //     .then((res) => res.json())
+  // //     .then((data) => data);
+  // // });
 
-  const { data: Stations, isLoading } = useQuery<Station[]>(
-    "stations",
-    async () => {
-      const res = await axios.put("/api/stations");
-      const data = res.data;
-      return data;
-    }
-  );
+  // const { data: Transactions, isLoading } = useQuery<Transactions[]>(
+  //   "transactions",
+  //   async () => {
+  //     const res = await axios.put("/api/transactions");
+  //     const data = res.data;
+  //     return data;
+  //   }
+  // );
 
   const { control, reset, handleSubmit, watch, setValue } = useForm();
   const roleWatch = watch("role");
 
   React.useEffect(() => {
-    if (station) {
-      reset(station);
+    if (transaction) {
+      reset(transaction);
     }
-  }, [station]);
+  }, [transaction]);
 
   return (
-    <Dialog open={station ? true : false} onClose={onClose}>
+    <Dialog open={transaction ? true : false} onClose={onClose}>
       {/* Dialog content */}
-      <DialogTitle>Edit Station</DialogTitle>
+      <DialogTitle>Edit Transaction</DialogTitle>
       <DialogContent>
         <Controller
           name="name"
@@ -142,4 +142,4 @@ const EditStationDialog: React.FC<EditStationDialogProps> = ({
   );
 };
 
-export default EditStationDialog;
+export default EditTransactionDialog;

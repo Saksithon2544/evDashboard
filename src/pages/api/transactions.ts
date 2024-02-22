@@ -13,7 +13,7 @@ export type Transactions = {
     created: string,
 }
 
-let transactions: Transactions[] = [
+export let transactions: Transactions[] = [
     {
         transactionId: '60bb0414-ce25-528d-98d6-b01857edae7b',
         userId: '1',

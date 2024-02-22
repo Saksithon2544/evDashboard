@@ -1,7 +1,6 @@
 // ** React Imports
 import { ChangeEvent, MouseEvent, ReactNode, useState } from "react";
-// import axios from "@/libs/Axios";
-import axios from "@/libs/AxiosV1";
+import axios from "@/libs/Axios";
 import Swal from "sweetalert2";
 
 // ** Next Imports
@@ -45,7 +44,7 @@ import BlankLayout from "src/@core/layouts/BlankLayout";
 import FooterIllustrationsV1 from "src/views/pages/auth/FooterIllustration";
 
 interface State {
-  email: string; // Change "email" to "email"
+  username: string; // Change "username" to "username"
   password: string;
   showPassword: boolean;
   rememberMe: boolean;
@@ -74,7 +73,7 @@ const FormControlLabel = styled(MuiFormControlLabel)<FormControlLabelProps>(
 const LoginPage = () => {
   // ** State
   const [values, setValues] = useState<State>({
-    email: "", // Change "email" to "email"
+    username: "", // Change "username" to "username"
     password: "",
     showPassword: false,
     rememberMe: false,
@@ -101,33 +100,37 @@ const LoginPage = () => {
     setValues({ ...values, rememberMe: !values.rememberMe });
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     // Data validation
-    if (!values.email || !values.password) {
+    if (!values.username || !values.password) {
       Swal.fire({
         icon: 'error',
         title: 'Login Error',
-        text: 'Please enter both email and password.',
+        text: 'Please enter both username and password.',
       });
       return; // Exit the function if validation fails
     } 
     
-    const params = new URLSearchParams();
-    params.append("username", values.email);
-    params.append("password", values.password);
-    
-    if (values.email === "admin@gmail.com" && values.password === "admin") {
-      Swal.fire({
-        icon: 'success',
-        title: 'Login Success',
-        text: 'You have successfully logged in.',
+    try {
+      // Send a POST request to the server with content type as application/x-www-form-urlencoded
+      const response = await axios.post("/token", new URLSearchParams({
+        username: values.username,
+        password: values.password,
+      }), {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
       });
-      router.push("/dashboard");
-    } else if (values.email !== "admin@gmail.com" || values.password !== "admin") {
+      
+      // Handle the response
+      console.log(response.data); // Assuming the server returns some data upon successful login
+    } catch (error) {
+      console.error('Error occurred while logging in:', error);
+      // Handle error (e.g., display error message)
       Swal.fire({
         icon: 'error',
         title: 'Login Error',
-        text: 'Invalid email or password.',
+        text: 'An error occurred while logging in. Please try again later.',
       });
     }
   };
@@ -194,12 +197,12 @@ const LoginPage = () => {
             <TextField
               autoFocus
               fullWidth
-              id="email" // Change the ID to "email"
-              label="email" // Change the label to "email"
+              id="username" // Change the ID to "username"
+              label="Username" // Change the label to "username"
               sx={{ marginBottom: 4 }}
-              value={values.email} // Update to use values.email
-              autoComplete="email"
-              onChange={handleChange("email")} // Update the handleChange function
+              value={values.username} // Update to use values.username
+              autoComplete="username"
+              onChange={handleChange("username")} // Update the handleChange function
             />
             <FormControl fullWidth>
               <InputLabel htmlFor="auth-login-password">Password</InputLabel>

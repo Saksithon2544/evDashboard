@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 
-const API_URL = 'http://localhost:3000/api';
+const API_URL = 'https://ecocharging.up.railway.app';
 
 // Create a global Axios instance with default settings
 const Axios = axios.create({
@@ -35,9 +35,9 @@ Axios.interceptors.request.use(
   // @ts-ignore
   (config: AxiosRequestConfig) => {
     const token = localStorage.getItem('access_token');
-    // if (token) {
-    //   config.headers['Authorization'] = `Bearer ${token}`;
-    // }
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
 
     return config;
   },

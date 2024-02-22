@@ -22,7 +22,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import Swal from "sweetalert2";
 
 import { visuallyHidden } from "@mui/utils";
-import { Station as StationData } from "@/pages/api/stations";
+import { Transactions as TransactionData } from "@/pages/api/transactions";
 
 function createData(
   name: string,
@@ -190,17 +190,17 @@ EnhancedTableToolbar.propTypes = {
 
 export type CallBack = {
   action: "edit" | "delete";
-  station: StationData | null | any;
+  transaction: TransactionData | null | any;
 };
 
 type Props = {
-  Stations: StationData[];
+  Transactions: TransactionData[];
   isLoading?: boolean;
   refetch?: () => void;
   callback?: (data: CallBack) => void;
 };
 
-function TableStation({ Stations, isLoading, refetch, callback }: Props) {
+function TableTransactions({ Transactions, isLoading, refetch, callback }: Props) {
   const [order, setOrder] = React.useState<"asc" | "desc">("asc");
   const [orderBy, setOrderBy] = React.useState<string>("name");
   const [selected, setSelected] = React.useState<number[]>([]);
@@ -208,27 +208,27 @@ function TableStation({ Stations, isLoading, refetch, callback }: Props) {
   const [dense, setDense] = React.useState<boolean>(false);
   const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
 
-  const [selectedUser, setSelectedUser] = React.useState<StationData | null>(
+  const [selectedUser, setSelectedUser] = React.useState<TransactionData | null>(
     null
   );
 
-  const handleEditClick = (station: StationData) => {
-    // console.log("station", station);
+  const handleEditClick = (transaction: TransactionData) => {
+    // console.log("transaction", transaction);
     callback({
       action: "edit",
-      station,
+      transaction,
     });
   };
 
-  const handleDeleteClick = (station: StationData) => {
-    // console.log("station", station);
+  const handleDeleteClick = (transaction: TransactionData) => {
+    // console.log("transaction", transaction);
     try {
       Swal.fire({
         title: "Are you sure?",
         html:
           "Do you want to remove " +
           "<span style='color:red;'>" +
-          station.name +
+          transaction.name +
           "</span> from the system ?",
         icon: "warning",
         showCancelButton: true,
@@ -236,10 +236,10 @@ function TableStation({ Stations, isLoading, refetch, callback }: Props) {
         cancelButtonText: "No",
       }).then(async (result) => {
         if (result.isConfirmed) {
-          const res = await fetch(`/api/station`, {
+          const res = await fetch(`/api/transaction`, {
             method: "DELETE",
             body: JSON.stringify({
-              stationId: station.stationId,
+              transactionId: transaction.transactionId,
             }),
           });
           const data = await res.json();
@@ -261,7 +261,7 @@ function TableStation({ Stations, isLoading, refetch, callback }: Props) {
 
     callback({
       action: "delete",
-      station,
+      transaction,
     });
   };
 
@@ -290,16 +290,16 @@ function TableStation({ Stations, isLoading, refetch, callback }: Props) {
 
   const emptyRows =
     page > 0
-      ? Math.max(0, (1 + page) * rowsPerPage - (Stations ? Stations.length : 0))
+      ? Math.max(0, (1 + page) * rowsPerPage - (Transactions ? Transactions.length : 0))
       : 0;
 
   const visibleRows = React.useMemo(
     () =>
-      stableSort(Stations || [], getComparator(order, orderBy)).slice(
+      stableSort(Transactions || [], getComparator(order, orderBy)).slice(
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage
       ),
-    [Stations, order, orderBy, page, rowsPerPage]
+    [Transactions, order, orderBy, page, rowsPerPage]
   );
 
   if (isLoading) {
@@ -325,16 +325,16 @@ function TableStation({ Stations, isLoading, refetch, callback }: Props) {
               rowCount={visibleRows.length}
             />
             <TableBody>
-              {visibleRows.map((row: StationData) => {
-                // const isSelectedRow = isSelected(row.stationId);
-                const labelId = `enhanced-table-checkbox-${row.stationId}`;
+              {visibleRows.map((row: TransactionData) => {
+                // const isSelectedRow = isSelected(row.transactionId);
+                const labelId = `enhanced-table-checkbox-${row.transactionId}`;
 
                 return (
                   <TableRow
                     hover
                     role="checkbox"
                     tabIndex={-1}
-                    key={row.stationId}
+                    key={row.transactionId}
                   >
                     <TableCell
                       component="th"
@@ -345,7 +345,7 @@ function TableStation({ Stations, isLoading, refetch, callback }: Props) {
                       {row.name}
                     </TableCell>
                     <TableCell>
-                      {row.location.lat},{row.location.lng}
+                      {row.location}
 
                     </TableCell>
                     {row.status === "online" ? (
@@ -394,7 +394,7 @@ function TableStation({ Stations, isLoading, refetch, callback }: Props) {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={0 || Stations.length}
+          count={0 || Transactions.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
@@ -409,4 +409,4 @@ function TableStation({ Stations, isLoading, refetch, callback }: Props) {
   );
 }
 
-export default TableStation;
+export default TableTransactions;

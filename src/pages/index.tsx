@@ -44,7 +44,7 @@ import BlankLayout from "src/@core/layouts/BlankLayout";
 import FooterIllustrationsV1 from "src/views/pages/auth/FooterIllustration";
 
 interface State {
-  username: string; // Change "username" to "username"
+  username: string;
   password: string;
   showPassword: boolean;
   rememberMe: boolean;
@@ -73,7 +73,7 @@ const FormControlLabel = styled(MuiFormControlLabel)<FormControlLabelProps>(
 const LoginPage = () => {
   // ** State
   const [values, setValues] = useState<State>({
-    username: "", // Change "username" to "username"
+    username: "",
     password: "",
     showPassword: false,
     rememberMe: false,
@@ -208,6 +208,7 @@ const LoginPage = () => {
             noValidate
             autoComplete="off"
             onSubmit={(e) => e.preventDefault()}
+            id="login-form" // เพิ่ม ID ฟอร์ม
           >
             <TextField
               autoFocus
@@ -271,7 +272,9 @@ const LoginPage = () => {
               size="large"
               variant="contained"
               sx={{ marginBottom: 7 }}
-              onClick={handleLogin}
+              onClick={handleLogin} // คำสั่งให้ปุ่ม Login เรียกใช้ฟังก์ชัน handleLogin
+              type="submit" // เพิ่มประเภทเป็น submit เพื่อให้ Enter ที่กดบนฟอร์มทำการ Submit ฟอร์ม
+              form="login-form" // เชื่อมโยงปุ่มกับฟอร์ม
             >
               Login
             </Button>

@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 
-const API_URL = 'https://ecocharging.up.railway.app';
+const API_URL = 'https://ecochargingtest.up.railway.app';
 
 // Create a global Axios instance with default settings
 const Axios = axios.create({

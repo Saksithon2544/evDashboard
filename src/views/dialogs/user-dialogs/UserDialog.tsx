@@ -9,7 +9,6 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import { Station } from "@/pages/api/stations";
 import { User } from "@/pages/api/user";
 import Swal from "sweetalert2";
 
@@ -20,7 +19,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { useForm, Controller } from "react-hook-form";
 
 //  Query Client Provider
-import axios from "axios";
+import axios from "@/libs/Axios";
 import { useQuery, useMutation, QueryClient } from "react-query";
 
 type Props = {
@@ -28,20 +27,12 @@ type Props = {
 };
 
 export default function UserDialog({ callback }) {
-  //ดึงข้อมูลจาก api/stations มาแสดง
-  const { data: Stations, isLoading } = useQuery<Station[]>("stations", async () => {
-    const res = await fetch("/api/stations");
-    const data = await res.json();
-    return data;
-  });
 
-  // สร้าง queryClient ขึ้นมา เพื่อใช้ในการ invalidateQueries หลังจาก mutate แล้ว จะได้ render ใหม่ แสดงข้อมูลล่าสุด
   const queryClient = new QueryClient();
 
-  // สร้าง mutation ขึ้นมา เพื่อใช้ในการเรียก api/user และ invalidateQueries เพื่อให้ render ใหม่
   const { mutate } = useMutation<User>({
     mutationFn: async (article) => {
-      return await axios.post("/api/user", article);
+      return await axios.post("/register/by_superadmin", article);
     },
     onSuccess: async (data) => {
       console.log("data", data); // data is displayed, onSuccess is called
@@ -70,10 +61,10 @@ export default function UserDialog({ callback }) {
       firstName: "",
       lastName: "",
       email: "",
-      phone: "",
+      phoneNumber: "",
       role: "superadmin",
-      station: "",
       password: "",
+      confirmPassword: "",
     });
     setOpen(false);
   };
@@ -163,7 +154,7 @@ export default function UserDialog({ callback }) {
             )}
           />
           <Controller
-            name="phone"
+            name="phoneNumber"
             control={control}
             render={({ field }) => (
               <TextField
@@ -196,37 +187,6 @@ export default function UserDialog({ callback }) {
               </FormControl>
             )}
           />
-          {roleWatch === "adminstation" && (
-            <Controller
-              name="station"
-              control={control}
-              render={({ field }) => (
-                <FormControl fullWidth style={{ marginTop: ".5rem" }}>
-                  <InputLabel id="select-station">
-                    Station
-                  </InputLabel>
-                  <Select
-                    labelId="select-station"
-                    label="Station"
-                    id="select"
-                    defaultValue={"station1"}
-                    variant="outlined"
-                    {...field}
-                  >
-                    {Stations?.map((station) => (
-                      <MenuItem
-                        key={station.stationId}
-                        value={station.stationId}
-                      >
-                        {station.name} ( {station.location.lat} ,{" "}
-                        {station.location.lng})
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )}
-            />
-          )}
           <Controller
             name="password"
             control={control}
@@ -234,6 +194,19 @@ export default function UserDialog({ callback }) {
               <TextField
                 margin="dense"
                 label="Password"
+                type="password"
+                fullWidth
+                {...field}
+              />
+            )}
+          />
+          <Controller
+            name="confirmPassword"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                margin="dense"
+                label="Confirm Password"
                 type="password"
                 fullWidth
                 {...field}

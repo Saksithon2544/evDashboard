@@ -9,7 +9,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import { type Station } from "@/pages/api/stations";
+
 import { type User } from "@/pages/api/user";
 import Swal from "sweetalert2";
 
@@ -31,7 +31,16 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({
   onClose,
   onSave,
 }) => {
-  const handleSave = (dataForm: User) => {
+  const {
+    control,
+    reset,
+    handleSubmit,
+    formState: { errors }, // เพิ่มตรงนี้
+  } = useForm(); // เพิ่มตรงนี้
+
+  const handleSave = async (dataForm: User) => {
+    
+    await axios.put(`/users/${user.id}`, dataForm);
     onSave(dataForm);
     Swal.fire({
       icon: "success",
@@ -41,13 +50,6 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({
 
     onClose();
   };
-
-  const { data: Stations, isLoading } = useQuery<Station[]>("stations", () => {
-    return axios.get("/stations").then((res) => res.data);
-  });
-
-  const { control, reset, handleSubmit, watch, setValue } = useForm();
-  const roleWatch = watch("role");
 
   React.useEffect(() => {
     if (user) {
@@ -60,125 +62,122 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({
       {/* Dialog content */}
       <DialogTitle>Edit User</DialogTitle>
       <DialogContent>
-        <Controller
-          name="firstName"
-          control={control}
-          render={({ field }) => (
-            <TextField
-              autoFocus
-              margin="dense"
-              label="First Name*"
-              type="text"
-              fullWidth
-              {...field}
-            />
-          )}
-        />
-        <Controller
-          name="lastName"
-          control={control}
-          render={({ field }) => (
-            <TextField
-              margin="dense"
-              label="Last Name*"
-              type="text"
-              fullWidth
-              {...field}
-            />
-          )}
-        />
-        <Controller
-          name="email"
-          control={control}
-          render={({ field }) => (
-            <TextField
-              margin="dense"
-              label="Email Address*"
-              type="email"
-              fullWidth
-              {...field}
-            />
-          )}
-        />
-        <Controller
-          name="phone"
-          control={control}
-          render={({ field }) => (
-            <TextField
-              margin="dense"
-              label="Phone Number*"
-              type="text"
-              fullWidth
-              {...field}
-            />
-          )}
-        />
-        <Controller
-          name="role"
-          control={control}
-          defaultValue={"superadmin"}
-          render={({ field }) => (
-            <FormControl fullWidth style={{ marginTop: ".5rem" }}>
-              <InputLabel id="demo-simple-select-role">Role*</InputLabel>
-              <Select
-                labelId="demo-simple-select-role"
-                label="Role*"
-                id="demo-simple-select"
-                variant="outlined"
-                {...field}
-              >
-                <MenuItem value={"superadmin"}>Super Admin</MenuItem>
-                <MenuItem value={"adminstation"}>Admin Station</MenuItem>
-                <MenuItem value={"user"}>User</MenuItem>
-              </Select>
-            </FormControl>
-          )}
-        />
-        {roleWatch === "adminstation" && (
+        <form>
           <Controller
-            name="station"
+            name="firstName"
             control={control}
+            rules={{ required: "First Name is required" }} // เพิ่ม rules สำหรับ validation
+            render={({ field }) => (
+              <TextField
+                autoFocus
+                margin="dense"
+                label="First Name"
+                type="text"
+                fullWidth
+                {...field}
+                error={!!errors.firstName} // เพิ่มส่วนนี้เพื่อแสดง error หากมีการ validate ไม่ผ่าน
+                helperText={errors.firstName ? errors.firstName.message : null} // เพิ่มส่วนนี้เพื่อแสดงข้อความ error
+              />
+            )}
+          />
+          <Controller
+            name="lastName"
+            control={control}
+            rules={{ required: "Last Name is required" }} // เพิ่ม rules สำหรับ validation
+            render={({ field }) => (
+              <TextField
+                margin="dense"
+                label="Last Name"
+                type="text"
+                fullWidth
+                {...field}
+                error={!!errors.lastName} // เพิ่มส่วนนี้เพื่อแสดง error หากมีการ validate ไม่ผ่าน
+                helperText={errors.lastName ? errors.lastName.message : null} // เพิ่มส่วนนี้เพื่อแสดงข้อความ error
+              />
+            )}
+          />
+          <Controller
+            name="email"
+            control={control}
+            rules={{ required: "Email is required", pattern: { value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i, message: "Invalid email address" } }} // เพิ่ม rules สำหรับ validation
+            render={({ field }) => (
+              <TextField
+                margin="dense"
+                label="Email Address"
+                type="email"
+                fullWidth
+                {...field}
+                error={!!errors.email} // เพิ่มส่วนนี้เพื่อแสดง error หากมีการ validate ไม่ผ่าน
+                helperText={errors.email ? errors.email.message : null} // เพิ่มส่วนนี้เพื่อแสดงข้อความ error
+              />
+            )}
+          />
+          <Controller
+            name="phoneNumber"
+            control={control}
+            rules={{ required: "Phone Number is required" }} // เพิ่ม rules สำหรับ validation
+            render={({ field }) => (
+              <TextField
+                margin="dense"
+                label="Phone Number"
+                type="text"
+                fullWidth
+                {...field}
+                error={!!errors.phoneNumber} // เพิ่มส่วนนี้เพื่อแสดง error หากมีการ validate ไม่ผ่าน
+                helperText={errors.phoneNumber ? errors.phoneNumber.message : null} // เพิ่มส่วนนี้เพื่อแสดงข้อความ error
+              />
+            )}
+          />
+          <Controller
+            name="role"
+            control={control}
+            rules={{ required: "Role is required" }} // เพิ่ม rules สำหรับ validation
             render={({ field }) => (
               <FormControl fullWidth style={{ marginTop: ".5rem" }}>
-                <InputLabel id="demo-simple-select-station">
-                  Station*
-                </InputLabel>
+                <InputLabel id="demo-simple-select-role">Role</InputLabel>
                 <Select
-                  labelId="demo-simple-select-station"
-                  label="Station*"
+                  labelId="demo-simple-select-role"
+                  label="Role*"
                   id="demo-simple-select"
-                  defaultValue={"station1"}
                   variant="outlined"
                   {...field}
+                  error={!!errors.role} // เพิ่มส่วนนี้เพื่อแสดง error หากมีการ validate ไม่ผ่าน
+                  // ในกรณีของ Select component จะไม่มี helperText เนื่องจากมีการแสดงชื่อตัวเลือกไว้แล้ว
                 >
-                  {Stations?.map((station) => (
-                    <MenuItem key={station.stationId} value={station.stationId}>
-                      {station.name} ( {station.location.lat} ,{" "}
-                      {station.location.lng})
-                    </MenuItem>
-                  ))}
+                  <MenuItem value={"superadmin"}>Super Admin</MenuItem>
+                  <MenuItem value={"adminstation"}>Admin Station</MenuItem>
+                  <MenuItem value={"user"}>User</MenuItem>
                 </Select>
               </FormControl>
             )}
           />
-        )}
-        <Controller
-          name="password"
-          control={control}
-          render={({ field }) => (
-            <TextField
-              margin="dense"
-              label="Password*"
-              type="password"
-              fullWidth
-              {...field}
-            />
-          )}
-        />
+          <Controller
+            name="is_active"
+            control={control}
+            rules={{ required: "Status is required" }} // เพิ่ม rules สำหรับ validation
+            render={({ field }) => (
+              <FormControl fullWidth style={{ marginTop: ".5rem" }}>
+                <InputLabel id="demo-simple-select-status">Status</InputLabel>
+                <Select
+                  labelId="demo-simple-select-status"
+                  label="Status"
+                  id="demo-simple-select"
+                  variant="outlined"
+                  {...field}
+                  error={!!errors.is_active} // เพิ่มส่วนนี้เพื่อแสดง error หากมีการ validate ไม่ผ่าน
+                  // ในกรณีของ Select component จะไม่มี helperText เนื่องจากมีการแสดงชื่อตัวเลือกไว้แล้ว
+                >
+                  <MenuItem value={"true"}>Active</MenuItem>
+                  <MenuItem value={"false"}>Inactive</MenuItem>
+                </Select>
+              </FormControl>
+            )}
+          />
+        </form>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={handleSubmit(handleSave)}>Save</Button>
+        <Button type="submit" onClick={handleSubmit(handleSave)}>Save</Button>
       </DialogActions>
     </Dialog>
   );

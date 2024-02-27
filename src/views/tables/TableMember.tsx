@@ -1,7 +1,7 @@
 import * as React from "react";
 import PropTypes from "prop-types";
-import { alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
+import Badge from "@mui/material/Badge";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -10,8 +10,6 @@ import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -19,16 +17,17 @@ import Switch from "@mui/material/Switch";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import Swal from "sweetalert2";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import { SelectChangeEvent } from "@mui/material/Select";
 
 import { visuallyHidden } from "@mui/utils";
 import { User as UserData } from "@/pages/api/user";
 import axios from "@/libs/Axios";
 
-function createData(id, name, email, role) {
-  return { id, name, email, role };
-}
-
-function descendingComparator(a, b, orderBy) {
+function descendingComparator(a: any, b: any, orderBy: string) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
   }
@@ -38,13 +37,13 @@ function descendingComparator(a, b, orderBy) {
   return 0;
 }
 
-function getComparator(order, orderBy) {
+function getComparator(order: "asc" | "desc", orderBy: string) {
   return order === "desc"
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
+    ? (a: any, b: any) => descendingComparator(a, b, orderBy)
+    : (a: any, b: any) => -descendingComparator(a, b, orderBy);
 }
 
-function stableSort(array, comparator) {
+function stableSort(array: any[], comparator: any) {
   const stabilizedThis = array.map((el, index) => [el, index]);
   stabilizedThis.sort((a, b) => {
     const order = comparator(a[0], b[0]);
@@ -76,6 +75,12 @@ const headCells = [
     label: "Role",
   },
   {
+    id: "status",
+    numeric: false,
+    disablePadding: false,
+    label: "Status",
+  },
+  {
     id: "action",
     numeric: false,
     disablePadding: false,
@@ -83,18 +88,17 @@ const headCells = [
   },
 ];
 
-function EnhancedTableHead(props) {
-  const {
-    onSelectAllClick,
-    order,
-    orderBy,
-    numSelected,
-    rowCount,
-    onRequestSort,
-  } = props;
+interface EnhancedTableHeadProps {
+  onRequestSort: (property: string) => void;
+  order: "asc" | "desc";
+  orderBy: string;
+}
 
-  const createSortHandler = (property) => (event) => {
-    onRequestSort(event, property);
+function EnhancedTableHead(props: EnhancedTableHeadProps) {
+  const { order, orderBy, onRequestSort } = props;
+
+  const createSortHandler = (property: string) => (event: React.MouseEvent) => {
+    onRequestSort(property);
   };
 
   return (
@@ -127,54 +131,9 @@ function EnhancedTableHead(props) {
 }
 
 EnhancedTableHead.propTypes = {
-  numSelected: PropTypes.number.isRequired,
   onRequestSort: PropTypes.func.isRequired,
-  onSelectAllClick: PropTypes.func.isRequired,
   order: PropTypes.oneOf(["asc", "desc"]).isRequired,
   orderBy: PropTypes.string.isRequired,
-  rowCount: PropTypes.number.isRequired,
-};
-
-function EnhancedTableToolbar(props) {
-  const { numSelected } = props;
-
-  return (
-    <Toolbar
-      sx={{
-        pl: { sm: 2 },
-        pr: { xs: 1, sm: 1 },
-        ...(numSelected > 0 && {
-          bgcolor: (theme) =>
-            alpha(
-              theme.palette.primary.main,
-              theme.palette.action.activatedOpacity
-            ),
-        }),
-      }}
-    >
-      {numSelected > 0 ? (
-        <Typography
-          sx={{ flex: "1 1 100%" }}
-          color="inherit"
-          variant="subtitle1"
-          component="div"
-        >
-          {numSelected} selected
-        </Typography>
-      ) : (
-        <Typography
-          sx={{ flex: "1 1 100%" }}
-          variant="h6"
-          id="tableTitle"
-          component="div"
-        ></Typography>
-      )}
-    </Toolbar>
-  );
-}
-
-EnhancedTableToolbar.propTypes = {
-  numSelected: PropTypes.number.isRequired,
 };
 
 export type CallBack = {
@@ -182,35 +141,33 @@ export type CallBack = {
   user: UserData | null | any;
 };
 
-type Props = {
+interface Props {
   Users: UserData[];
   isLoading?: boolean;
   refetch?: () => void;
   callback?: (data: CallBack) => void;
-};
+}
 
 function TableMember({ Users, isLoading, refetch, callback }: Props) {
   const [order, setOrder] = React.useState<"asc" | "desc">("asc");
   const [orderBy, setOrderBy] = React.useState<string>("name");
-  const [selected, setSelected] = React.useState<number[]>([]);
   const [page, setPage] = React.useState<number>(0);
   const [dense, setDense] = React.useState<boolean>(false);
   const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
-
-  const [selectedUser, setSelectedUser] = React.useState<UserData | null>(null);
+  const [statusFilter, setStatusFilter] = React.useState<
+    "active" | "inactive" | "all"
+  >("all");
 
   const handleEditClick = (user: UserData) => {
-    // console.log("user", user);
     callback({
       action: "edit",
       user,
     });
   };
 
-  const handleDeleteClick = (user: UserData) => {
-    console.log("user", user);
+  const handleDeleteClick = async (user: UserData) => {
     try {
-      Swal.fire({
+      const result = await Swal.fire({
         title: "Are you sure?",
         html:
           "Do you want to remove " +
@@ -223,22 +180,22 @@ function TableMember({ Users, isLoading, refetch, callback }: Props) {
         showCancelButton: true,
         confirmButtonText: "Yes",
         cancelButtonText: "No",
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          const { data } = await axios.put(`/users/${user.id}/disable`);
-
-          if (data) {
-            Swal.fire(
-              "Success!",
-              "Your imaginary file has been deleted.",
-              "success"
-            );
-            if (refetch) refetch();
-          }
-        }
       });
+
+      if (result.isConfirmed) {
+        const { data } = await axios.put(`/users/${user.id}/disable`);
+
+        if (data) {
+          Swal.fire(
+            "Success!",
+            "Your imaginary file has been deleted.",
+            "success"
+          );
+          if (refetch) refetch();
+        }
+      }
     } catch (error) {
-      console.log("error", error);
+      console.error("error", error);
     }
 
     callback({
@@ -247,7 +204,7 @@ function TableMember({ Users, isLoading, refetch, callback }: Props) {
     });
   };
 
-  const handleRequestSort = (event: React.MouseEvent, property: string) => {
+  const handleRequestSort = (property: string) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
@@ -268,20 +225,33 @@ function TableMember({ Users, isLoading, refetch, callback }: Props) {
     setDense(event.target.checked);
   };
 
-  // const isSelected = (id: string) => selected.indexOf(id) !== -1;
+  const handleStatusFilterChange = (
+    event: SelectChangeEvent<"active" | "inactive" | "all">
+  ) => {
+    setStatusFilter(event.target.value as "active" | "inactive" | "all");
+  };
 
   const emptyRows =
     page > 0
       ? Math.max(0, (1 + page) * rowsPerPage - (Users ? Users.length : 0))
       : 0;
 
+  const filteredRows = Users
+    ? Users.filter((user) => {
+        if (statusFilter === "all") return true;
+        if (statusFilter === "active") return user.is_active;
+        if (statusFilter === "inactive") return !user.is_active;
+        return true;
+      })
+    : [];
+
   const visibleRows = React.useMemo(
     () =>
-      stableSort(Users || [], getComparator(order, orderBy)).slice(
+      stableSort(filteredRows, getComparator(order, orderBy)).slice(
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage
       ),
-    [Users, order, orderBy, page, rowsPerPage]
+    [filteredRows, order, orderBy, page, rowsPerPage]
   );
 
   if (isLoading) {
@@ -290,8 +260,24 @@ function TableMember({ Users, isLoading, refetch, callback }: Props) {
 
   return (
     <Box style={{ width: "100%" }}>
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <FormControl style={{marginRight: 50}}>
+          <InputLabel id="status-filter-label">Status</InputLabel>
+          <Select
+            labelId="status-filter-label"
+            label="Status"
+            id="status-filter"
+            value={statusFilter}
+            onChange={handleStatusFilterChange}
+          >
+            <MenuItem value="all">All</MenuItem>
+            <MenuItem value="active">Active</MenuItem>
+            <MenuItem value="inactive">Inactive</MenuItem>
+          </Select>
+        </FormControl>
+      </div>
+
       <Paper style={{ width: "100%", marginBottom: 2 }}>
-        {/* <EnhancedTableToolbar numSelected={selected.length} /> */}
         <TableContainer component={Paper}>
           <Table
             style={{ minWidth: 750 }}
@@ -299,16 +285,12 @@ function TableMember({ Users, isLoading, refetch, callback }: Props) {
             size={dense ? "small" : "medium"}
           >
             <EnhancedTableHead
-              numSelected={selected.length}
               order={order}
               orderBy={orderBy}
-              // onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={visibleRows.length}
             />
             <TableBody>
               {visibleRows.map((row: UserData) => {
-                // const isSelectedRow = isSelected(row.userId);
                 const labelId = `enhanced-table-checkbox-${row.userId}`;
 
                 return (
@@ -328,6 +310,17 @@ function TableMember({ Users, isLoading, refetch, callback }: Props) {
                     </TableCell>
                     <TableCell>{row.email}</TableCell>
                     <TableCell>{row.role}</TableCell>
+                    {row.is_active ? (
+                      <TableCell>
+                        <Badge color="success" variant="dot" sx={{ mr: 2 }} />
+                        Active
+                      </TableCell>
+                    ) : (
+                      <TableCell>
+                        <Badge color="error" variant="dot" sx={{ mr: 2 }} />
+                        Inactive
+                      </TableCell>
+                    )}
                     <TableCell>
                       <IconButton
                         aria-label="edit"
@@ -351,7 +344,7 @@ function TableMember({ Users, isLoading, refetch, callback }: Props) {
                     height: (dense ? 33 : 53) * emptyRows,
                   }}
                 >
-                  <TableCell colSpan={4} />
+                  <TableCell colSpan={5} />
                 </TableRow>
               )}
             </TableBody>
@@ -360,7 +353,7 @@ function TableMember({ Users, isLoading, refetch, callback }: Props) {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={0 || Users.length}
+          count={filteredRows.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
@@ -370,6 +363,7 @@ function TableMember({ Users, isLoading, refetch, callback }: Props) {
       <FormControlLabel
         control={<Switch checked={dense} onChange={handleChangeDense} />}
         label="Dense padding"
+        style={{ marginLeft: 10 }}
       />
     </Box>
   );

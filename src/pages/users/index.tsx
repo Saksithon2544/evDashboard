@@ -9,7 +9,7 @@ import UserDialog from "@/views/dialogs/user-dialogs/UserDialog";
 import EditUserDialog from "@/views/dialogs/user-dialogs/EditUserDialog";
 
 import { useQuery } from "react-query";
-import { User as UserData } from "@/pages/api/user";
+import { User as UserData } from "@/interfaces/User.interface";
 import { useState } from "react";
 import axios from "@/libs/Axios";
 
@@ -48,7 +48,7 @@ const UsersAllTable = () => {
   async function handleUpdate(data: UserData) {
     // console.log("save", data);
     try {
-      await axios.put(`/users`, {
+      await axios.put(`/users/${data.id}`, {
         ...data,
         confirmPassword: data.password, // TODO: remove this line
       });

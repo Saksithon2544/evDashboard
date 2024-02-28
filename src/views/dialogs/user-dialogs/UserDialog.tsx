@@ -9,7 +9,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import { User } from "@/pages/api/user";
+import { User } from "@/interfaces/User.interface";
 import Swal from "sweetalert2";
 
 //  Icons Imports

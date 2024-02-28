@@ -38,11 +38,10 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({
   } = useForm(); // เพิ่มตรงนี้
 
   const handleSave = async (dataForm: User) => {
-    console.log(dataForm);
-    console.log(user);
     
     await axios.put(`/users/${user.id}`, dataForm);
-    // onSave(dataForm);
+    onSave(dataForm);
+    // console.log(dataForm);
     Swal.fire({
       icon: "success",
       title: "Success!",

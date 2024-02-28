@@ -10,7 +10,7 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 
-import { type User } from "@/pages/api/user";
+import { type User } from "@/interfaces/User.interface";
 import Swal from "sweetalert2";
 
 // ** Form Imports
@@ -18,7 +18,6 @@ import { useForm, Controller } from "react-hook-form";
 
 // ** Query Client Provider
 import axios from "@/libs/Axios";
-import { useQuery, useMutation, QueryClient } from "react-query";
 
 type EditUserDialogProps = {
   user: User;
@@ -39,9 +38,11 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({
   } = useForm(); // เพิ่มตรงนี้
 
   const handleSave = async (dataForm: User) => {
+    console.log(dataForm);
+    console.log(user);
     
     await axios.put(`/users/${user.id}`, dataForm);
-    onSave(dataForm);
+    // onSave(dataForm);
     Swal.fire({
       icon: "success",
       title: "Success!",

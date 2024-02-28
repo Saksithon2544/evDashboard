@@ -24,7 +24,7 @@ import MenuItem from "@mui/material/MenuItem";
 import { SelectChangeEvent } from "@mui/material/Select";
 
 import { visuallyHidden } from "@mui/utils";
-import { User as UserData } from "@/pages/api/user";
+import { User as UserData } from "@/interfaces/User.interface";
 import axios from "@/libs/Axios";
 
 function descendingComparator(a: any, b: any, orderBy: string) {

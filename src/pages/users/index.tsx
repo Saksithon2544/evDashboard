@@ -45,17 +45,17 @@ const UsersAllTable = () => {
     }
   }
 
-  async function handleUpdate(data: UserData) {
-    // console.log("save", data);
-    try {
-      await axios.put(`/users/${data.id}`, {
-        ...data,
-        confirmPassword: data.password, // TODO: remove this line
-      });
+  // async function handleUpdate(data: UserData) {
+  //   // console.log("save", data);
+  //   try {
+  //     await axios.put(`/users/${data.id}`, {
+  //       ...data,
+  //       confirmPassword: data.password, // TODO: remove this line
+  //     });
 
-      refetch();
-    } catch (error) {}
-  }
+  //     refetch();
+  //   } catch (error) {}
+  // }
 
   return (
     <Grid container>
@@ -65,7 +65,7 @@ const UsersAllTable = () => {
         <EditUserDialog
           user={selectedUser}
           onClose={handleCloseMoadal}
-          onSave={handleUpdate}
+          onSave={() => refetch()}
         />
       </Grid>
       <Grid item xs={12}>

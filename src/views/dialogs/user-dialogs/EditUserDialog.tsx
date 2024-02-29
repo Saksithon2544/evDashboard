@@ -22,7 +22,7 @@ import axios from "@/libs/Axios";
 type EditUserDialogProps = {
   user: User;
   onClose?: () => void;
-  onSave?: (updatedUser: User) => void;
+  onSave?: (bool:boolean) => void;
 };
 
 const EditUserDialog: React.FC<EditUserDialogProps> = ({
@@ -37,17 +37,31 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({
     formState: { errors }, // เพิ่มตรงนี้
   } = useForm(); // เพิ่มตรงนี้
 
-  const handleSave = async (dataForm: User) => {
-    
-    await axios.put(`/users/${user.id}`, dataForm);
-    onSave(dataForm);
-    // console.log(dataForm);
-    Swal.fire({
-      icon: "success",
-      title: "Success!",
-      text: "User has been updated.",
-    });
+  const [isLoading, setIsLoading] = React.useState(false);
 
+  const handleSave = async (dataForm: User) => {
+    try {
+      setIsLoading(true);
+
+      await axios.put(`/users/${user.id}`, dataForm);
+      // onSave(dataForm);
+      // console.log(dataForm);
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: "User has been updated.",
+      });
+
+      onSave(true);
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error,
+      });
+    } finally {
+      setIsLoading(false);
+    }
     onClose();
   };
 
@@ -99,7 +113,13 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({
           <Controller
             name="email"
             control={control}
-            rules={{ required: "Email is required", pattern: { value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i, message: "Invalid email address" } }} // เพิ่ม rules สำหรับ validation
+            rules={{
+              required: "Email is required",
+              pattern: {
+                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                message: "Invalid email address",
+              },
+            }} // เพิ่ม rules สำหรับ validation
             render={({ field }) => (
               <TextField
                 margin="dense"
@@ -124,7 +144,9 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({
                 fullWidth
                 {...field}
                 error={!!errors.phoneNumber} // เพิ่มส่วนนี้เพื่อแสดง error หากมีการ validate ไม่ผ่าน
-                helperText={errors.phoneNumber ? errors.phoneNumber.message : null} // เพิ่มส่วนนี้เพื่อแสดงข้อความ error
+                helperText={
+                  errors.phoneNumber ? errors.phoneNumber.message : null
+                } // เพิ่มส่วนนี้เพื่อแสดงข้อความ error
               />
             )}
           />
@@ -176,8 +198,16 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({
         </form>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button type="submit" onClick={handleSubmit(handleSave)}>Save</Button>
+        <Button onClick={onClose} disabled={isLoading}>
+          Cancel
+        </Button>
+        <Button
+          type="submit"
+          onClick={handleSubmit(handleSave)}
+          disabled={isLoading}
+        >
+          {isLoading ? "Loading" : "Save"}
+        </Button>
       </DialogActions>
     </Dialog>
   );

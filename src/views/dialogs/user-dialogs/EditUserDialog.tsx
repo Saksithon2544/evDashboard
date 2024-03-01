@@ -44,8 +44,7 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({
       setIsLoading(true);
 
       await axios.put(`/users/${user.id}`, dataForm);
-      // onSave(dataForm);
-      // console.log(dataForm);
+
       Swal.fire({
         icon: "success",
         title: "Success!",

@@ -10,6 +10,7 @@ import TabPanel from "@mui/lab/TabPanel";
 import TabContext from "@mui/lab/TabContext";
 import { styled } from "@mui/material/styles";
 import MuiTab, { TabProps } from "@mui/material/Tab";
+import Swal from "sweetalert2";
 
 // ** Icons Imports
 import AccountOutline from "mdi-material-ui/AccountOutline";
@@ -70,11 +71,68 @@ const AccountSettings = () => {
 
   async function handleUpdate(data: UserData) {
     try {
-      await axios.put(`/users`, data);
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You are about to update your data",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+        cancelButtonColor: "red",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          await axios.put(`/users`, data);
+          refetch();
 
-      refetch();
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: "Data has been updated successfully!",
+          });
+        }
+      });
     } catch (error) {
       console.log(error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "An error occurred while updating data.",
+      });
+    }
+  }
+
+  async function handleUpdatePassword(data: any) {
+    try {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You are about to update your password",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+        cancelButtonColor: "red",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          await axios.put(`/users/password`, {
+            ...User,
+            ...data
+          });
+          refetch();
+
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: "Password has been updated successfully!",
+          });
+        }
+      });
+    } catch (error) {
+      console.log(error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "An error occurred while updating password.",
+      });
     }
   }
 
@@ -105,7 +163,7 @@ const AccountSettings = () => {
               </Box>
             }
           />
-          <Tab
+          {/* <Tab
             value="info"
             label={
               <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -113,7 +171,7 @@ const AccountSettings = () => {
                 <TabName>Info</TabName>
               </Box>
             }
-          />
+          /> */}
         </TabList>
 
         {isLoading ? (
@@ -126,11 +184,11 @@ const AccountSettings = () => {
               <TabAccount User={User} onSaved={handleUpdate} />
             </TabPanel>
             <TabPanel sx={{ p: 0 }} value="security">
-              <TabSecurity />
+              <TabSecurity User={User} onSaved={handleUpdatePassword} />
             </TabPanel>
-            <TabPanel sx={{ p: 0 }} value="info">
+            {/* <TabPanel sx={{ p: 0 }} value="info">
               <TabInfo />
-            </TabPanel>
+            </TabPanel> */}
           </div>
         )}
       </TabContext>

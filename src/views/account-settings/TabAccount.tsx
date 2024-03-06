@@ -146,6 +146,7 @@ const TabAccount = ({ User,onSaved }: TabAccountProps) => {
             <Controller
               name="email"
               control={control}
+              disabled
               render={({ field }) => (
                 <TextField
                   {...field}
@@ -185,9 +186,6 @@ const TabAccount = ({ User,onSaved }: TabAccountProps) => {
           <Grid item xs={12}>
             <Button type="submit" variant="contained" sx={{ marginRight: 3.5 }}>
               Save Changes
-            </Button>
-            <Button type="reset" variant="outlined" color="secondary">
-              Reset
             </Button>
           </Grid>
         </Grid>

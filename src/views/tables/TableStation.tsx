@@ -11,7 +11,6 @@ import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
-import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
@@ -22,16 +21,9 @@ import EditIcon from "@mui/icons-material/Edit";
 import Swal from "sweetalert2";
 
 import { visuallyHidden } from "@mui/utils";
-import { Station as StationData } from "@/pages/api/stations";
+import { Station as StationData } from "@/pages/api/stations1";
+import axios from "@/libs/Axios";
 
-function createData(
-  name: string,
-  location: string,
-  status: string,
-  created: string
-) {
-  return { name, location, status, created };
-}
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -94,17 +86,24 @@ const headCells = [
   },
 ];
 
-function EnhancedTableHead(props) {
+interface EnhancedTableProps {
+  onRequestSort: (
+    event: React.MouseEvent,
+    property: string
+  ) => void;
+  order: "asc" | "desc";
+  orderBy: string;
+  rowCount: number;
+}
+
+function EnhancedTableHead(props: EnhancedTableProps) {
   const {
-    onSelectAllClick,
     order,
     orderBy,
-    numSelected,
-    rowCount,
     onRequestSort,
   } = props;
 
-  const createSortHandler = (property) => (event) => {
+  const createSortHandler = (property: string) => (event: React.MouseEvent) => {
     onRequestSort(event, property);
   };
 
@@ -138,54 +137,10 @@ function EnhancedTableHead(props) {
 }
 
 EnhancedTableHead.propTypes = {
-  numSelected: PropTypes.number.isRequired,
   onRequestSort: PropTypes.func.isRequired,
-  onSelectAllClick: PropTypes.func.isRequired,
   order: PropTypes.oneOf(["asc", "desc"]).isRequired,
   orderBy: PropTypes.string.isRequired,
   rowCount: PropTypes.number.isRequired,
-};
-
-function EnhancedTableToolbar(props) {
-  const { numSelected } = props;
-
-  return (
-    <Toolbar
-      sx={{
-        pl: { sm: 2 },
-        pr: { xs: 1, sm: 1 },
-        ...(numSelected > 0 && {
-          bgcolor: (theme) =>
-            alpha(
-              theme.palette.primary.main,
-              theme.palette.action.activatedOpacity
-            ),
-        }),
-      }}
-    >
-      {numSelected > 0 ? (
-        <Typography
-          sx={{ flex: "1 1 100%" }}
-          color="inherit"
-          variant="subtitle1"
-          component="div"
-        >
-          {numSelected} selected
-        </Typography>
-      ) : (
-        <Typography
-          sx={{ flex: "1 1 100%" }}
-          variant="h6"
-          id="tableTitle"
-          component="div"
-        ></Typography>
-      )}
-    </Toolbar>
-  );
-}
-
-EnhancedTableToolbar.propTypes = {
-  numSelected: PropTypes.number.isRequired,
 };
 
 export type CallBack = {
@@ -203,14 +158,10 @@ type Props = {
 function TableStation({ Stations, isLoading, refetch, callback }: Props) {
   const [order, setOrder] = React.useState<"asc" | "desc">("asc");
   const [orderBy, setOrderBy] = React.useState<string>("name");
-  const [selected, setSelected] = React.useState<number[]>([]);
   const [page, setPage] = React.useState<number>(0);
   const [dense, setDense] = React.useState<boolean>(false);
   const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
 
-  const [selectedUser, setSelectedUser] = React.useState<StationData | null>(
-    null
-  );
 
   const handleEditClick = (station: StationData) => {
     // console.log("station", station);
@@ -236,14 +187,7 @@ function TableStation({ Stations, isLoading, refetch, callback }: Props) {
         cancelButtonText: "No",
       }).then(async (result) => {
         if (result.isConfirmed) {
-          const res = await fetch(`/api/station`, {
-            method: "DELETE",
-            body: JSON.stringify({
-              stationId: station.stationId,
-            }),
-          });
-          const data = await res.json();
-          // console.log("data", data);
+          const data = await axios.put(`/stations/${station.stationId}`);
 
           if (data) {
             Swal.fire(
@@ -309,7 +253,6 @@ function TableStation({ Stations, isLoading, refetch, callback }: Props) {
   return (
     <Box style={{ width: "100%" }}>
       <Paper style={{ width: "100%", marginBottom: 2 }}>
-        {/* <EnhancedTableToolbar numSelected={selected.length} /> */}
         <TableContainer component={Paper}>
           <Table
             style={{ minWidth: 750 }}
@@ -317,7 +260,6 @@ function TableStation({ Stations, isLoading, refetch, callback }: Props) {
             size={dense ? "small" : "medium"}
           >
             <EnhancedTableHead
-              numSelected={selected.length}
               order={order}
               orderBy={orderBy}
               // onSelectAllClick={handleSelectAllClick}

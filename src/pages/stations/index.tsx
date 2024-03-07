@@ -9,7 +9,7 @@ import AddStationDialog from "@/views/dialogs/station-dialogs/AddStationDialog";
 import EditStationDialog from "@/views/dialogs/station-dialogs/EditStationDialog";
 
 import { useQuery } from "react-query";
-import { Station as StationData } from "@/pages/api/stations";
+import { Station as StationData } from "@/pages/api/stations1";
 import { useState } from "react";
 import axios from "@/libs/Axios";
 
@@ -21,8 +21,8 @@ const StationsAllTable = () => {
     isLoading,
     refetch,
   } = useQuery<StationData[]>("stations", async () => {
-    const res = await fetch("/api/station/");
-    const data = await res.json();
+    const res = await axios.get("/stations");
+    const data = await res.data;
     return data;
   });
 
@@ -44,17 +44,17 @@ const StationsAllTable = () => {
     }
   }
 
-  async function handleSave(data: StationData) {
-    // console.log("save", data);
-    try {
-      const res = await axios.put(`/station`, data);
-      const resData = await res.data;
+  // async function handleSave(data: StationData) {
+  //   // console.log("save", data);
+  //   try {
+  //     const res = await axios.put(`/stations`, data);
+  //     const resData = await res.data;
 
-      // console.log("resData", resData);
+  //     // console.log("resData", resData);
 
-      refetch();
-    } catch (error) {}
-  }
+  //     refetch();
+  //   } catch (error) {}
+  // }
 
   return (
     <Grid container>
@@ -64,7 +64,7 @@ const StationsAllTable = () => {
         <EditStationDialog
           station={selectedStation}
           onClose={handleCloseMoadal}
-          onSave={handleSave} 
+          onSave={() => refetch()} 
         />
       </Grid>
       <Grid item xs={12}>

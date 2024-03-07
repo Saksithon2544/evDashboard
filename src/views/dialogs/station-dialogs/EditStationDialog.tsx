@@ -9,7 +9,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import { type Station } from "@/pages/api/stations";
+import { type Station } from "@/pages/api/stations1";
 // import { type Station } from "@/pages/api/station";
 import Swal from "sweetalert2";
 

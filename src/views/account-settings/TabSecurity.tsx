@@ -26,8 +26,8 @@ interface State {
   oldPassword?: string;
   showNewPassword?: boolean;
   confirmPassword?: string;
-  showCurrentPassword?: boolean;
-  showConfirmNewPassword?: boolean;
+  showoldPassword?: boolean;
+  showConfirmPassword?: boolean;
 }
 
 type TabSecurityProps = {
@@ -44,8 +44,8 @@ const TabSecurity = ({ User, onSaved }: TabSecurityProps) => {
     oldPassword: "",
     showNewPassword: false,
     confirmPassword: "",
-    showCurrentPassword: false,
-    showConfirmNewPassword: false,
+    showoldPassword: false,
+    showConfirmPassword: false,
   });
 
   // Handle Current Password
@@ -54,7 +54,7 @@ const TabSecurity = ({ User, onSaved }: TabSecurityProps) => {
       setValues({ ...values, [prop]: event.target.value });
     };
   const handleClickShowCurrentPassword = () => {
-    setValues({ ...values, showCurrentPassword: !values.showCurrentPassword });
+    setValues({ ...values, showoldPassword: !values.showoldPassword });
   };
   const handleMouseDownCurrentPassword = (
     event: MouseEvent<HTMLButtonElement>
@@ -82,7 +82,7 @@ const TabSecurity = ({ User, onSaved }: TabSecurityProps) => {
   const handleClickShowConfirmNewPassword = () => {
     setValues({
       ...values,
-      showConfirmNewPassword: !values.showConfirmNewPassword,
+      showConfirmPassword: !values.showConfirmPassword,
     });
   };
   const handleMouseDownConfirmNewPassword = (
@@ -120,7 +120,7 @@ const TabSecurity = ({ User, onSaved }: TabSecurityProps) => {
                     label="Current Password"
                     value={values.oldPassword}
                     id="account-settings-current-password"
-                    type={values.showCurrentPassword ? "text" : "password"}
+                    type={values.showoldPassword ? "text" : "password"}
                     onChange={handleCurrentPasswordChange("oldPassword")}
                     endAdornment={
                       <InputAdornment position="end">
@@ -130,7 +130,7 @@ const TabSecurity = ({ User, onSaved }: TabSecurityProps) => {
                           onClick={handleClickShowCurrentPassword}
                           onMouseDown={handleMouseDownCurrentPassword}
                         >
-                          {values.showCurrentPassword ? (
+                          {values.showoldPassword ? (
                             <EyeOutline />
                           ) : (
                             <EyeOffOutline />
@@ -182,7 +182,7 @@ const TabSecurity = ({ User, onSaved }: TabSecurityProps) => {
                     label="Confirm New Password"
                     value={values.confirmPassword}
                     id="account-settings-confirm-new-password"
-                    type={values.showConfirmNewPassword ? "text" : "password"}
+                    type={values.showConfirmPassword ? "text" : "password"}
                     onChange={handleConfirmNewPasswordChange(
                       "confirmPassword"
                     )}
@@ -194,7 +194,7 @@ const TabSecurity = ({ User, onSaved }: TabSecurityProps) => {
                           onClick={handleClickShowConfirmNewPassword}
                           onMouseDown={handleMouseDownConfirmNewPassword}
                         >
-                          {values.showConfirmNewPassword ? (
+                          {values.showConfirmPassword ? (
                             <EyeOutline />
                           ) : (
                             <EyeOffOutline />

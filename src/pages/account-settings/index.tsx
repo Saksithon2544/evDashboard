@@ -114,7 +114,12 @@ const AccountSettings = () => {
       }).then(async (result) => {
         if (result.isConfirmed) {
           await axios.put(`/users/password`, {
-            ...User,
+            firstName: User?.firstName,
+            lastName: User?.lastName,
+            phoneNumber: User?.phoneNumber,
+            email: User?.email,
+            role: User?.role,
+            is_active: User?.is_active,
             ...data
           });
           refetch();

@@ -22,10 +22,10 @@ import { User as UserData } from "@/interfaces/User.interface";
 import { on } from "events";
 
 interface State {
-  newPassword?: string;
-  currentPassword?: string;
+  password?: string;
+  oldPassword?: string;
   showNewPassword?: boolean;
-  confirmNewPassword?: string;
+  confirmPassword?: string;
   showCurrentPassword?: boolean;
   showConfirmNewPassword?: boolean;
 }
@@ -40,10 +40,10 @@ const TabSecurity = ({ User, onSaved }: TabSecurityProps) => {
 
   // ** States
   const [values, setValues] = useState<State>({
-    newPassword: "",
-    currentPassword: "",
+    password: "",
+    oldPassword: "",
     showNewPassword: false,
-    confirmNewPassword: "",
+    confirmPassword: "",
     showCurrentPassword: false,
     showConfirmNewPassword: false,
   });
@@ -93,9 +93,9 @@ const TabSecurity = ({ User, onSaved }: TabSecurityProps) => {
 
   const onSubmit = async () => {
     onSaved({
-        confirmNewPassword: values.confirmNewPassword,
-        currentPassword: values.currentPassword,
-        newPassword: values.newPassword,
+      oldPassword: values.oldPassword,
+      password: values.password,
+      confirmPassword: values.confirmPassword,
     });
   };
 
@@ -118,10 +118,10 @@ const TabSecurity = ({ User, onSaved }: TabSecurityProps) => {
                   </InputLabel>
                   <OutlinedInput
                     label="Current Password"
-                    value={values.currentPassword}
+                    value={values.oldPassword}
                     id="account-settings-current-password"
                     type={values.showCurrentPassword ? "text" : "password"}
-                    onChange={handleCurrentPasswordChange("currentPassword")}
+                    onChange={handleCurrentPasswordChange("oldPassword")}
                     endAdornment={
                       <InputAdornment position="end">
                         <IconButton
@@ -149,9 +149,9 @@ const TabSecurity = ({ User, onSaved }: TabSecurityProps) => {
                   </InputLabel>
                   <OutlinedInput
                     label="New Password"
-                    value={values.newPassword}
+                    value={values.password}
                     id="account-settings-new-password"
-                    onChange={handleNewPasswordChange("newPassword")}
+                    onChange={handleNewPasswordChange("password")}
                     type={values.showNewPassword ? "text" : "password"}
                     endAdornment={
                       <InputAdornment position="end">
@@ -180,11 +180,11 @@ const TabSecurity = ({ User, onSaved }: TabSecurityProps) => {
                   </InputLabel>
                   <OutlinedInput
                     label="Confirm New Password"
-                    value={values.confirmNewPassword}
+                    value={values.confirmPassword}
                     id="account-settings-confirm-new-password"
                     type={values.showConfirmNewPassword ? "text" : "password"}
                     onChange={handleConfirmNewPasswordChange(
-                      "confirmNewPassword"
+                      "confirmPassword"
                     )}
                     endAdornment={
                       <InputAdornment position="end">
@@ -243,9 +243,9 @@ const TabSecurity = ({ User, onSaved }: TabSecurityProps) => {
             onClick={() =>
               setValues({
                 ...values,
-                currentPassword: "",
-                newPassword: "",
-                confirmNewPassword: "",
+                oldPassword: "",
+                password: "",
+                confirmPassword: "",
               })
             }
           >

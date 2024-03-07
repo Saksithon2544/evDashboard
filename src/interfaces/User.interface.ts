@@ -6,7 +6,7 @@ export type User = {
     password: string,
     confirmPassword:string,
     email: string,
-    phone: string,
+    phoneNumber: string,
     role: string,
     is_deleted?: boolean
     is_active?: boolean

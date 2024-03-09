@@ -21,7 +21,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import Swal from "sweetalert2";
 
 import { visuallyHidden } from "@mui/utils";
-import { Station as StationData } from "@/pages/api/stations1";
+import { Station as StationData } from "@/interfaces/Station.interface";
 import axios from "@/libs/Axios";
 
 
@@ -93,7 +93,6 @@ interface EnhancedTableProps {
   ) => void;
   order: "asc" | "desc";
   orderBy: string;
-  rowCount: number;
 }
 
 function EnhancedTableHead(props: EnhancedTableProps) {
@@ -140,7 +139,6 @@ EnhancedTableHead.propTypes = {
   onRequestSort: PropTypes.func.isRequired,
   order: PropTypes.oneOf(["asc", "desc"]).isRequired,
   orderBy: PropTypes.string.isRequired,
-  rowCount: PropTypes.number.isRequired,
 };
 
 export type CallBack = {
@@ -187,7 +185,7 @@ function TableStation({ Stations, isLoading, refetch, callback }: Props) {
         cancelButtonText: "No",
       }).then(async (result) => {
         if (result.isConfirmed) {
-          const data = await axios.put(`/stations/${station.stationId}`);
+          const data = await axios.put(`/stations/${station.id}`);
 
           if (data) {
             Swal.fire(
@@ -264,19 +262,18 @@ function TableStation({ Stations, isLoading, refetch, callback }: Props) {
               orderBy={orderBy}
               // onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={visibleRows.length}
             />
             <TableBody>
               {visibleRows.map((row: StationData) => {
-                // const isSelectedRow = isSelected(row.stationId);
-                const labelId = `enhanced-table-checkbox-${row.stationId}`;
+                // const isSelectedRow = isSelected(row.id);
+                const labelId = `enhanced-table-checkbox-${row.id}`;
 
                 return (
                   <TableRow
                     hover
                     role="checkbox"
                     tabIndex={-1}
-                    key={row.stationId}
+                    key={row.id}
                   >
                     <TableCell
                       component="th"
@@ -287,10 +284,10 @@ function TableStation({ Stations, isLoading, refetch, callback }: Props) {
                       {row.name}
                     </TableCell>
                     <TableCell>
-                      {row.location.lat},{row.location.lng}
+                      {row.location},{row.location}
 
                     </TableCell>
-                    {row.status === "online" ? (
+                    {/* {row.status === "online" ? (
                       <TableCell>
                         <Badge color="success" variant="dot" sx={{mr:2}} />
                         {row.status}
@@ -300,10 +297,10 @@ function TableStation({ Stations, isLoading, refetch, callback }: Props) {
                         <Badge color="error" variant="dot" sx={{mr:2}} />
                         {row.status}
                       </TableCell>
-                    )}
+                    )} */}
                     
                     {/* <TableCell>{row.status}</TableCell> */}
-                    <TableCell>{row.created}</TableCell>
+                    <TableCell>{row.created_at}</TableCell>
                     <TableCell>
                       <IconButton
                         aria-label="edit"
@@ -336,7 +333,7 @@ function TableStation({ Stations, isLoading, refetch, callback }: Props) {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={0 || Stations.length}
+          count={Stations.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}

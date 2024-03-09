@@ -9,7 +9,7 @@ import AddStationDialog from "@/views/dialogs/station-dialogs/AddStationDialog";
 import EditStationDialog from "@/views/dialogs/station-dialogs/EditStationDialog";
 
 import { useQuery } from "react-query";
-import { Station as StationData } from "@/pages/api/stations1";
+import { Station as StationData } from "@/interfaces/Station.interface";
 import { useState } from "react";
 import axios from "@/libs/Axios";
 

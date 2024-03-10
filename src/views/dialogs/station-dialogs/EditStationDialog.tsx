@@ -9,6 +9,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+
 import { type Station } from "@/interfaces/Station.interface";
 import Swal from "sweetalert2";
 
@@ -30,34 +31,39 @@ const EditStationDialog: React.FC<EditStationDialogProps> = ({
   onClose,
   onSave,
 }) => {
-  const handleSave = (dataForm: Station) => {
-    onSave(dataForm);
-    Swal.fire({
-      icon: "success",
-      title: "Success!",
-      text: "Station has been updated.",
-    });
+  const {
+    control,
+    reset,
+    handleSubmit,
+    formState: { errors }, // เพิ่มตรงนี้
+  } = useForm(); // เพิ่มตรงนี้
 
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  const handleSave = async (dataForm: Station) => {
+    try {
+      setIsLoading(true);
+
+      await axios.put(`/stations/${station.id}`, dataForm);
+
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: "Station has been updated.",
+      });
+
+      onSave(dataForm);
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error,
+      });
+    } finally {
+      setIsLoading(false);
+    }
     onClose();
   };
-
-  // const { data: Stations, isLoading } = useQuery<Station[]>("stations", () => {
-  //   return fetch("/api/stations")
-  //     .then((res) => res.json())
-  //     .then((data) => data);
-  // });
-
-  const { data: Stations, isLoading } = useQuery<Station[]>(
-    "stations",
-    async () => {
-      const res = await axios.put("/stations");
-      const data = res.data;
-      return data;
-    }
-  );
-
-  const { control, reset, handleSubmit, watch, setValue } = useForm();
-  const roleWatch = watch("role");
 
   React.useEffect(() => {
     if (station) {

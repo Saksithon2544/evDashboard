@@ -185,7 +185,7 @@ function TableStation({ Stations=[], isLoading, refetch, callback }: Props) {
         cancelButtonText: "No",
       }).then(async (result) => {
         if (result.isConfirmed) {
-          const data = await axios.put(`/stations/${station.id}`);
+          const data = await axios.delete(`/stations/${station.id}`);
 
           if (data) {
             Swal.fire(

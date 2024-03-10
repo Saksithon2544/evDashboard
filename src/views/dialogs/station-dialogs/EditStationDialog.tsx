@@ -16,7 +16,7 @@ import Swal from "sweetalert2";
 import { useForm, Controller } from "react-hook-form";
 
 // ** Query Client Provider
-import axios from "axios";
+import axios from "@/libs/Axios";
 import { useQuery, useMutation, QueryClient } from "react-query";
 
 type EditStationDialogProps = {
@@ -50,7 +50,7 @@ const EditStationDialog: React.FC<EditStationDialogProps> = ({
   const { data: Stations, isLoading } = useQuery<Station[]>(
     "stations",
     async () => {
-      const res = await axios.put("/api/stations");
+      const res = await axios.put("/stations");
       const data = res.data;
       return data;
     }
@@ -85,7 +85,7 @@ const EditStationDialog: React.FC<EditStationDialogProps> = ({
           )}
         />
         <Controller
-          name="location.lat"
+          name="location[0]"
           control={control}
           render={({ field }) => (
             <TextField
@@ -98,7 +98,7 @@ const EditStationDialog: React.FC<EditStationDialogProps> = ({
           )}
         />
         <Controller
-          name="location.lng"
+          name="location[1]"
           control={control}
           render={({ field }) => (
             <TextField

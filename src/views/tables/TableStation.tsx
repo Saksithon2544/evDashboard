@@ -153,7 +153,7 @@ type Props = {
   callback?: (data: CallBack) => void;
 };
 
-function TableStation({ Stations, isLoading, refetch, callback }: Props) {
+function TableStation({ Stations=[], isLoading, refetch, callback }: Props) {
   const [order, setOrder] = React.useState<"asc" | "desc">("asc");
   const [orderBy, setOrderBy] = React.useState<string>("name");
   const [page, setPage] = React.useState<number>(0);
@@ -284,10 +284,10 @@ function TableStation({ Stations, isLoading, refetch, callback }: Props) {
                       {row.name}
                     </TableCell>
                     <TableCell>
-                      {row.location},{row.location}
+                      {row.location[0]},{row.location[1]}
 
                     </TableCell>
-                    {/* {row.status === "online" ? (
+                    {row.status === "online" ? (
                       <TableCell>
                         <Badge color="success" variant="dot" sx={{mr:2}} />
                         {row.status}
@@ -297,7 +297,7 @@ function TableStation({ Stations, isLoading, refetch, callback }: Props) {
                         <Badge color="error" variant="dot" sx={{mr:2}} />
                         {row.status}
                       </TableCell>
-                    )} */}
+                    )}
                     
                     {/* <TableCell>{row.status}</TableCell> */}
                     <TableCell>{row.created_at}</TableCell>

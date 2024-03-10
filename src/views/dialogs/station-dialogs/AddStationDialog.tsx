@@ -20,7 +20,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { useForm, Controller } from "react-hook-form";
 
 // ** Query Client Provider
-import axios from "axios";
+import axios from "@/libs/Axios";
 import { useQuery, useMutation, QueryClient } from "react-query";
 
 type Props = {
@@ -30,8 +30,8 @@ type Props = {
 export default function StationDialog({ callback }) {
   //ดึงข้อมูลจาก api/stations มาแสดง
   const { data: Stations, isLoading } = useQuery<Station[]>("stations", async () => {
-    const res = await fetch("/api/stations");
-    const data = await res.json();
+    const res = await axios.get("/stations");
+    const data = await res.data;
     return data;
   });
 
@@ -41,7 +41,7 @@ export default function StationDialog({ callback }) {
   // สร้าง mutation ขึ้นมา เพื่อใช้ในการเรียก api/user และ invalidateQueries เพื่อให้ render ใหม่
   const { mutate } = useMutation<Station>({
     mutationFn: async (article) => {
-      return await axios.post("/api/stations", article);
+      return await axios.post("/stations", article);
     },
     onSuccess: async (data) => {
       console.log("data", data); // data is displayed, onSuccess is called
@@ -68,10 +68,7 @@ export default function StationDialog({ callback }) {
   const handleClose = () => {
     reset({
       name: "",
-      location: {
-        lat: "",
-        lng: "",
-      },
+      location:[],
       status: "online",
       created: "",
     });
@@ -137,7 +134,7 @@ export default function StationDialog({ callback }) {
             )}
           />
           <Controller
-            name="location.lat"
+            name="location[0]"
             control={control}
             render={({ field }) => (
               <TextField
@@ -150,7 +147,7 @@ export default function StationDialog({ callback }) {
             )}
           />
           <Controller
-            name="location.lng"
+            name="location[1]"
             control={control}
             render={({ field }) => (
               <TextField

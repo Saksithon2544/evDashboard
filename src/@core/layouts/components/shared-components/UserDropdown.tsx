@@ -33,6 +33,18 @@ const BadgeContentSpan = styled("span")(({ theme }) => ({
   boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
 }));
 
+function logout() {
+  try {
+    // Destroy token here (example: remove from localStorage)
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("token_type");
+    // Redirect or do other actions as necessary
+    location.href = "/";
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 const UserDropdown = () => {
   // ** States
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
@@ -63,15 +75,7 @@ const UserDropdown = () => {
       cancelButtonColor: "red",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        try {
-          // Destroy token here (example: remove from localStorage)
-          localStorage.removeItem("access_token");
-          localStorage.removeItem("token_type");
-          // Redirect or do other actions as necessary
-          router.push("/");
-        } catch (error) {
-          console.log(error);
-        }
+        logout();
       }
     });
   };
@@ -194,3 +198,4 @@ const UserDropdown = () => {
 };
 
 export default UserDropdown;
+export { logout };

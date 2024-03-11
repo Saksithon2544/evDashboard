@@ -4,7 +4,7 @@ import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
 
 // ** Demo Components Imports
-import TableStation, { type CallBack } from "src/views/tables/TableStation";
+import TableadminStation, { type CallBack } from "src/views/tables/TableadminStation";
 import AddStationDialog from "@/views/dialogs/station-dialogs/AddStationDialog";
 import EditStationDialog from "@/views/dialogs/station-dialogs/EditStationDialog";
 
@@ -44,18 +44,6 @@ const StationsAllTable = () => {
     }
   }
 
-  // async function handleSave(data: StationData) {
-  //   // console.log("save", data);
-  //   try {
-  //     const res = await axios.put(`/stations`, data);
-  //     const resData = await res.data;
-
-  //     // console.log("resData", resData);
-
-  //     refetch();
-  //   } catch (error) {}
-  // }
-
   return (
     <Grid container>
       <Grid item xs={12}>
@@ -69,9 +57,9 @@ const StationsAllTable = () => {
       </Grid>
       <Grid item xs={12}>
         <Card>
-          <CardHeader title="Station" titleTypographyProps={{ variant: "h6" }} />
+          <CardHeader title="Admin Stations" titleTypographyProps={{ variant: "h6" }} />
           {/* <TableNutrition /> */}
-          {!isLoading && <TableStation Stations={Stations} callback={handleTable} />}
+          {!isLoading && <TableadminStation Stations={Stations} callback={handleTable} />}
         </Card>
       </Grid>
     </Grid>

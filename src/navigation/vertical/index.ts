@@ -18,6 +18,9 @@ import CubeOutline from 'mdi-material-ui/CubeOutline'
 
 // ** Type import
 import { VerticalNavItemsType } from 'src/@core/layouts/types'
+import { Logout } from 'mdi-material-ui'
+
+import Swal from 'sweetalert2'
 
 const navigation = (): VerticalNavItemsType => {
   return [
@@ -60,27 +63,27 @@ const navigation = (): VerticalNavItemsType => {
       icon: HistoryEduOutlined,
       path: '/transactions',
     },
-    {
-      sectionTitle: 'Pages'
-    },
-    {
-      title: 'Login',
-      icon: Login,
-      path: '/',
-      openInNewTab: true
-    },
-    {
-      title: 'Register',
-      icon: AccountPlusOutline,
-      path: '/register',
-      openInNewTab: true
-    },
-    {
-      title: 'Error',
-      icon: AlertCircleOutline,
-      path: '/error',
-      openInNewTab: true
-    },
+    // {
+    //   sectionTitle: 'Pages'
+    // },
+    // {
+    //   title: 'Login',
+    //   icon: Login,
+    //   path: '/',
+    //   openInNewTab: true
+    // },
+    // {
+    //   title: 'Register',
+    //   icon: AccountPlusOutline,
+    //   path: '/register',
+    //   openInNewTab: true
+    // },
+    // {
+    //   title: 'Error',
+    //   icon: AlertCircleOutline,
+    //   path: '/error',
+    //   openInNewTab: true
+    // },
 
     // {
     //   sectionTitle: 'User Interface'

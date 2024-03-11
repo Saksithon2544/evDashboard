@@ -9,7 +9,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import { Station } from "@/pages/api/stations1";
+import { type Station } from "@/interfaces/Station.interface";
 // import { Station } from "@/pages/api/user";
 import Swal from "sweetalert2";
 
@@ -22,39 +22,13 @@ import { useForm, Controller } from "react-hook-form";
 // ** Query Client Provider
 import axios from "@/libs/Axios";
 import { useQuery, useMutation, QueryClient } from "react-query";
+import { ok } from "assert";
 
 type Props = {
   callback?: () => void;
 };
 
 export default function StationDialog({ callback }) {
-  //ดึงข้อมูลจาก api/stations มาแสดง
-  const { data: Stations, isLoading } = useQuery<Station[]>("stations", async () => {
-    const res = await axios.get("/stations");
-    const data = await res.data;
-    return data;
-  });
-
-  // สร้าง queryClient ขึ้นมา เพื่อใช้ในการ invalidateQueries หลังจาก mutate แล้ว จะได้ render ใหม่ แสดงข้อมูลล่าสุด
-  const queryClient = new QueryClient();
-
-  // สร้าง mutation ขึ้นมา เพื่อใช้ในการเรียก api/user และ invalidateQueries เพื่อให้ render ใหม่
-  const { mutate } = useMutation<Station>({
-    mutationFn: async (article) => {
-      return await axios.post("/stations", article);
-    },
-    onSuccess: async (data) => {
-      console.log("data", data); // data is displayed, onSuccess is called
-      // refetch data after mutation other queries
-      
-      await queryClient.refetchQueries(["posts"], { active: true });
-      
-      if(callback) callback(true);
-
-      handleClose();
-    },
-  });
-
   const { control, reset, handleSubmit, watch, setValue } = useForm();
 
   const roleWatch = watch("role");
@@ -68,45 +42,41 @@ export default function StationDialog({ callback }) {
   const handleClose = () => {
     reset({
       name: "",
-      location:[],
+      location: [],
       status: "online",
-      created: "",
     });
     setOpen(false);
   };
 
-  const onSubmit = handleSubmit((data: Station) => {
-    const payload: Station = { ...data };
-    console.log(payload);
+  const onSubmit = handleSubmit(async (data: Station) => {
+    try {
+      handleClose();
 
-    Swal.fire({
-      title: "Please wait...",
-      text: "Adding station",
-      allowOutsideClick: false,
-      willOpen: () => {
-        Swal.showLoading();
-      }
-    });
+      Swal.fire({
+        title: "Please wait...",
+        text: "Adding Station",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        willOpen: () => {
+          Swal.showLoading();
+        },
+      });
 
-    // Call mutate to add the station, React Query handles the promise internally
-    //@ts-ignore
-    mutate(payload, {
-      onSuccess: () => {
-        // Close the SweetAlert dialog and possibly show success message
-        Swal.fire('Success', 'Station has been added successfully', 'success');
-      },
-      onError: (error) => {
-        // Log the error and show error message
-        console.log(error);
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "Something went wrong.",
-        });
-      }
-    });
-});
+      await axios.post("/stations", data);
 
+      await Swal.fire({
+        title: "Success",
+        text: "Station added successfully",
+        icon: "success",
+      });
+
+      callback();
+
+      Swal.close();
+    } catch (error) {
+      Swal.fire("Error", "Failed to add station", "error");
+    }
+  });
 
   React.useEffect(() => {
     if (roleWatch !== "adminstation") {
@@ -127,7 +97,7 @@ export default function StationDialog({ callback }) {
       <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
         <DialogTitle>Add Station</DialogTitle>
         <DialogContent>
-         <Controller 
+          <Controller
             name="name"
             control={control}
             render={({ field }) => (
@@ -189,7 +159,6 @@ export default function StationDialog({ callback }) {
               </FormControl>
             )}
           />
-         
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>

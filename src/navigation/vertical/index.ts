@@ -5,6 +5,7 @@ import AccountCogOutline from 'mdi-material-ui/AccountCogOutline'
 import AccountPlusOutline from 'mdi-material-ui/AccountPlusOutline'
 import AlertCircleOutline from 'mdi-material-ui/AlertCircleOutline'
 import AccountGroupOutline from 'mdi-material-ui/AccountGroupOutline'
+import AccountChildOutline from 'mdi-material-ui/AccountChildOutline'
 import { EvStationOutlined } from '@mui/icons-material'
 import { HistoryEduOutlined } from '@mui/icons-material'
 
@@ -40,6 +41,11 @@ const navigation = (): VerticalNavItemsType => {
     },
     {
       sectionTitle: 'Station Management'
+    },
+    {
+      title : 'Admin Stations',
+      icon: AccountChildOutline,
+      path: '/admin-stations'
     },
     {
       title: 'Station',

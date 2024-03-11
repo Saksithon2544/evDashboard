@@ -71,7 +71,7 @@ const StationsAllTable = () => {
         <Card>
           <CardHeader title="Station" titleTypographyProps={{ variant: "h6" }} />
           {/* <TableNutrition /> */}
-          {!isLoading && <TableStation Stations={Stations} callback={handleTable} refetch={()=>refetch()} />}
+          {!isLoading && <TableStation Stations={Stations} callback={handleTable} />}
         </Card>
       </Grid>
     </Grid>

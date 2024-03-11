@@ -76,29 +76,37 @@ export default function StationDialog({ callback }) {
   };
 
   const onSubmit = handleSubmit((data: Station) => {
-    try {
-      const payload: Station = {
-        ...data,
-      };
-      console.log(payload);
+    const payload: Station = { ...data };
+    console.log(payload);
 
-      //@ts-ignore
-      mutate(payload);
+    Swal.fire({
+      title: "Please wait...",
+      text: "Adding station",
+      allowOutsideClick: false,
+      willOpen: () => {
+        Swal.showLoading();
+      }
+    });
 
-      Swal.fire({
-        icon: "success",
-        title: "Success",
-        text: "Station has been added.",
-      });
-    } catch (error) {
-      console.log(error);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Something went wrong.",
-      });
-    }
-  });
+    // Call mutate to add the station, React Query handles the promise internally
+    //@ts-ignore
+    mutate(payload, {
+      onSuccess: () => {
+        // Close the SweetAlert dialog and possibly show success message
+        Swal.fire('Success', 'Station has been added successfully', 'success');
+      },
+      onError: (error) => {
+        // Log the error and show error message
+        console.log(error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Something went wrong.",
+        });
+      }
+    });
+});
+
 
   React.useEffect(() => {
     if (roleWatch !== "adminstation") {

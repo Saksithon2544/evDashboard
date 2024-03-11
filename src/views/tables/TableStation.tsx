@@ -149,7 +149,7 @@ export type CallBack = {
 type Props = {
   Stations: StationData[];
   isLoading?: boolean;
-  refetch?: () => void;
+  refetch?: (data: boolean) => void;
   callback?: (data: CallBack) => void;
 };
 
@@ -169,43 +169,56 @@ function TableStation({ Stations=[], isLoading, refetch, callback }: Props) {
     });
   };
 
-  const handleDeleteClick = (station: StationData) => {
-    // console.log("station", station);
+  const handleDeleteClick = async (station: StationData) => {
     try {
-      Swal.fire({
-        title: "Are you sure?",
-        html:
-          "Do you want to remove " +
-          "<span style='color:red;'>" +
-          station.name +
-          "</span> from the system ?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes",
-        cancelButtonText: "No",
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          const data = await axios.delete(`/stations/${station.id}`);
+        const confirmationResult = await Swal.fire({
+            title: "Are you sure?",
+            html: "Do you want to remove <span style='color:red;'>" + station.name + "</span> from the system?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes",
+            cancelButtonText: "No",
+            cancelButtonColor: "red",
+        });
 
-          if (data) {
-            Swal.fire(
-              "Success!",
-              "Your imaginary file has been deleted.",
-              "success"
-            );
-            if (refetch) refetch();
-          }
+        if (confirmationResult.isConfirmed) {
+            // Show loading modal
+            Swal.fire({
+                title: "Please wait...",
+                text: "Deleting station",
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            await axios.delete(`/stations/${station.id}`);
+            refetch(true); 
+
+            // Close the loading modal
+            Swal.close();
+
+            // Show success message
+            Swal.fire({
+                icon: "success",
+                title: "Deleted!",
+                text: "Station has been deleted successfully.",
+            });
         }
-      });
     } catch (error) {
-      console.log("error", error);
+        console.log(error);
+        let errorMessage = "An error occurred while deleting station.";
+        if (error.response && error.response.data) {
+            errorMessage = error.response.data.message;
+        }
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: errorMessage,
+        });
     }
+};
 
-    callback({
-      action: "delete",
-      station,
-    });
-  };
 
   const handleRequestSort = (event: React.MouseEvent, property: string) => {
     const isAsc = orderBy === property && order === "asc";

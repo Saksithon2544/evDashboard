@@ -193,7 +193,8 @@ function TableStation({ Stations=[], isLoading, refetch, callback }: Props) {
                 }
             });
             await axios.delete(`/stations/${station.id}`);
-            refetch(true); 
+            refetch?.(true);
+
 
             // Close the loading modal
             Swal.close();
@@ -209,7 +210,7 @@ function TableStation({ Stations=[], isLoading, refetch, callback }: Props) {
         console.log(error);
         let errorMessage = "An error occurred while deleting station.";
         if (error.response && error.response.data) {
-            errorMessage = error.response.data.message;
+            errorMessage = error.response.data.detail;
         }
         Swal.fire({
             icon: "error",

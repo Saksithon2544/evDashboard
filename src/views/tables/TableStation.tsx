@@ -27,7 +27,7 @@ import { visuallyHidden } from "@mui/utils";
 import { Station as StationData } from "@/interfaces/Station.interface";
 import axios from "@/libs/Axios";
 
-function descendingComparator(a, b, orderBy) {
+function descendingComparator(a: any, b: any, orderBy: any) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
   }
@@ -37,10 +37,10 @@ function descendingComparator(a, b, orderBy) {
   return 0;
 }
 
-function getComparator(order, orderBy) {
+function getComparator(order: any, orderBy: any) {
   return order === "desc"
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
+    ? (a: any, b: any) => descendingComparator(a, b, orderBy)
+    : (a: any, b: any) => -descendingComparator(a, b, orderBy);
 }
 
 function stableSort(array, comparator) {
@@ -279,7 +279,7 @@ function TableStation({ Stations = [], isLoading, refetch, callback }: Props) {
                 const labelId = `enhanced-table-checkbox-${row.id}`;
 
                 return (
-                  <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
+                  <TableRow key={row.id}>
                     <TableCell
                       component="th"
                       id={labelId}

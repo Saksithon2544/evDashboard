@@ -12,7 +12,7 @@ import TableadminStation from "src/views/tables/TableadminStation";
 import AddadminStationDialog from "@/views/dialogs/adminstation-dialogs/AddadminStationDialog";
 import EditadminStationDialog from "@/views/dialogs/adminstation-dialogs/EditadminStationDialog";
 
-import { Admin as AdminData , Station as StationData, User as UserData} from "@/interfaces/Adminstation.interface";
+import { Admin as AdminData, Station as StationData, User as UserData } from "@/interfaces/Adminstation.interface";
 
 export default function ViewStation() {
   const router = useRouter();
@@ -44,12 +44,24 @@ export default function ViewStation() {
     data: usersData,
     isLoading: usersLoading,
     refetch: refetchUsers,
-    } = useQuery<UserData[]>("users", async () => {
+  } = useQuery<UserData[]>("users", async () => {
     const res = await axios.get("/users");
     return res.data;
   });
 
   if (adminsLoading || stationsLoading || usersLoading) return <div>Loading...</div>;
+
+  // Merge data from adminsData, stationsData, and usersData
+  const mergedData = adminsData.map(admin => {
+    const station = stationsData.find(station => station.id === admin.stationId);
+    const user = usersData.find(user => user.id === admin.userId);
+    return {
+      ...admin,
+      status: station ? station.status : "",
+      stationName: station ? station.name : "",
+      userName: user ? `${user.firstName} ${user.lastName}` : "",
+    };
+  });
 
   return (
     <Grid container spacing={2}>
@@ -72,9 +84,7 @@ export default function ViewStation() {
             titleTypographyProps={{ variant: "h6" }}
           />
           <TableadminStation
-            Stations={stationsData.filter(station => station.id === id)}
-            Admins={adminsData.filter(admin => admin.userId === id)}
-            Users={usersData}
+            data={mergedData}
             callback={handleTable}
             refetch={() => {
               refetchAdmins();

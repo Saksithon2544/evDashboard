@@ -11,15 +11,12 @@ export type Station= {
 export type Admin = {
     id?: string,
     userId: string,
-    name: string,
-    email: string,
-    role: string,
+    stationId: string,
     created_at: string,
 };
 
 export type User = {
     id?: string,
-    userId?: string,
     firstName: string,
     lastName: string,
     password: string,

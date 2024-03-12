@@ -18,12 +18,14 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import { useRouter } from "next/router";
+
 import Swal from "sweetalert2";
 
 import { visuallyHidden } from "@mui/utils";
 import { Station as StationData } from "@/interfaces/Station.interface";
 import axios from "@/libs/Axios";
-
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -87,20 +89,13 @@ const headCells = [
 ];
 
 interface EnhancedTableProps {
-  onRequestSort: (
-    event: React.MouseEvent,
-    property: string
-  ) => void;
+  onRequestSort: (event: React.MouseEvent, property: string) => void;
   order: "asc" | "desc";
   orderBy: string;
 }
 
 function EnhancedTableHead(props: EnhancedTableProps) {
-  const {
-    order,
-    orderBy,
-    onRequestSort,
-  } = props;
+  const { order, orderBy, onRequestSort } = props;
 
   const createSortHandler = (property: string) => (event: React.MouseEvent) => {
     onRequestSort(event, property);
@@ -153,13 +148,13 @@ type Props = {
   callback?: (data: CallBack) => void;
 };
 
-function TableStation({ Stations=[], isLoading, refetch, callback }: Props) {
+function TableStation({ Stations = [], isLoading, refetch, callback }: Props) {
+  const router = useRouter();
   const [order, setOrder] = React.useState<"asc" | "desc">("asc");
   const [orderBy, setOrderBy] = React.useState<string>("name");
   const [page, setPage] = React.useState<number>(0);
   const [dense, setDense] = React.useState<boolean>(false);
   const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
-
 
   const handleEditClick = (station: StationData) => {
     // console.log("station", station);
@@ -171,55 +166,56 @@ function TableStation({ Stations=[], isLoading, refetch, callback }: Props) {
 
   const handleDeleteClick = async (station: StationData) => {
     try {
-        const confirmationResult = await Swal.fire({
-            title: "Are you sure?",
-            html: "Do you want to remove <span style='color:red;'>" + station.name + "</span> from the system?",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Yes",
-            cancelButtonText: "No",
-            cancelButtonColor: "red",
-        });
+      const confirmationResult = await Swal.fire({
+        title: "Are you sure?",
+        html:
+          "Do you want to remove <span style='color:red;'>" +
+          station.name +
+          "</span> from the system?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+        cancelButtonColor: "red",
+      });
 
-        if (confirmationResult.isConfirmed) {
-            // Show loading modal
-            Swal.fire({
-                title: "Please wait...",
-                text: "Deleting station",
-                allowOutsideClick: false,
-                showConfirmButton: false,
-                willOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-            await axios.delete(`/stations/${station.id}`);
-            refetch?.(true);
-
-
-            // Close the loading modal
-            Swal.close();
-
-            // Show success message
-            Swal.fire({
-                icon: "success",
-                title: "Deleted!",
-                text: "Station has been deleted successfully.",
-            });
-        }
-    } catch (error) {
-        console.log(error);
-        let errorMessage = "An error occurred while deleting station.";
-        if (error.response && error.response.data) {
-            errorMessage = error.response.data.detail;
-        }
+      if (confirmationResult.isConfirmed) {
+        // Show loading modal
         Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: errorMessage,
+          title: "Please wait...",
+          text: "Deleting station",
+          allowOutsideClick: false,
+          showConfirmButton: false,
+          willOpen: () => {
+            Swal.showLoading();
+          },
         });
-    }
-};
+        await axios.delete(`/stations/${station.id}`);
+        refetch?.(true);
 
+        // Close the loading modal
+        Swal.close();
+
+        // Show success message
+        Swal.fire({
+          icon: "success",
+          title: "Deleted!",
+          text: "Station has been deleted successfully.",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      let errorMessage = "An error occurred while deleting station.";
+      if (error.response && error.response.data) {
+        errorMessage = error.response.data.detail;
+      }
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+  };
 
   const handleRequestSort = (event: React.MouseEvent, property: string) => {
     const isAsc = orderBy === property && order === "asc";
@@ -283,36 +279,36 @@ function TableStation({ Stations=[], isLoading, refetch, callback }: Props) {
                 const labelId = `enhanced-table-checkbox-${row.id}`;
 
                 return (
-                  <TableRow
-                    hover
-                    role="checkbox"
-                    tabIndex={-1}
-                    key={row.id}
-                  >
+                  <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
                     <TableCell
                       component="th"
                       id={labelId}
                       scope="row"
                       padding="none"
                     >
+                      <IconButton
+                        aria-label="view"
+                        onClick={() => router.push(`/stations/${row.id}`)}
+                      >
+                        <VisibilityIcon />
+                      </IconButton>
                       {row.name}
                     </TableCell>
                     <TableCell>
-                      {row.location[0]},{row.location[1]}
-
+                      {row.location[0]}, {row.location[1]}
                     </TableCell>
                     {row.status === "online" ? (
                       <TableCell>
-                        <Badge color="success" variant="dot" sx={{mr:2}} />
+                        <Badge color="success" variant="dot" sx={{ mr: 2 }} />
                         {row.status}
                       </TableCell>
                     ) : (
                       <TableCell>
-                        <Badge color="error" variant="dot" sx={{mr:2}} />
+                        <Badge color="error" variant="dot" sx={{ mr: 2 }} />
                         {row.status}
                       </TableCell>
                     )}
-                    
+
                     {/* <TableCell>{row.status}</TableCell> */}
                     <TableCell>{row.created_at}</TableCell>
                     <TableCell>

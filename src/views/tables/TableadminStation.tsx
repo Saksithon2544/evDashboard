@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import { alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -21,9 +21,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import Swal from "sweetalert2";
 
 import { visuallyHidden } from "@mui/utils";
-import { Station as StationData } from "@/interfaces/Station.interface";
+import { Admin, Station, User} from "@/interfaces/Adminstation.interface";
 import axios from "@/libs/Axios";
-
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -87,20 +86,13 @@ const headCells = [
 ];
 
 interface EnhancedTableProps {
-  onRequestSort: (
-    event: React.MouseEvent,
-    property: string
-  ) => void;
+  onRequestSort: (event: React.MouseEvent, property: string) => void;
   order: "asc" | "desc";
   orderBy: string;
 }
 
 function EnhancedTableHead(props: EnhancedTableProps) {
-  const {
-    order,
-    orderBy,
-    onRequestSort,
-  } = props;
+  const { order, orderBy, onRequestSort } = props;
 
   const createSortHandler = (property: string) => (event: React.MouseEvent) => {
     onRequestSort(event, property);
@@ -143,83 +135,100 @@ EnhancedTableHead.propTypes = {
 
 export type CallBack = {
   action: "edit" | "delete";
-  station: StationData | null | any;
+  station: Station | null | any;
 };
-
-type Props = {
-  Stations: StationData[];
+interface Props {
+  Stations: Station[];
+  Admins: Admin[];
+  Users: User[];
   isLoading?: boolean;
-  refetch?: (data: boolean) => void;
+  refetch?: () => void;
   callback?: (data: CallBack) => void;
-};
+  id?: string; // Make id property optional
+}
 
-function TableStation({ Stations=[], isLoading, refetch, callback }: Props) {
+function TableadminStation({
+  Stations = [],
+  Admins = [],
+  Users = [],
+  isLoading,
+  refetch,
+  callback,
+  id,
+}: Props) {
   const [order, setOrder] = React.useState<"asc" | "desc">("asc");
   const [orderBy, setOrderBy] = React.useState<string>("name");
   const [page, setPage] = React.useState<number>(0);
   const [dense, setDense] = React.useState<boolean>(false);
   const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
+  const [filteredStations, setFilteredStations] = React.useState<Station[]>([]);
 
+  React.useEffect(() => {
+    if (Stations && id) {
+      const filteredData = Stations.filter((station) => station.id === id);
+      setFilteredStations(filteredData);
+    }
+  }, [Stations, id]);
 
-  const handleEditClick = (station: StationData) => {
-    // console.log("station", station);
+  const handleEditClick = (station: Station) => {
     callback({
       action: "edit",
       station,
     });
   };
 
-  const handleDeleteClick = async (station: StationData) => {
+  const handleDeleteClick = async (station: Station) => {
     try {
-        const confirmationResult = await Swal.fire({
-            title: "Are you sure?",
-            html: "Do you want to remove <span style='color:red;'>" + station.name + "</span> from the system?",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Yes",
-            cancelButtonText: "No",
-            cancelButtonColor: "red",
-        });
+      const confirmationResult = await Swal.fire({
+        title: "Are you sure?",
+        html:
+          "Do you want to remove <span style='color:red;'>" +
+          station.name +
+          "</span> from the system?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+        cancelButtonColor: "red",
+      });
 
-        if (confirmationResult.isConfirmed) {
-            // Show loading modal
-            Swal.fire({
-                title: "Please wait...",
-                text: "Deleting station",
-                allowOutsideClick: false,
-                showConfirmButton: false,
-                willOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-            await axios.delete(`/stations/${station.id}`);
-            refetch?.(true);
-
-
-            // Close the loading modal
-            Swal.close();
-
-            // Show success message
-            Swal.fire({
-                icon: "success",
-                title: "Deleted!",
-                text: "Station has been deleted successfully.",
-            });
-        }
-    } catch (error) {
-        console.log(error);
-        let errorMessage = "An error occurred while deleting station.";
-        if (error.response && error.response.data) {
-            errorMessage = error.response.data.detail;
-        }
+      if (confirmationResult.isConfirmed) {
+        // Show loading modal
         Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: errorMessage,
+          title: "Please wait...",
+          text: "Deleting station",
+          allowOutsideClick: false,
+          showConfirmButton: false,
+          willOpen: () => {
+            Swal.showLoading();
+          },
         });
-    }
-};
+        await axios.delete(`/stations/${station.id}`);
+        refetch?.();
 
+        // Close the loading modal
+        Swal.close();
+
+        // Show success message
+        Swal.fire({
+          icon: "success",
+          title: "Deleted!",
+          text: "Station has been deleted successfully.",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      let errorMessage = "An error occurred while deleting station.";
+      if (error.response && error.response.data) {
+        errorMessage = error.response.data.detail;
+      }
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+  };
 
   const handleRequestSort = (event: React.MouseEvent, property: string) => {
     const isAsc = orderBy === property && order === "asc";
@@ -242,20 +251,22 @@ function TableStation({ Stations=[], isLoading, refetch, callback }: Props) {
     setDense(event.target.checked);
   };
 
-  // const isSelected = (id: string) => selected.indexOf(id) !== -1;
-
   const emptyRows =
     page > 0
-      ? Math.max(0, (1 + page) * rowsPerPage - (Stations ? Stations.length : 0))
+      ? Math.max(
+          0,
+          (1 + page) * rowsPerPage -
+            (filteredStations ? filteredStations.length : 0)
+        )
       : 0;
 
   const visibleRows = React.useMemo(
     () =>
-      stableSort(Stations || [], getComparator(order, orderBy)).slice(
+      stableSort([...Admins, ...Stations], getComparator(order, orderBy)).slice(
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage
       ),
-    [Stations, order, orderBy, page, rowsPerPage]
+    [Admins, Stations, order, orderBy, page, rowsPerPage]
   );
 
   if (isLoading) {
@@ -274,21 +285,22 @@ function TableStation({ Stations=[], isLoading, refetch, callback }: Props) {
             <EnhancedTableHead
               order={order}
               orderBy={orderBy}
-              // onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
             />
             <TableBody>
-              {visibleRows.map((row: StationData) => {
-                // const isSelectedRow = isSelected(row.id);
+              <TableRow>
+                <TableCell colSpan={5}>
+                  {/* Loop Admins and Stations */}
+                  {visibleRows.map((item) => (
+                    <div key={item.id}>{item.id || item.name}</div>
+                  ))}
+                </TableCell>
+              </TableRow>
+              {visibleRows.map((row: Station) => {
                 const labelId = `enhanced-table-checkbox-${row.id}`;
 
                 return (
-                  <TableRow
-                    hover
-                    role="checkbox"
-                    tabIndex={-1}
-                    key={row.id}
-                  >
+                  <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
                     <TableCell
                       component="th"
                       id={labelId}
@@ -297,23 +309,18 @@ function TableStation({ Stations=[], isLoading, refetch, callback }: Props) {
                     >
                       {row.name}
                     </TableCell>
-                    <TableCell>
-                      {row.location[0]},{row.location[1]}
-
-                    </TableCell>
+                    <TableCell>{row.location}</TableCell>
                     {row.status === "online" ? (
                       <TableCell>
-                        <Badge color="success" variant="dot" sx={{mr:2}} />
+                        <Badge color="success" variant="dot" sx={{ mr: 2 }} />
                         {row.status}
                       </TableCell>
                     ) : (
                       <TableCell>
-                        <Badge color="error" variant="dot" sx={{mr:2}} />
+                        <Badge color="error" variant="dot" sx={{ mr: 2 }} />
                         {row.status}
                       </TableCell>
                     )}
-                    
-                    {/* <TableCell>{row.status}</TableCell> */}
                     <TableCell>{row.created_at}</TableCell>
                     <TableCell>
                       <IconButton
@@ -338,7 +345,7 @@ function TableStation({ Stations=[], isLoading, refetch, callback }: Props) {
                     height: (dense ? 33 : 53) * emptyRows,
                   }}
                 >
-                  <TableCell colSpan={4} />
+                  <TableCell colSpan={5} />
                 </TableRow>
               )}
             </TableBody>
@@ -347,7 +354,7 @@ function TableStation({ Stations=[], isLoading, refetch, callback }: Props) {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={Stations.length}
+          count={filteredStations.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
@@ -362,4 +369,4 @@ function TableStation({ Stations=[], isLoading, refetch, callback }: Props) {
   );
 }
 
-export default TableStation;
+export default TableadminStation;

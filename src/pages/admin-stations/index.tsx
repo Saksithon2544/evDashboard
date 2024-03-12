@@ -21,7 +21,7 @@ const StationsAllTable = () => {
     isLoading,
     refetch,
   } = useQuery<StationData[]>("stations", async () => {
-    const res = await axios.get("/stations");
+    const res = await axios.get(`/stations`);
     const data = await res.data;
     return data;
   });
@@ -59,7 +59,7 @@ const StationsAllTable = () => {
         <Card>
           <CardHeader title="Admin Stations" titleTypographyProps={{ variant: "h6" }} />
           {/* <TableNutrition /> */}
-          {!isLoading && <TableadminStation Stations={Stations} callback={handleTable} />}
+          {/* {!isLoading && <TableadminStation Stations={Stations} callback={handleTable} />} */}
         </Card>
       </Grid>
     </Grid>

@@ -10,7 +10,7 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 
-import { type Station } from "@/interfaces/Station.interface";
+import { type Station, User, Admin } from "@/interfaces/Adminstation.interface";
 import Swal from "sweetalert2";
 
 // ** Form Imports
@@ -20,14 +20,19 @@ import { useForm, Controller } from "react-hook-form";
 import axios from "@/libs/Axios";
 import { useQuery, useMutation, QueryClient } from "react-query";
 
+
 type EditStationDialogProps = {
-  station: Station;
+  data: {
+    staion: Station;
+    user: User;
+    admin: Admin;
+  };
   onClose?: () => void;
   onSave?: (updatedStation: Station) => void;
 };
 
 const EditStationDialog: React.FC<EditStationDialogProps> = ({
-  station,
+  data,
   onClose,
   onSave,
 }) => {
@@ -44,7 +49,7 @@ const EditStationDialog: React.FC<EditStationDialogProps> = ({
     try {
       setIsLoading(true);
 
-      await axios.put(`/stations/${station.id}`, dataForm);
+      await axios.put(`/stations/${data.staion.id}/admins/`, dataForm);
 
       Swal.fire({
         icon: "success",
@@ -66,18 +71,19 @@ const EditStationDialog: React.FC<EditStationDialogProps> = ({
   };
 
   React.useEffect(() => {
-    if (station) {
-      reset(station);
+    if (data) {
+      reset(data);
     }
-  }, [station]);
+  }, [data]);
 
   return (
-    <Dialog open={station ? true : false} onClose={onClose}>
+    <Dialog open={data ? true : false} onClose={onClose}>
       {/* Dialog content */}
-      <DialogTitle>Edit Station</DialogTitle>
+      <DialogTitle>Edit Admin Station</DialogTitle>
       <DialogContent>
+        {JSON.stringify(data)}
         <Controller
-          name="name"
+          name="userName"
           control={control}
           render={({ field }) => (
             <TextField

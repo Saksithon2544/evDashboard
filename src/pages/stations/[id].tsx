@@ -10,7 +10,6 @@ import CardHeader from "@mui/material/CardHeader";
 
 import TableadminStation from "src/views/tables/TableadminStation";
 import AddadminStationDialog from "@/views/dialogs/adminstation-dialogs/AddadminStationDialog";
-import EditadminStationDialog from "@/views/dialogs/adminstation-dialogs/EditadminStationDialog";
 
 import { Admin as AdminData, Station as StationData, User as UserData } from "@/interfaces/Adminstation.interface";
 
@@ -67,15 +66,6 @@ export default function ViewStation() {
     <Grid container spacing={2}>
       <Grid item xs={12}>
         <AddadminStationDialog callback={refetchAdmins} />
-        <EditadminStationDialog
-          station={selectedStation}
-          onClose={handleCloseModal}
-          onSave={() => {
-            refetchAdmins();
-            refetchStations();
-            refetchUsers();
-          }}
-        />
       </Grid>
       <Grid item xs={12}>
         <Card>

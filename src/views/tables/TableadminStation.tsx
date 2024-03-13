@@ -1,6 +1,4 @@
 import * as React from "react";
-import PropTypes from "prop-types";
-import { alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Badge from "@mui/material/Badge";
 import Table from "@mui/material/Table";
@@ -11,13 +9,11 @@ import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
-import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
 import { useRouter } from "next/router";
 
 import Swal from "sweetalert2";
@@ -169,9 +165,6 @@ function TableadminStation({ data, callback, refetch }: Props) {
   const [dense, setDense] = React.useState<boolean>(false);
   const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
 
-  const handleEditClick = (data: any) => {
-    callback({ action: "edit", data });
-  };
   const handleDeleteClick = async (data: any) => {
     try {
       const confirmationResult = await Swal.fire({
@@ -198,7 +191,7 @@ function TableadminStation({ data, callback, refetch }: Props) {
             Swal.showLoading();
           },
         });
-        // await axios.delete(`/stations/${station.id}`);
+        await axios.delete(`/stations/${data.stationId}/admins/${data.userId}`);
         refetch();
 
         // Close the loading modal
@@ -296,12 +289,6 @@ function TableadminStation({ data, callback, refetch }: Props) {
                   )}
                   <TableCell>{row.created_at}</TableCell>
                   <TableCell>
-                    <IconButton
-                      aria-label="edit"
-                      onClick={() => handleEditClick(row)}
-                    >
-                      <EditIcon />
-                    </IconButton>
                     <IconButton
                       aria-label="delete"
                       onClick={() => handleDeleteClick(row)}

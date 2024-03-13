@@ -52,25 +52,25 @@ const headCells = [
     id: "stationName",
     numeric: false,
     disablePadding: true,
-    label: "Name",
+    label: "Station Name",
   },
   {
     id: "userName",
     numeric: false,
     disablePadding: false,
-    label: "Location",
+    label: "User Name",
+  },
+  {
+    id: "email",
+    numeric: false,
+    disablePadding: false,
+    label: "Email Admin Station",
   },
   {
     id: "status",
     numeric: false,
     disablePadding: false,
     label: "Status",
-  },
-  {
-    id: "created",
-    numeric: false,
-    disablePadding: false,
-    label: "Created",
   },
   {
     id: "actions",
@@ -147,6 +147,7 @@ interface Props {
   data: {
     stationName: string;
     userName: string;
+    email: string;
     id?: string;
     userId: string;
     stationId: string;
@@ -239,7 +240,6 @@ function TableadminStation({ data, callback, refetch }: Props) {
     setDense(event.target.checked);
   };
 
-  // const isSelected = (id: string) => selected.indexOf(id) !== -1;
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
 
@@ -276,6 +276,7 @@ function TableadminStation({ data, callback, refetch }: Props) {
                 <TableRow key={index}>
                   <TableCell>{row.stationName}</TableCell>
                   <TableCell>{row.userName}</TableCell>
+                  <TableCell>{row.email}</TableCell>
                   {row.status === "online" ? (
                     <TableCell>
                       <Badge color="success" variant="dot" sx={{ mr: 2 }} />
@@ -287,7 +288,6 @@ function TableadminStation({ data, callback, refetch }: Props) {
                       {row.status}
                     </TableCell>
                   )}
-                  <TableCell>{row.created_at}</TableCell>
                   <TableCell>
                     <IconButton
                       aria-label="delete"

@@ -54,7 +54,7 @@ export default function StationDialog({ callback }) {
 
       Swal.fire({
         title: "Please wait...",
-        text: "Adding Station",
+        text: "Adding Admin Station",
         allowOutsideClick: false,
         showConfirmButton: false,
         willOpen: () => {
@@ -66,7 +66,7 @@ export default function StationDialog({ callback }) {
 
       await Swal.fire({
         title: "Success",
-        text: "Station added successfully",
+        text: "Admin Station added successfully",
         icon: "success",
       });
 
@@ -92,10 +92,10 @@ export default function StationDialog({ callback }) {
         onClick={handleClickOpen}
         startIcon={<AddIcon />}
       >
-        Add Station
+        Admin Station
       </Button>
       <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-        <DialogTitle>Add Station</DialogTitle>
+        <DialogTitle>Add Admin Station</DialogTitle>
         <DialogContent>
           <Controller
             name="name"

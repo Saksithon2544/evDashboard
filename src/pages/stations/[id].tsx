@@ -17,8 +17,7 @@ export default function ViewStation() {
   const router = useRouter();
   const { id } = router.query;
 
-  const [selectedStation, setSelectedStation] = useState(null);
-  const handleCloseModal = () => setSelectedStation(null);
+  const [setSelectedStation] = useState(null);
   const handleTable = (station: any) => setSelectedStation(station);
 
   const {
@@ -59,6 +58,7 @@ export default function ViewStation() {
       status: station ? station.status : "",
       stationName: station ? station.name : "",
       userName: user ? `${user.firstName} ${user.lastName}` : "",
+      email: user ? user.email : "",
     };
   });
 

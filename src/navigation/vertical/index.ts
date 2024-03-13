@@ -55,14 +55,14 @@ const navigation = (): VerticalNavItemsType => {
       icon: EvStationOutlined,
       path: '/stations',
     },
-    {
-      sectionTitle: 'Transactions Management'
-    },
-    {
-      title: 'Transactions',
-      icon: HistoryEduOutlined,
-      path: '/transactions',
-    },
+    // {
+    //   sectionTitle: 'Transactions Management'
+    // },
+    // {
+    //   title: 'Transactions',
+    //   icon: HistoryEduOutlined,
+    //   path: '/transactions',
+    // },
     // {
     //   sectionTitle: 'Pages'
     // },

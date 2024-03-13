@@ -9,7 +9,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import { type Station } from "@/interfaces/Station.interface";
+import { type Station, User, Admin } from "@/interfaces/Adminstation.interface";
 // import { Station } from "@/pages/api/user";
 import Swal from "sweetalert2";
 
@@ -28,6 +28,11 @@ type Props = {
   callback?: () => void;
 };
 
+type FormData = {
+  user_id: string;
+  station_id: string;
+}
+
 export default function StationDialog({ callback }) {
   const { control, reset, handleSubmit, watch, setValue } = useForm();
 
@@ -35,20 +40,31 @@ export default function StationDialog({ callback }) {
 
   const [open, setOpen] = React.useState(false);
 
+  const {data:users} = useQuery<User[]>("users", async () => {
+    const res = await axios.get("/users");
+    return res.data;
+  }
+  );
+
+  const {data:stations} = useQuery<Station[]>("stations", async () => {
+    const res = await axios.get("/stations");
+    return res.data;
+  }
+  );
+
   const handleClickOpen = () => {
     setOpen(true);
   };
 
   const handleClose = () => {
     reset({
-      name: "",
-      location: [],
-      status: "online",
+      user_id: "",
+      station_id: "",
     });
     setOpen(false);
   };
 
-  const onSubmit = handleSubmit(async (data: Station) => {
+  const onSubmit = handleSubmit(async (data: FormData) => {
     try {
       handleClose();
 
@@ -62,7 +78,10 @@ export default function StationDialog({ callback }) {
         },
       });
 
-      await axios.post("/stations", data);
+      console.log(data);
+
+
+      await axios.put(`/stations/${data.station_id}/admins/${data.user_id}`);
 
       await Swal.fire({
         title: "Success",
@@ -98,63 +117,41 @@ export default function StationDialog({ callback }) {
         <DialogTitle>Add Admin Station</DialogTitle>
         <DialogContent>
           <Controller
-            name="name"
+            name="user_id"
             control={control}
-            render={({ field }) => (
-              <TextField
-                autoFocus
-                margin="dense"
-                label="Name"
-                type="text"
-                fullWidth
-                {...field}
-              />
-            )}
-          />
-          <Controller
-            name="location[0]"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                margin="dense"
-                label="Latitude"
-                type="text"
-                fullWidth
-                {...field}
-              />
-            )}
-          />
-          <Controller
-            name="location[1]"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                margin="dense"
-                label="Longitude"
-                type="text"
-                fullWidth
-                {...field}
-              />
-            )}
-          />
-          <Controller
-            name="status"
-            control={control}
-            defaultValue={"online"}
             render={({ field }) => (
               <FormControl fullWidth margin="dense">
-                <InputLabel id="status">Status</InputLabel>
+                <InputLabel id="user_id">User</InputLabel>
                 <Select
-                  labelId="status"
-                  label="Status"
+                  labelId="user_id"
+                  label="user_id"
                   variant="outlined"
                   {...field}
-                  onChange={(e: SelectChangeEvent) => {
-                    field.onChange(e.target.value);
-                  }}
                 >
-                  <MenuItem value="online">Online</MenuItem>
-                  <MenuItem value="offline">Offline</MenuItem>
+                  {users?.map((user) => (
+                    <MenuItem value={user.id}>{user.email} [{user.firstName} {user.lastName}]</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            )}
+          />
+
+          <Controller
+            name="station_id"
+            control={control}
+            defaultValue={""}
+            render={({ field }) => (
+              <FormControl fullWidth margin="dense">
+                <InputLabel id="station_id">station</InputLabel>
+                <Select
+                  labelId="station_id"
+                  label="station_id"
+                  variant="outlined"
+                  {...field}
+                >
+                  {stations?.map((station) => (
+                    <MenuItem value={station.id}>{station.name}</MenuItem>
+                  ))}
                 </Select>
               </FormControl>
             )}

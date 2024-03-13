@@ -45,11 +45,11 @@ const navigation = (): VerticalNavItemsType => {
     {
       sectionTitle: 'Station Management'
     },
-    {
-      title : 'Admin Stations',
-      icon: AccountChildOutline,
-      path: '/admin-stations'
-    },
+    // {
+    //   title : 'Admin Stations',
+    //   icon: AccountChildOutline,
+    //   path: '/admin-stations'
+    // },
     {
       title: 'Station',
       icon: EvStationOutlined,

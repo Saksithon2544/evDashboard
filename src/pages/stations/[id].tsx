@@ -9,6 +9,7 @@ import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
 
 import TableadminStation from "src/views/tables/TableadminStation";
+import TableadCharging from "src/views/tables/TableCharging";
 import AddadminStationDialog from "@/views/dialogs/adminstation-dialogs/AddadminStationDialog";
 
 import {
@@ -66,6 +67,7 @@ export default function ViewStation() {
       stationName: station ? station.name : "",
       userName: user ? `${user.firstName} ${user.lastName}` : "",
       email: user ? user.email : "",
+      is_active: user.is_active,
     };
   });
 
@@ -98,10 +100,10 @@ export default function ViewStation() {
       <Grid item xs={12}>
         <Card>
           <CardHeader
-            title="Admin Stations"
+            title="Station Charging Cabinet"
             titleTypographyProps={{ variant: "h6" }}
           />
-          <TableadminStation
+          <TableadCharging
             data={mergedData}
             callback={handleTable}
             refetch={() => {

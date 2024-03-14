@@ -58,7 +58,7 @@ const headCells = [
     id: "userName",
     numeric: false,
     disablePadding: false,
-    label: "Admin Station",   
+    label: "User Name",
   },
   {
     id: "email",
@@ -152,7 +152,6 @@ interface Props {
     userId: string;
     stationId: string;
     status: string;
-    is_active: boolean;
     created_at: string;
   }[];
   callback: (station: any) => void;
@@ -287,20 +286,19 @@ function TableadminStation({ data, callback, refetch }: Props) {
               {data.map((row, index) => (
                 <TableRow key={index}>
                   <TableCell>{row.stationName}</TableCell>
-                  <TableCell>{row.userName}</TableCell> 
+                  <TableCell>{row.userName}</TableCell>
                   <TableCell>{row.email}</TableCell>
-                  {row.is_active ? (
-                      <TableCell>
-                        <Badge color="success" variant="dot" sx={{ mr: 2 }} />
-                        Active
-                      </TableCell>
-                    ) : (
-                      <TableCell>
-                        <Badge color="error" variant="dot" sx={{ mr: 2 }} />
-                        Inactive
-                      </TableCell>
-                    )}
-                    
+                  {row.status === "online" ? (
+                    <TableCell>
+                      <Badge color="success" variant="dot" sx={{ mr: 2 }} />
+                      {row.status}
+                    </TableCell>
+                  ) : (
+                    <TableCell>
+                      <Badge color="error" variant="dot" sx={{ mr: 2 }} />
+                      {row.status}
+                    </TableCell>
+                  )}
                   <TableCell>
                     <IconButton
                       aria-label="delete"

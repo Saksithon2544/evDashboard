@@ -11,7 +11,11 @@ import CardHeader from "@mui/material/CardHeader";
 import TableadminStation from "src/views/tables/TableadminStation";
 import AddadminStationDialog from "@/views/dialogs/adminstation-dialogs/AddadminStationDialog";
 
-import { Admin as AdminData, Station as StationData, User as UserData } from "@/interfaces/Adminstation.interface";
+import {
+  Admin as AdminData,
+  Station as StationData,
+  User as UserData,
+} from "@/interfaces/Adminstation.interface";
 
 export default function ViewStation() {
   const router = useRouter();
@@ -47,12 +51,15 @@ export default function ViewStation() {
     return res.data;
   });
 
-  if (adminsLoading || stationsLoading || usersLoading) return <div>Loading...</div>;
+  if (adminsLoading || stationsLoading || usersLoading)
+    return <div>Loading...</div>;
 
   // Merge data from adminsData, stationsData, and usersData
-  const mergedData = adminsData.map(admin => {
-    const station = stationsData.find(station => station.id === admin.stationId);
-    const user = usersData.find(user => user.id === admin.userId);
+  const mergedData = adminsData.map((admin) => {
+    const station = stationsData.find(
+      (station) => station.id === admin.stationId
+    );
+    const user = usersData.find((user) => user.id === admin.userId);
     return {
       ...admin,
       status: station ? station.status : "",
@@ -64,6 +71,27 @@ export default function ViewStation() {
 
   return (
     <Grid container spacing={2}>
+      <Grid item xs={12}>
+        <AddadminStationDialog callback={refetchAdmins} />
+      </Grid>
+      <Grid item xs={12} paddingBottom={12}>
+        <Card>
+          <CardHeader
+            title="Admin Stations"
+            titleTypographyProps={{ variant: "h6" }}
+          />
+          <TableadminStation
+            data={mergedData}
+            callback={handleTable}
+            refetch={() => {
+              refetchAdmins();
+              refetchStations();
+              refetchUsers();
+            }}
+          />
+        </Card>
+      </Grid>
+      
       <Grid item xs={12}>
         <AddadminStationDialog callback={refetchAdmins} />
       </Grid>

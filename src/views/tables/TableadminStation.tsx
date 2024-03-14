@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, {useRef} from "react"; 
 import Box from "@mui/material/Box";
 import Badge from "@mui/material/Badge";
 import Table from "@mui/material/Table";
@@ -165,6 +165,17 @@ function TableadminStation({ data, callback, refetch }: Props) {
   const [page, setPage] = React.useState<number>(0);
   const [dense, setDense] = React.useState<boolean>(false);
   const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
+  const refetchTimer = useRef(null);
+
+  // React.useEffect(() => {
+  //   refetchTimer.current = setInterval(() => {
+  //     refetch();
+  //   }, 100000);
+
+  //   return () => {
+  //     clearInterval(refetchTimer.current);
+  //   };
+  // }, []);
 
   const handleDeleteClick = async (data: any) => {
     try {

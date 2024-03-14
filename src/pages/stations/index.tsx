@@ -12,6 +12,7 @@ import { useQuery } from "react-query";
 import { Station as StationData } from "@/interfaces/Station.interface";
 import { useState } from "react";
 import axios from "@/libs/Axios";
+import { Typography } from "@mui/material";
 
 const StationsAllTable = () => {
   const [selectedStation, setSelectedStation] = useState<StationData>();
@@ -52,14 +53,27 @@ const StationsAllTable = () => {
         <EditStationDialog
           station={selectedStation}
           onClose={handleCloseMoadal}
-          onSave={() => refetch()} 
+          onSave={() => refetch()}
         />
       </Grid>
       <Grid item xs={12}>
         <Card>
-          <CardHeader title="Station" titleTypographyProps={{ variant: "h6" }} />
-          {/* <TableNutrition /> */}
-          {!isLoading && <TableStation Stations={Stations} callback={handleTable} refetch={()=>refetch()} />}
+          <CardHeader
+            title="Station"
+            titleTypographyProps={{ variant: "h6" }}
+          />
+          {isLoading && (
+            <Typography variant="h6" align="center">
+              Loading...
+            </Typography>
+          )}
+          {!isLoading && (
+            <TableStation
+              Stations={Stations}
+              callback={handleTable}
+              refetch={() => refetch()}
+            />
+          )}
         </Card>
       </Grid>
     </Grid>

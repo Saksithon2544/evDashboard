@@ -101,60 +101,57 @@ const AccountSettings = () => {
     }
   }
 
-  async function handleUpdatePassword(data:any) {
+  async function handleUpdatePassword(data: any) {
     try {
-        const confirmationResult = await Swal.fire({
-            title: "Are you sure?",
-            text: "You are about to update your password",
-            icon: "question",
-            showCancelButton: true,
-            confirmButtonText: "Yes",
-            cancelButtonText: "No",
-            cancelButtonColor: "red",
-        });
+      const confirmationResult = await Swal.fire({
+        title: "Are you sure?",
+        text: "You are about to update your password",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+        cancelButtonColor: "red",
+      });
 
-        if (confirmationResult.isConfirmed) {
-            // Show loading modal
-            Swal.fire({
-                title: "Please wait...",
-                text: "Updating password",
-                allowOutsideClick: false,
-                showConfirmButton: false,
-                willOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-
-            // Make the password update request
-            const response = await axios.post(`/users/password`, data);
-            refetch();
-
-            // Hide loading modal
-            Swal.close();
-
-            // Show success message
-            Swal.fire({
-                icon: "success",
-                title: "Success",
-                text: "Password updated successfully!",
-            });
-        }
-    } catch (error) {
-        console.log(error);
-        let errorMessage = "An error occurred while updating password.";
-        if (error.response && error.response.data && error.response.data.detail) {
-            errorMessage = error.response.data.detail;
-        }
+      if (confirmationResult.isConfirmed) {
+        // Show loading modal
         Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: errorMessage,
+          title: "Please wait...",
+          text: "Updating password",
+          allowOutsideClick: false,
+          showConfirmButton: false,
+          willOpen: () => {
+            Swal.showLoading();
+          },
         });
-    }
-}
 
-  
-    
+        // Make the password update request
+        const response = await axios.post(`/users/password`, data);
+        refetch();
+
+        // Hide loading modal
+        Swal.close();
+
+        // Show success message
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "Password updated successfully!",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      let errorMessage = "An error occurred while updating password.";
+      if (error.response && error.response.data && error.response.data.detail) {
+        errorMessage = error.response.data.detail;
+      }
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+  }
 
   return (
     <Card>
@@ -186,7 +183,7 @@ const AccountSettings = () => {
         </TabList>
 
         {isLoading ? (
-          <Typography align="center" variant="body1">
+          <Typography variant="h6" align="center">
             Loading...
           </Typography>
         ) : (

@@ -12,6 +12,7 @@ import { useQuery } from "react-query";
 import { User as UserData } from "@/interfaces/User.interface";
 import { useState } from "react";
 import axios from "@/libs/Axios";
+import { Typography } from "@mui/material";
 
 const UsersAllTable = () => {
   const [selectedUser, setSelectedUser] = useState<UserData>();
@@ -44,19 +45,6 @@ const UsersAllTable = () => {
         break;
     }
   }
-
-  // async function handleUpdate(data: UserData) {
-  //   // console.log("save", data);
-  //   try {
-  //     await axios.put(`/users/${data.id}`, {
-  //       ...data,
-  //       confirmPassword: data.password, // TODO: remove this line
-  //     });
-
-  //     refetch();
-  //   } catch (error) {}
-  // }
-
   return (
     <Grid container>
       <Grid item xs={12}>
@@ -71,7 +59,11 @@ const UsersAllTable = () => {
       <Grid item xs={12}>
         <Card>
           <CardHeader title="Member" titleTypographyProps={{ variant: "h6" }} />
-          {/* <TableNutrition /> */}
+          {isLoading && (
+            <Typography variant="h6" align="center">
+              Loading...
+            </Typography>
+          )}
           {!isLoading && <TableMember Users={Users} callback={handleTable} />}
         </Card>
       </Grid>

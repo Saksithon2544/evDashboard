@@ -8,13 +8,11 @@ import TableTransactions, {
   type CallBack,
 } from "src/views/tables/TableTransactions";
 import AddTransactionDialog from "@/views/dialogs/transaction-dialogs/AddTransactionDialog";
-import EditTransactionDialog from "@/views/dialogs/transaction-dialogs/EditTransactionDialog";
 
 import { useQuery } from "react-query";
 import {
-  Transactions as TransactionData,
-  transactions,
-} from "@/pages/api/transactions";
+  Transaction as TransactionData,
+} from "@/interfaces/Transaction.interface";
 import { useState } from "react";
 import axios from "@/libs/Axios";
 import { Typography } from "@mui/material";
@@ -28,15 +26,14 @@ const TransactionsAllTable = () => {
     isLoading,
     refetch,
   } = useQuery<TransactionData[]>("transactions", async () => {
-    const res = await fetch("/api/transactions/");
-    const data = await res.json();
-
+    const res = await axios.get("/transactions");
+    const data = await res.data;
     // check data not array
     if (!Array.isArray(data)) {
       return [];
     }
 
-    return transactions;
+    return data;
   });
 
   function handleCloseMoadal() {
@@ -47,7 +44,7 @@ const TransactionsAllTable = () => {
     switch (data.action) {
       case "edit":
         // console.log("edit", data.transaction);
-        setSelectedTransaction(data.transaction);
+        setSelectedTransaction(data.Transaction);
         break;
       case "delete":
         // console.log("delete", data.transaction);
@@ -74,11 +71,6 @@ const TransactionsAllTable = () => {
       <Grid item xs={12}>
         {/* {JSON.stringify(selectedTransaction)} */}
         <AddTransactionDialog callback={refetch} />
-        <EditTransactionDialog
-          transaction={selectedTransaction}
-          onClose={handleCloseMoadal}
-          onSave={handleSave}
-        />
       </Grid>
       <Grid item xs={12}>
         <Card>
@@ -87,13 +79,16 @@ const TransactionsAllTable = () => {
             titleTypographyProps={{ variant: "h6" }}
           />
           {/* <TableTransactions /> */}
-          {!isLoading && !(typeof TransactionsData === "object") ? (
+          {!isLoading && TransactionsData && TransactionsData.length > 0 ? (
             <TableTransactions
               Transactions={TransactionsData}
               callback={handleTable}
+              refetch={() => refetch()}
             />
           ) : (
-            <div>Loading...</div>
+            <Typography variant="h6" align="center">
+              Loading...
+            </Typography>
           )}
         </Card>
       </Grid>

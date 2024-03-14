@@ -9,9 +9,8 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import { type Station } from "@/interfaces/Station.interface";
-
-// import { Station } from "@/pages/api/user";
+import { type User } from "@/interfaces/User.interface";
+// import { Transaction } from "@/pages/api/user";
 import Swal from "sweetalert2";
 
 // ** Icons Imports
@@ -21,46 +20,31 @@ import AddIcon from "@mui/icons-material/Add";
 import { useForm, Controller } from "react-hook-form";
 
 // ** Query Client Provider
-import axios from "axios";
+import axios from "@/libs/Axios";
 import { useQuery, useMutation, QueryClient } from "react-query";
+import { ok } from "assert";
 
 type Props = {
   callback?: () => void;
 };
 
-export default function StationDialog({ callback }) {
-  //ดึงข้อมูลจาก api/stations มาแสดง
-  const { data: Stations, isLoading } = useQuery<Station[]>("stations", async () => {
-    const res = await fetch("/api/stations");
-    const data = await res.json();
-    return data;
-  });
+type FormData = {
+  user_id: string;
+  amount: number;
+  // Transaction_id: string;
+};
 
-  // สร้าง queryClient ขึ้นมา เพื่อใช้ในการ invalidateQueries หลังจาก mutate แล้ว จะได้ render ใหม่ แสดงข้อมูลล่าสุด
-  const queryClient = new QueryClient();
-
-  // สร้าง mutation ขึ้นมา เพื่อใช้ในการเรียก api/user และ invalidateQueries เพื่อให้ render ใหม่
-  const { mutate } = useMutation<Station>({
-    mutationFn: async (article) => {
-      return await axios.post("/api/stations", article);
-    },
-    onSuccess: async (data) => {
-      console.log("data", data); // data is displayed, onSuccess is called
-      // refetch data after mutation other queries
-      
-      await queryClient.refetchQueries(["posts"], { active: true });
-      
-      if(callback) callback(true);
-
-      handleClose();
-    },
-  });
-
+export default function TransactionDialog({ callback }) {
   const { control, reset, handleSubmit, watch, setValue } = useForm();
 
   const roleWatch = watch("role");
 
   const [open, setOpen] = React.useState(false);
+
+  const { data: users } = useQuery<User[]>("users", async () => {
+    const res = await axios.get("/users");
+    return res.data;
+  });
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -68,45 +52,47 @@ export default function StationDialog({ callback }) {
 
   const handleClose = () => {
     reset({
-      name: "",
-      location: {
-        lat: "",
-        lng: "",
-      },
-      status: "online",
-      created: "",
+      user_id: "",
+      Transaction_id: "",
     });
     setOpen(false);
   };
 
-  const onSubmit = handleSubmit((data: Station) => {
+  const onSubmit = handleSubmit(async (data: FormData) => {
     try {
-      const payload: Station = {
-        ...data,
-      };
-      console.log(payload);
-
-      //@ts-ignore
-      mutate(payload);
+      handleClose();
 
       Swal.fire({
-        icon: "success",
+        title: "Please wait...",
+        text: "Top up processing",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        willOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      // console.log(data);
+
+      await axios.put(`/users/${data.user_id}/topup?amount=${data.amount}`);
+
+      await Swal.fire({
         title: "Success",
-        text: "Station has been added.",
+        text: "Top up success",
+        icon: "success",
       });
+
+      callback();
+
+      Swal.close();
     } catch (error) {
-      console.log(error);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Something went wrong.",
-      });
+      Swal.fire("Error", "Failed to Top up", "error");
     }
   });
 
   React.useEffect(() => {
-    if (roleWatch !== "adminstation") {
-      setValue("station", "");
+    if (roleWatch !== "adminTransaction") {
+      setValue("Transaction", "");
     }
   }, [roleWatch]);
 
@@ -118,74 +104,46 @@ export default function StationDialog({ callback }) {
         onClick={handleClickOpen}
         startIcon={<AddIcon />}
       >
-        Add Station
+        Top up
       </Button>
       <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-        <DialogTitle>Add Station</DialogTitle>
+        <DialogTitle>Top up</DialogTitle>
         <DialogContent>
-         <Controller 
-            name="name"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                autoFocus
-                margin="dense"
-                label="Name"
-                type="text"
-                fullWidth
-                {...field}
-              />
-            )}
-          />
           <Controller
-            name="location.lat"
+            name="user_id"
             control={control}
-            render={({ field }) => (
-              <TextField
-                margin="dense"
-                label="Latitude"
-                type="text"
-                fullWidth
-                {...field}
-              />
-            )}
-          />
-          <Controller
-            name="location.lng"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                margin="dense"
-                label="Longitude"
-                type="text"
-                fullWidth
-                {...field}
-              />
-            )}
-          />
-          <Controller
-            name="status"
-            control={control}
-            defaultValue={"online"}
             render={({ field }) => (
               <FormControl fullWidth margin="dense">
-                <InputLabel id="status">Status</InputLabel>
+                <InputLabel id="user_id">User</InputLabel>
                 <Select
-                  labelId="status"
-                  label="Status"
+                  labelId="user_id"
+                  label="user_id"
                   variant="outlined"
                   {...field}
-                  onChange={(e: SelectChangeEvent) => {
-                    field.onChange(e.target.value);
-                  }}
                 >
-                  <MenuItem value="online">Online</MenuItem>
-                  <MenuItem value="offline">Offline</MenuItem>
+                  {users?.map((user) => (
+                    <MenuItem value={user.id}>
+                      {user.email} [{user.firstName} {user.lastName}]
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
             )}
           />
-         
+
+          <Controller
+            name="amount"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                margin="dense"
+                label="Amount"
+                type="number"
+                fullWidth
+                {...field}
+              />
+            )}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>

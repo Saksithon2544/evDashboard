@@ -11,7 +11,6 @@ import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
-import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
@@ -19,21 +18,16 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import { useRouter } from "next/router";
+
 import Swal from "sweetalert2";
 
 import { visuallyHidden } from "@mui/utils";
-import { Transactions as TransactionData } from "@/pages/api/transactions";
+import { Transaction as TransactionData } from "@/interfaces/Transaction.interface";
+import axios from "@/libs/Axios";
 
-function createData(
-  name: string,
-  location: string,
-  status: string,
-  created: string
-) {
-  return { name, location, status, created };
-}
-
-function descendingComparator(a, b, orderBy) {
+function descendingComparator(a: any, b: any, orderBy: any) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
   }
@@ -43,15 +37,14 @@ function descendingComparator(a, b, orderBy) {
   return 0;
 }
 
-function getComparator(order, orderBy) {
+function getComparator(order: any, orderBy: any) {
   return order === "desc"
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
+    ? (a: any, b: any) => descendingComparator(a, b, orderBy)
+    : (a: any, b: any) => -descendingComparator(a, b, orderBy);
 }
 
-function stableSort(array:Array<any>, comparator) {
-  //@ts-ignore
-  const stabilizedThis = array?.map((el, index) => [el, index]);
+function stableSort(array, comparator) {
+  const stabilizedThis = array.map((el, index) => [el, index]);
   stabilizedThis.sort((a, b) => {
     const order = comparator(a[0], b[0]);
     if (order !== 0) {
@@ -95,17 +88,16 @@ const headCells = [
   },
 ];
 
-function EnhancedTableHead(props) {
-  const {
-    onSelectAllClick,
-    order,
-    orderBy,
-    numSelected,
-    rowCount,
-    onRequestSort,
-  } = props;
+interface EnhancedTableProps {
+  onRequestSort: (event: React.MouseEvent, property: string) => void;
+  order: "asc" | "desc";
+  orderBy: string;
+}
 
-  const createSortHandler = (property) => (event) => {
+function EnhancedTableHead(props: EnhancedTableProps) {
+  const { order, orderBy, onRequestSort } = props;
+
+  const createSortHandler = (property: string) => (event: React.MouseEvent) => {
     onRequestSort(event, property);
   };
 
@@ -139,131 +131,90 @@ function EnhancedTableHead(props) {
 }
 
 EnhancedTableHead.propTypes = {
-  numSelected: PropTypes.number.isRequired,
   onRequestSort: PropTypes.func.isRequired,
-  onSelectAllClick: PropTypes.func.isRequired,
   order: PropTypes.oneOf(["asc", "desc"]).isRequired,
   orderBy: PropTypes.string.isRequired,
-  rowCount: PropTypes.number.isRequired,
-};
-
-function EnhancedTableToolbar(props) {
-  const { numSelected } = props;
-
-  return (
-    <Toolbar
-      sx={{
-        pl: { sm: 2 },
-        pr: { xs: 1, sm: 1 },
-        ...(numSelected > 0 && {
-          bgcolor: (theme) =>
-            alpha(
-              theme.palette.primary.main,
-              theme.palette.action.activatedOpacity
-            ),
-        }),
-      }}
-    >
-      {numSelected > 0 ? (
-        <Typography
-          sx={{ flex: "1 1 100%" }}
-          color="inherit"
-          variant="subtitle1"
-          component="div"
-        >
-          {numSelected} selected
-        </Typography>
-      ) : (
-        <Typography
-          sx={{ flex: "1 1 100%" }}
-          variant="h6"
-          id="tableTitle"
-          component="div"
-        ></Typography>
-      )}
-    </Toolbar>
-  );
-}
-
-EnhancedTableToolbar.propTypes = {
-  numSelected: PropTypes.number.isRequired,
 };
 
 export type CallBack = {
   action: "edit" | "delete";
-  transaction: TransactionData | null | any;
+  Transaction: TransactionData | null | any;
 };
 
 type Props = {
   Transactions: TransactionData[];
   isLoading?: boolean;
-  refetch?: () => void;
+  refetch?: (data: boolean) => void;
   callback?: (data: CallBack) => void;
 };
 
-function TableTransactions({ Transactions, isLoading, refetch, callback }: Props) {
+function TableTransactions({ Transactions = [], isLoading, refetch, callback }: Props) {
+  const router = useRouter();
   const [order, setOrder] = React.useState<"asc" | "desc">("asc");
   const [orderBy, setOrderBy] = React.useState<string>("name");
-  const [selected, setSelected] = React.useState<number[]>([]);
   const [page, setPage] = React.useState<number>(0);
   const [dense, setDense] = React.useState<boolean>(false);
   const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
 
-  const [selectedUser, setSelectedUser] = React.useState<TransactionData | null>(
-    null
-  );
-
-  const handleEditClick = (transaction: TransactionData) => {
-    // console.log("transaction", transaction);
+  const handleEditClick = (Transaction: TransactionData) => {
+    // console.log("Transaction", Transaction);
     callback({
       action: "edit",
-      transaction,
+      Transaction,
     });
   };
 
-  const handleDeleteClick = (transaction: TransactionData) => {
-    // console.log("transaction", transaction);
+  const handleDeleteClick = async (Transaction: TransactionData) => {
     try {
-      Swal.fire({
+      const confirmationResult = await Swal.fire({
         title: "Are you sure?",
         html:
-          "Do you want to remove " +
-          "<span style='color:red;'>" +
-          transaction.transactionType +
-          "</span> from the system ?",
+          "Do you want to remove <span style='color:red;'>" +
+          Transaction.id +
+          "</span> from the system?",
         icon: "warning",
         showCancelButton: true,
         confirmButtonText: "Yes",
         cancelButtonText: "No",
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          const res = await fetch(`/api/transaction`, {
-            method: "DELETE",
-            body: JSON.stringify({
-              transactionId: transaction.transactionId,
-            }),
-          });
-          const data = await res.json();
-          // console.log("data", data);
-
-          if (data) {
-            Swal.fire(
-              "Success!",
-              "Your imaginary file has been deleted.",
-              "success"
-            );
-            if (refetch) refetch();
-          }
-        }
+        cancelButtonColor: "red",
       });
-    } catch (error) {
-      console.log("error", error);
-    }
 
-    callback({
-      action: "delete",
-      transaction,
-    });
+      if (confirmationResult.isConfirmed) {
+        // Show loading modal
+        Swal.fire({
+          title: "Please wait...",
+          text: "Deleting Transaction",
+          allowOutsideClick: false,
+          showConfirmButton: false,
+          willOpen: () => {
+            Swal.showLoading();
+          },
+        });
+        await axios.delete(`/transactions/${Transaction.id}`);
+        refetch?.(true);
+
+        // Close the loading modal
+        Swal.close();
+
+        // Show success message
+        Swal.fire({
+          icon: "success",
+          title: "Deleted!",
+          text: "Transaction has been deleted successfully.",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      let errorMessage = "An error occurred while deleting Transaction.";
+      if (error.response && error.response.data) {
+        errorMessage = error.response.data.detail;
+      }
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
   };
 
   const handleRequestSort = (event: React.MouseEvent, property: string) => {
@@ -310,7 +261,6 @@ function TableTransactions({ Transactions, isLoading, refetch, callback }: Props
   return (
     <Box style={{ width: "100%" }}>
       <Paper style={{ width: "100%", marginBottom: 2 }}>
-        {/* <EnhancedTableToolbar numSelected={selected.length} /> */}
         <TableContainer component={Paper}>
           <Table
             style={{ minWidth: 750 }}
@@ -318,48 +268,50 @@ function TableTransactions({ Transactions, isLoading, refetch, callback }: Props
             size={dense ? "small" : "medium"}
           >
             <EnhancedTableHead
-              numSelected={selected.length}
               order={order}
               orderBy={orderBy}
               // onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={visibleRows.length}
             />
             <TableBody>
               {visibleRows.map((row: TransactionData) => {
-                // const isSelectedRow = isSelected(row.transactionId);
-                const labelId = `enhanced-table-checkbox-${row.transactionId}`;
+                // const isSelectedRow = isSelected(row.id);
+                const labelId = `enhanced-table-checkbox-${row.id}`;
 
                 return (
-                  <TableRow
-                    hover
-                    role="checkbox"
-                    tabIndex={-1}
-                    key={row.transactionId}
-                  >
+                  <TableRow key={row.id}>
                     <TableCell
                       component="th"
                       id={labelId}
                       scope="row"
                       padding="none"
                     >
-                      {row.amount}
-                    </TableCell>
-                    <TableCell>
-                      {row.created}
-
-                    </TableCell>
-                   
-                    
-                    {/* <TableCell>{row.status}</TableCell> */}
-                    <TableCell>{row.created}</TableCell>
-                    <TableCell>
                       <IconButton
-                        aria-label="edit"
-                        onClick={() => handleEditClick(row)}
+                        aria-label="view"
+                        onClick={() => router.push(`/transactions/${row.id}`)}
                       >
-                        <EditIcon />
+                        <VisibilityIcon />
                       </IconButton>
+                      {row.id}
+                    </TableCell>
+                    <TableCell>
+                      {row.userId}
+                    </TableCell>
+                    {row.transactionType === "topup" ? (
+                      <TableCell>
+                        <Badge color="success" variant="dot" sx={{ mr: 2 }} />
+                        {row.transactionType}
+                      </TableCell>
+                    ) : (
+                      <TableCell>
+                        <Badge color="error" variant="dot" sx={{ mr: 2 }} />
+                        {row.transactionType}
+                      </TableCell>
+                    )}
+
+                    {/* <TableCell>{row.status}</TableCell> */}
+                    <TableCell>{row.description}</TableCell>
+                    <TableCell>
                       <IconButton
                         aria-label="delete"
                         onClick={() => handleDeleteClick(row)}
@@ -385,7 +337,7 @@ function TableTransactions({ Transactions, isLoading, refetch, callback }: Props
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={0 || Transactions.length}
+          count={Transactions.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}

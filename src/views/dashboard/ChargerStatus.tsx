@@ -67,17 +67,14 @@ const ChargerStatus = () => {
       },
     },
     colors: [
-      theme.palette.primary.main,
-      theme.palette.warning.main,
+      theme.palette.success.main,
       theme.palette.error.main,
+      theme.palette.primary.main,
     ],
     labels: [
-      "Available",
-      "Out of order",
+      "Online",
       "Offline",
       "Charging",
-      "Scheduled",
-      "Coming soon",
     ],
   };
 
@@ -87,7 +84,7 @@ const ChargerStatus = () => {
         title="Charger Status"
         titleTypographyProps={{
           sx: {
-            lineHeight: "2rem !important",
+            lineHeight: "5rem !important",
             letterSpacing: "0.15px !important",
           },
         }}
@@ -107,7 +104,7 @@ const ChargerStatus = () => {
           type="donut"
           height={205}
           options={options}
-          series={[30, 5, 15, 25, 10, 15]}
+          series={[30, 5, 15,]}
         />
         <Box sx={{ mt: 3, display: "flex", alignItems: "center" }}>
           <Typography variant="h5" sx={{ mr: 4 }}>

@@ -26,6 +26,8 @@ import { SelectChangeEvent } from "@mui/material/Select";
 import { visuallyHidden } from "@mui/utils";
 import { User as UserData } from "@/interfaces/User.interface";
 import axios from "@/libs/Axios";
+import { Tab } from "@mui/material";
+import { dateFormate } from "@/libs/date";
 
 function descendingComparator(a: any, b: any, orderBy: string) {
   if (b[orderBy] < a[orderBy]) {
@@ -73,6 +75,12 @@ const headCells = [
     numeric: false,
     disablePadding: false,
     label: "Role",
+  },
+  {
+    id: "created_at",
+    numeric: false,
+    disablePadding: false,
+    label: "Created",
   },
   {
     id: "status",
@@ -310,6 +318,8 @@ function TableMember({ Users, isLoading, refetch, callback }: Props) {
                     </TableCell>
                     <TableCell>{row.email}</TableCell>
                     <TableCell>{row.role}</TableCell>
+
+                    <TableCell> { dateFormate(row.created_at)} </TableCell>
                     {row.is_active ? (
                       <TableCell>
                         <Badge color="success" variant="dot" sx={{ mr: 2 }} />

@@ -44,18 +44,6 @@ const StationsAllTable = () => {
     }
   }
 
-  // async function handleSave(data: StationData) {
-  //   // console.log("save", data);
-  //   try {
-  //     const res = await axios.put(`/stations`, data);
-  //     const resData = await res.data;
-
-  //     // console.log("resData", resData);
-
-  //     refetch();
-  //   } catch (error) {}
-  // }
-
   return (
     <Grid container>
       <Grid item xs={12}>

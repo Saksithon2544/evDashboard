@@ -10,7 +10,7 @@ export type User = {
     role: string,
     is_deleted?: boolean
     is_active?: boolean
-    created: string,
+    created_at: string,
     updated: string,
     totp_secret?: string
     top_counter?: number

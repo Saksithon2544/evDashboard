@@ -20,6 +20,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { useRouter } from "next/router";
+import { dateFormate } from "@/libs/date";
 
 import Swal from "sweetalert2";
 
@@ -69,12 +70,6 @@ const headCells = [
     label: "Location",
   },
   {
-    id: "status",
-    numeric: false,
-    disablePadding: false,
-    label: "Status",
-  },
-  {
     id: "created",
     numeric: false,
     disablePadding: false,
@@ -85,6 +80,12 @@ const headCells = [
     numeric: false,
     disablePadding: false,
     label: "Actions",
+  },
+  {
+    id: "view",
+    numeric: false,
+    disablePadding: false,
+    label: "View Station",
   },
 ];
 
@@ -286,31 +287,15 @@ function TableStation({ Stations = [], isLoading, refetch, callback }: Props) {
                       scope="row"
                       padding="none"
                     >
-                      <IconButton
-                        aria-label="view"
-                        onClick={() => router.push(`/stations/${row.id}`)}
-                      >
-                        <VisibilityIcon />
-                      </IconButton>
                       {row.name}
                     </TableCell>
                     <TableCell>
                       {row.location[0]}, {row.location[1]}
                     </TableCell>
-                    {row.status === "online" ? (
-                      <TableCell>
-                        <Badge color="success" variant="dot" sx={{ mr: 2 }} />
-                        {row.status}
-                      </TableCell>
-                    ) : (
-                      <TableCell>
-                        <Badge color="error" variant="dot" sx={{ mr: 2 }} />
-                        {row.status}
-                      </TableCell>
-                    )}
 
                     {/* <TableCell>{row.status}</TableCell> */}
-                    <TableCell>{row.created_at}</TableCell>
+
+                    <TableCell> {dateFormate(row.created_at)}</TableCell>
                     <TableCell>
                       <IconButton
                         aria-label="edit"
@@ -323,6 +308,15 @@ function TableStation({ Stations = [], isLoading, refetch, callback }: Props) {
                         onClick={() => handleDeleteClick(row)}
                       >
                         <DeleteIcon />
+                      </IconButton>
+                    </TableCell>
+
+                    <TableCell>
+                      <IconButton
+                        aria-label="view"
+                        onClick={() => router.push(`/stations/${row.id}`)}
+                      >
+                        <VisibilityIcon />
                       </IconButton>
                     </TableCell>
                   </TableRow>

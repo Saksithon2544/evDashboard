@@ -183,15 +183,6 @@ const AccountSettings = () => {
               </Box>
             }
           />
-          {/* <Tab
-            value="info"
-            label={
-              <Box sx={{ display: "flex", alignItems: "center" }}>
-                <InformationOutline />
-                <TabName>Info</TabName>
-              </Box>
-            }
-          /> */}
         </TabList>
 
         {isLoading ? (
@@ -206,9 +197,6 @@ const AccountSettings = () => {
             <TabPanel sx={{ p: 0 }} value="security">
               <TabSecurity User={User} onSaved={handleUpdatePassword} />
             </TabPanel>
-            {/* <TabPanel sx={{ p: 0 }} value="info">
-              <TabInfo />
-            </TabPanel> */}
           </div>
         )}
       </TabContext>

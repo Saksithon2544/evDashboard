@@ -59,9 +59,13 @@ const UserDropdown = () => {
   const handleDropdownClose = (url?: string) => {
     if (url) {
       router.push(url);
-    }
+    } 
     setAnchorEl(null);
   };
+
+  const handleProfile = () => {
+    handleDropdownClose("/account-settings");
+  }
 
   const handleLogout = async () => {
     setAnchorEl(null);
@@ -150,7 +154,7 @@ const UserDropdown = () => {
           </Box>
         </Box>
         <Divider sx={{ mt: 0, mb: 1 }} />
-        <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose()}>
+        <MenuItem sx={{ p: 0 }} onClick={() => handleProfile()}>
           <Box sx={styles}>
             <AccountOutline sx={{ marginRight: 2 }} />
             Profile

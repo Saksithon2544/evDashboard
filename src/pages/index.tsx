@@ -100,52 +100,138 @@ const LoginPage = () => {
     setValues({ ...values, rememberMe: !values.rememberMe });
   };
 
+  // const handleLogin = async () => {
+  //   // Data validation
+  //   if (!values.username || !values.password) {
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Login Error',
+  //       text: 'Please enter your username and password.',
+  //     });
+  //     return; // Exit the function if validation fails
+  //   }
+
+  //   try {
+  //     // Send a POST request to the server with content type as application/x-www-form-urlencoded
+  //     const response = await axios.post("/token", new URLSearchParams({
+  //       username: values.username,
+  //       password: values.password,
+  //     }), {
+  //       headers: {
+  //         'Content-Type': 'application/x-www-form-urlencoded'
+  //       }
+  //     });
+
+  //     if (response.status === 200) {
+  //       // Store the token in local storage
+  //       localStorage.setItem('access_token', response.data.access_token);
+  //       localStorage.setItem('token_type', response.data.token_type);
+
+  //       Swal.fire({
+  //         icon: 'success',
+  //         title: 'Login Successful',
+  //         text: 'You have been logged in successfully.',
+  //       });
+
+  //       // Redirect to the dashboard page
+  //       router.push('/dashboard');
+  //     }
+
+  //     // Handle the response
+  //     console.log(response.data); // Assuming the server returns some data upon successful login
+  //   } catch (error) {
+  //     console.error('Error occurred while logging in:', error);
+  //     console.log('Error response:', error.response); // Assuming the server returns an error message
+  //     // Handle error (e.g., display error message)
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Login Error',
+  //       text: `${error.response.data.detail}`,
+  //     });
+  //   }
+  // };
+
   const handleLogin = async () => {
-    // Data validation
     if (!values.username || !values.password) {
       Swal.fire({
-        icon: 'error',
-        title: 'Login Error',
-        text: 'Please enter both username and password.',
+        icon: "error",
+        title: "Login Error",
+        text: "Please enter your username and password.",
       });
-      return; // Exit the function if validation fails
-    } 
-    
+      return;
+    }
+
+    // แสดงอนิเมชัน Loading ด้วย Swal
+    Swal.fire({
+      title: "Logging in...",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
     try {
-      // Send a POST request to the server with content type as application/x-www-form-urlencoded
-      const response = await axios.post("/token", new URLSearchParams({
-        username: values.username,
-        password: values.password,
-      }), {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
+      const response = await axios.post(
+        "/token",
+        new URLSearchParams({
+          username: values.username,
+          password: values.password,
+        }),
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
         }
-      });
+      );
 
       if (response.status === 200) {
+        const { access_token, token_type } = response.data;
+
+        // Call API to get user data
+        const userResponse = await axios.get("/users/me", {
+          headers: {
+            Authorization: `${token_type} ${access_token}`,
+          },
+        });
+
+        console.log(userResponse.data.role);
+
+        // Find user with 'admin' or 'superadmin' role from the response
+        const adminUser =
+          userResponse.data.role === "adminstation" ||
+          userResponse.data.role === "superadmin";
+
+        // Check if adminUser is found
+        if (!adminUser) {
+          Swal.fire({
+            icon: "error",
+            title: "Access Denied",
+            text: "You do not have permission to access this page.",
+          });
+          return; // Exit function if role is not appropriate
+        }
+
         // Store the token in local storage
-        localStorage.setItem('access_token', response.data.access_token);
-        localStorage.setItem('token_type', response.data.token_type);
-        
+        localStorage.setItem("access_token", access_token);
+        localStorage.setItem("token_type", token_type);
+
         Swal.fire({
-          icon: 'success',
-          title: 'Login Successful',
-          text: 'You have been logged in successfully.',
+          icon: "success",
+          title: "Login Successful",
+          text: "You have been logged in successfully.",
         });
 
         // Redirect to the dashboard page
-        router.push('/dashboard');
+        router.push("/dashboard");
       }
-      
-      // Handle the response
-      console.log(response.data); // Assuming the server returns some data upon successful login
     } catch (error) {
-      console.error('Error occurred while logging in:', error);
-      // Handle error (e.g., display error message)
+      console.error("Error occurred while logging in:", error);
+      console.log("Error response:", error.response); // Assuming the server returns an error message
       Swal.fire({
-        icon: 'error',
-        title: 'Login Error',
-        text: 'An error occurred while logging in. Please try again later.',
+        icon: "error",
+        title: "Login Error",
+        // text: `${error.response.data.detail}`,
+        text: "Username or password is incorrect.",
       });
     }
   };

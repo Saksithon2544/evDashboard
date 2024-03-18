@@ -103,7 +103,7 @@ export default function ViewStation() {
             title="Station Charging Cabinet"
             titleTypographyProps={{ variant: "h6" }}
           />
-          {/* <TableadCharging
+          <TableadCharging
             data={mergedData}
             callback={handleTable}
             refetch={() => {
@@ -111,7 +111,7 @@ export default function ViewStation() {
               refetchStations();
               refetchUsers();
             }}
-          /> */}
+          />
         </Card>
       </Grid>
     </Grid>

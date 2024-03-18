@@ -22,7 +22,7 @@ const UsersAllTable = () => {
     isLoading,
     refetch,
   } = useQuery<UserData[]>("users", async () => {
-    const res = await axios.get("/users");
+    const res = await axios.get("/super_admin/users");
     const data = await res.data;
 
     return data;

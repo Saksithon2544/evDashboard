@@ -44,7 +44,7 @@ const EditStationDialog: React.FC<EditStationDialogProps> = ({
     try {
       setIsLoading(true);
 
-      await axios.put(`/stations/${station.id}`, dataForm);
+      await axios.put(`/station/${station.id}`, dataForm);
 
       Swal.fire({
         icon: "success",

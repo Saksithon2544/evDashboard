@@ -30,7 +30,8 @@ export default function ViewStation() {
     isLoading: adminsLoading,
     refetch: refetchAdmins,
   } = useQuery<AdminData[]>("admins", async () => {
-    const res = await axios.get(`/stations/${id}/admins`);
+    const res = await axios.get(`/station/${id}/admins`);
+    console.log("admins", res.data);
     return res.data;
   });
 
@@ -39,7 +40,8 @@ export default function ViewStation() {
     isLoading: stationsLoading,
     refetch: refetchStations,
   } = useQuery<StationData[]>("stations", async () => {
-    const res = await axios.get(`/stations`);
+    const res = await axios.get(`/station`);
+    console.log("stations", res.data);
     return res.data;
   });
 
@@ -48,7 +50,8 @@ export default function ViewStation() {
     isLoading: usersLoading,
     refetch: refetchUsers,
   } = useQuery<UserData[]>("users", async () => {
-    const res = await axios.get("/users");
+    const res = await axios.get("/super_admin/users");
+    console.log("users", res.data);
     return res.data;
   });
 
@@ -57,17 +60,13 @@ export default function ViewStation() {
 
   // Merge data from adminsData, stationsData, and usersData
   const mergedData = adminsData.map((admin) => {
-    const station = stationsData.find(
-      (station) => station.id === admin.stationId
-    );
+    const station = stationsData.find((station) => station.id === admin.stationId);
     const user = usersData.find((user) => user.id === admin.userId);
     return {
       ...admin,
-      status: station ? station.status : "",
-      stationName: station ? station.name : "",
-      userName: user ? `${user.firstName} ${user.lastName}` : "",
-      email: user ? user.email : "",
-      is_active: user.is_active,
+      stationName: station?.name,
+      userName: user?`${user.firstName} ${user.lastName}`: "",
+      email: user? user.email: "",
     };
   });
 
@@ -82,6 +81,7 @@ export default function ViewStation() {
             title="Admin Stations"
             titleTypographyProps={{ variant: "h6" }}
           />
+          {JSON.stringify(mergedData)}
           <TableadminStation
             data={mergedData}
             callback={handleTable}
@@ -103,7 +103,7 @@ export default function ViewStation() {
             title="Station Charging Cabinet"
             titleTypographyProps={{ variant: "h6" }}
           />
-          <TableadCharging
+          {/* <TableadCharging
             data={mergedData}
             callback={handleTable}
             refetch={() => {
@@ -111,7 +111,7 @@ export default function ViewStation() {
               refetchStations();
               refetchUsers();
             }}
-          />
+          /> */}
         </Card>
       </Grid>
     </Grid>

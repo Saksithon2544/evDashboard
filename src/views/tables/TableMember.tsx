@@ -191,7 +191,7 @@ function TableMember({ Users, isLoading, refetch, callback }: Props) {
       });
 
       if (result.isConfirmed) {
-        const { data } = await axios.put(`/users/${user.id}/disable`);
+        const { data } = await axios.put(`/super_admin/users/${user.id}/disable`);
 
         if (data) {
           Swal.fire(

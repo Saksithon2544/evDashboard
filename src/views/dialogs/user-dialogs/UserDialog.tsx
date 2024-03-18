@@ -32,7 +32,7 @@ export default function UserDialog({ callback }) {
 
   const { mutate } = useMutation<User>({
     mutationFn: async (article) => {
-      return await axios.post("/register/by_superadmin", article);
+      return await axios.post("/super_admin/register/user", article);
     },
     onSuccess: async (data) => {
       console.log("data", data); // data is displayed, onSuccess is called

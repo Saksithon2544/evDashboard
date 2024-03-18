@@ -42,7 +42,7 @@ export default function TransactionDialog({ callback }) {
   const [open, setOpen] = React.useState(false);
 
   const { data: users } = useQuery<User[]>("users", async () => {
-    const res = await axios.get("/users");
+    const res = await axios.get("/super_admin/users");
     return res.data;
   });
 

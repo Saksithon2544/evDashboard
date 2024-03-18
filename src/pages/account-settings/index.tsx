@@ -63,7 +63,7 @@ const AccountSettings = () => {
     isLoading,
     refetch,
   } = useQuery<UserData>("users", async () => {
-    const res = await axios.get("/users/me");
+    const res = await axios.get("/user/me");
     const data = await res.data;
 
     return data;
@@ -81,7 +81,7 @@ const AccountSettings = () => {
         cancelButtonColor: "red",
       }).then(async (result) => {
         if (result.isConfirmed) {
-          await axios.put(`/users`, data);
+          await axios.put(`/user/me`, data);
           refetch();
 
           Swal.fire({
@@ -126,7 +126,7 @@ const AccountSettings = () => {
         });
 
         // Make the password update request
-        const response = await axios.post(`/users/password`, data);
+        const response = await axios.post(`/user/password`, data);
         refetch();
 
         // Hide loading modal

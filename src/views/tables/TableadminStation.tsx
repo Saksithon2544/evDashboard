@@ -145,15 +145,12 @@ export type CallBack = {
 
 interface Props {
   data: {
+    stationId: string;
     stationName: string;
+    userId: string;
     userName: string;
     email: string;
-    id?: string;
-    userId: string;
-    stationId: string;
-    status: string;
-    is_active: boolean;
-    created_at: string;
+    // status: string;
   }[];
   callback: (station: any) => void;
   refetch: () => void;
@@ -204,7 +201,7 @@ function TableadminStation({ data, callback, refetch }: Props) {
             Swal.showLoading();
           },
         });
-        await axios.delete(`/stations/${data.stationId}/admins/${data.userId}`);
+        await axios.delete(`/station_admin/${data.stationId}/admins/${data.userId}`);
         refetch();
 
         // Close the loading modal
@@ -289,7 +286,7 @@ function TableadminStation({ data, callback, refetch }: Props) {
                   <TableCell>{row.stationName}</TableCell>
                   <TableCell>{row.userName}</TableCell> 
                   <TableCell>{row.email}</TableCell>
-                  {row.is_active ? (
+                  {row ? (
                       <TableCell>
                         <Badge color="success" variant="dot" sx={{ mr: 2 }} />
                         Active

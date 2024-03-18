@@ -151,7 +151,7 @@ interface Props {
     id?: string;
     userId: string;
     stationId: string;
-    status: string;
+    // status: string;
     created_at: string;
   }[];
   callback: (station: any) => void;
@@ -203,7 +203,7 @@ function TableadminStation({ data, callback, refetch }: Props) {
             Swal.showLoading();
           },
         });
-        await axios.delete(`/stations/${data.stationId}/admins/${data.userId}`);
+        await axios.delete(`/station_admin/${data.stationId}/admins/${data.userId}`);
         refetch();
 
         // Close the loading modal

@@ -5,6 +5,7 @@ export type User = {
     lastName: string,
     password: string,
     confirmPassword:string,
+    confirm_password: string,
     email: string,
     phoneNumber: string,
     role: string,

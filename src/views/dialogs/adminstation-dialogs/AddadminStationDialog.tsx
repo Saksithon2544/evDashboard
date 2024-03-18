@@ -41,13 +41,13 @@ export default function StationDialog({ callback }) {
   const [open, setOpen] = React.useState(false);
 
   const {data:users} = useQuery<User[]>("users", async () => {
-    const res = await axios.get("/users");
+    const res = await axios.get("/super_admin/users");
     return res.data;
   }
   );
 
   const {data:stations} = useQuery<Station[]>("stations", async () => {
-    const res = await axios.get("/stations");
+    const res = await axios.get("/station");
     return res.data;
   }
   );
@@ -81,7 +81,7 @@ export default function StationDialog({ callback }) {
       console.log(data);
 
 
-      await axios.put(`/stations/${data.station_id}/admins/${data.user_id}`);
+      await axios.post(`/station_admin/${data.station_id}/admins/${data.user_id}`);
 
       await Swal.fire({
         title: "Success",

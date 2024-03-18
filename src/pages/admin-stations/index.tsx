@@ -21,7 +21,7 @@ const StationsAllTable = () => {
     isLoading,
     refetch,
   } = useQuery<StationData[]>("stations", async () => {
-    const res = await axios.get(`/stations`);
+    const res = await axios.get(`/station`);
     const data = await res.data;
     return data;
   });

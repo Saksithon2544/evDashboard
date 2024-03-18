@@ -188,7 +188,7 @@ const LoginPage = () => {
         const { access_token, token_type } = response.data;
 
         // Call API to get user data
-        const userResponse = await axios.get("/users/me", {
+        const userResponse = await axios.get("/user/me", {
           headers: {
             Authorization: `${token_type} ${access_token}`,
           },
@@ -198,7 +198,7 @@ const LoginPage = () => {
 
         // Find user with 'admin' or 'superadmin' role from the response
         const adminUser =
-          userResponse.data.role === "adminstation" ||
+          userResponse.data.role === "stationadmin" ||
           userResponse.data.role === "superadmin";
 
         // Check if adminUser is found

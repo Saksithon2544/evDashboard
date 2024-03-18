@@ -62,7 +62,7 @@ export default function StationDialog({ callback }) {
         },
       });
 
-      await axios.post("/stations", data);
+      await axios.post("/station", data);
 
       await Swal.fire({
         title: "Success",

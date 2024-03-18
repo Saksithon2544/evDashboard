@@ -191,7 +191,7 @@ function TableStation({ Stations = [], isLoading, refetch, callback }: Props) {
             Swal.showLoading();
           },
         });
-        await axios.delete(`/stations/${station.id}`);
+        await axios.delete(`/station/${station.id}`);
         refetch?.(true);
 
         // Close the loading modal

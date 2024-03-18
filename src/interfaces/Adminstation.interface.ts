@@ -9,10 +9,10 @@ export type Station= {
 };
 
 export type Admin = {
-    id?: string,
-    userId: string,
-    stationId: string,
-    created_at: string,
+    created_at?: string
+    id?: string
+    user_id?: string
+    stationId?: string
 };
 
 export type User = {

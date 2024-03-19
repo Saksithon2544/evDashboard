@@ -1,4 +1,4 @@
-import React, {useRef} from "react"; 
+import React, { useRef } from "react";
 import Box from "@mui/material/Box";
 import Badge from "@mui/material/Badge";
 import Table from "@mui/material/Table";
@@ -20,6 +20,8 @@ import Swal from "sweetalert2";
 import axios from "@/libs/Axios";
 import { Button } from "@mui/material";
 import { visuallyHidden } from "@mui/utils";
+
+import type {  User } from '@/interfaces/Adminstation.interface'
 
 function descendingComparator(a: any, b: any, orderBy: any) {
   if (b[orderBy] < a[orderBy]) {
@@ -49,22 +51,22 @@ function stableSort(array: any, comparator: any) {
 
 const headCells = [
   {
-    id: "stationName",
+    id: "adminStation",
     numeric: false,
     disablePadding: true,
-    label: "Station Name",
-  },
-  {
-    id: "userName",
-    numeric: false,
-    disablePadding: false,
-    label: "Admin Station",   
+    label: "Admin Station",
   },
   {
     id: "email",
     numeric: false,
     disablePadding: false,
     label: "Email Admin Station",
+  },
+  {
+    id: "phoneNumber",
+    numeric: false,
+    disablePadding: false,
+    label: "Phone Number",
   },
   {
     id: "status",
@@ -142,28 +144,28 @@ export type CallBack = {
   action: "edit" | "delete";
   station: any;
 };
-
+interface UserData {
+  id: string;
+  name: string;
+  email: string;
+}
+// อินเทอร์เฟซของ TableadminStation ที่ปรับปรุงแล้ว
 interface Props {
-  data: {
-    stationId: string;
-    stationName: string;
-    userId: string;
-    userName: string;
-    email: string;
-    // status: string;
-  }[];
-  callback: (station: any) => void;
+  mergedData: User[];
+  callback: () => void;
   refetch: () => void;
 }
 
-function TableadminStation({ data, callback, refetch }: Props) {
+
+
+function TableadminStation({ mergedData, callback, refetch }: Props) {
   const router = useRouter();
+  const refetchTimer = useRef<any>(null);
   const [order, setOrder] = React.useState<"asc" | "desc">("asc");
-  const [orderBy, setOrderBy] = React.useState<string>("name");
-  const [page, setPage] = React.useState<number>(0);
-  const [dense, setDense] = React.useState<boolean>(false);
-  const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
-  const refetchTimer = useRef(null);
+  const [orderBy, setOrderBy] = React.useState("calories");
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [dense, setDense] = React.useState(false);
 
   // React.useEffect(() => {
   //   refetchTimer.current = setInterval(() => {
@@ -181,7 +183,7 @@ function TableadminStation({ data, callback, refetch }: Props) {
         title: "Are you sure?",
         html:
           "Do you want to remove <span style='color:red;'>" +
-          data.userName +
+          data.firstName + data.lastName +
           "</span> from the system?",
         icon: "warning",
         showCancelButton: true,
@@ -201,9 +203,10 @@ function TableadminStation({ data, callback, refetch }: Props) {
             Swal.showLoading();
           },
         });
-        await axios.delete(`/station_admin/${data.stationId}/admins/${data.userId}`);
-        refetch();
-
+        await axios.delete(
+          `/station_admin/${data.stationId}/admins/${data.userId}`
+        );
+          
         // Close the loading modal
         Swal.close();
 
@@ -249,16 +252,16 @@ function TableadminStation({ data, callback, refetch }: Props) {
     setDense(event.target.checked);
   };
 
-
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
+  const emptyRows =
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - mergedData.length) : 0;
 
   const visibleRows = React.useMemo(
     () =>
-      stableSort(data, getComparator(order, orderBy)).slice(
+      stableSort(mergedData, getComparator(order, orderBy)).slice(
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage
       ),
-    [data, order, orderBy, page, rowsPerPage]
+    [mergedData, order, orderBy, page, rowsPerPage]
   );
 
   return (
@@ -277,27 +280,28 @@ function TableadminStation({ data, callback, refetch }: Props) {
               order={order}
               orderBy={orderBy}
               onRequestSort={handleRequestSort}
-              rowCount={data.length}
+              rowCount={mergedData.length}
             />
 
+
             <TableBody>
-              {data.map((row, index) => (
+              {mergedData.map((row, index) => (
                 <TableRow key={index}>
-                  <TableCell>{row.stationName}</TableCell>
-                  <TableCell>{row.userName}</TableCell> 
+                  <TableCell>{row.firstName} {row.lastName}</TableCell>
                   <TableCell>{row.email}</TableCell>
+                  <TableCell>{row.phoneNumber}</TableCell>
                   {row ? (
-                      <TableCell>
-                        <Badge color="success" variant="dot" sx={{ mr: 2 }} />
-                        Active
-                      </TableCell>
-                    ) : (
-                      <TableCell>
-                        <Badge color="error" variant="dot" sx={{ mr: 2 }} />
-                        Inactive
-                      </TableCell>
-                    )}
-                    
+                    <TableCell>
+                      <Badge color="success" variant="dot" sx={{ mr: 2 }} />
+                      Active
+                    </TableCell>
+                  ) : (
+                    <TableCell>
+                      <Badge color="error" variant="dot" sx={{ mr: 2 }} />
+                      Inactive
+                    </TableCell>
+                  )}
+
                   <TableCell>
                     <IconButton
                       aria-label="delete"
@@ -310,12 +314,11 @@ function TableadminStation({ data, callback, refetch }: Props) {
               ))}
             </TableBody>
           </Table>
-          <Button onClick={refetch}>Refresh</Button>
         </TableContainer>
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={data.length}
+          count={mergedData.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}

@@ -55,7 +55,11 @@ export default function ViewStation() {
   //   return res.data;
   // });
 
-  const {data: mergedData, isFetching , refetch} = useQuery(
+  const {
+    data: mergedData,
+    isFetching,
+    refetch,
+  } = useQuery(
     ["station", id],
     async () => {
       const res1 = (await axios.get(`/station/${id}/admins`))
@@ -74,10 +78,8 @@ export default function ViewStation() {
 
         const adminInfo = users.find((user) => user.id === adminId);
 
-        return {
-          adminInfo: adminInfo,
-        };
-      });
+        return adminInfo;
+      }) as UserData[];
 
       return {
         ...mergedData,
@@ -89,13 +91,12 @@ export default function ViewStation() {
     }
   );
 
-  if (isFetching)
-    return <div>Loading...</div>;
+  if (isFetching) return <div>Loading...</div>;
 
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
-        {/* <AddadminStationDialog callback={refetchAdmins} /> */}
+        <AddadminStationDialog callback={refetch} />
       </Grid>
       <Grid item xs={12} paddingBottom={12}>
         <Card>
@@ -103,14 +104,14 @@ export default function ViewStation() {
             title={`Admin Stations: ${mergedData?.name}`}
             titleTypographyProps={{ variant: "h6" }}
           />
-          {JSON.stringify(mergedData)}
-          {/* <TableadminStation
-            data={mergedData.adminInStation}
-            callback={handleTable}
+          {/* {JSON.stringify(mergedData)} */}
+          <TableadminStation
+            mergedData={mergedData.adminInStation}
+            callback={() => {}}
             refetch={() => {
-              refetch()
+              refetch();
             }}
-          /> */}
+          />
         </Card>
       </Grid>
 

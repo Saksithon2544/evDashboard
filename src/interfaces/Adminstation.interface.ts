@@ -1,4 +1,4 @@
-export type Station= {
+export type Station = {
     id?: string,
     stationId: string,
     name: string,
@@ -20,7 +20,7 @@ export type User = {
     firstName: string,
     lastName: string,
     password: string,
-    confirmPassword:string,
+    confirmPassword: string,
     email: string,
     phoneNumber: string,
     role: string,
@@ -32,3 +32,14 @@ export type User = {
     top_counter?: number
     balance?: number
 }
+
+
+export interface MergedData {
+    id: string
+    name: string
+    location: number[]
+    created_at: string
+    adminInStation: User[]
+}
+
+

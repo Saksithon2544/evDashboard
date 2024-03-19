@@ -88,6 +88,9 @@ export default function ViewStation() {
     },
     {
       enabled: !!id,
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
     }
   );
 
@@ -104,9 +107,9 @@ export default function ViewStation() {
             title={`Admin Stations: ${mergedData?.name}`}
             titleTypographyProps={{ variant: "h6" }}
           />
-          {/* {JSON.stringify(mergedData)} */}
           <TableadminStation
-            mergedData={mergedData.adminInStation}
+            mergedData={mergedData?.adminInStation}
+            stationId={id as string }
             callback={() => {}}
             refetch={() => {
               refetch();

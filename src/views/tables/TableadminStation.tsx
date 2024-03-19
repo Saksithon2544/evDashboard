@@ -21,7 +21,7 @@ import axios from "@/libs/Axios";
 import { Button } from "@mui/material";
 import { visuallyHidden } from "@mui/utils";
 
-import type {  User } from '@/interfaces/Adminstation.interface'
+import type { User } from "@/interfaces/Adminstation.interface";
 
 function descendingComparator(a: any, b: any, orderBy: any) {
   if (b[orderBy] < a[orderBy]) {
@@ -40,6 +40,10 @@ function getComparator(order: any, orderBy: any) {
 }
 
 function stableSort(array: any, comparator: any) {
+  if (!Array.isArray(array)) {
+    return [];
+  }
+
   const stabilizedThis = array.map((el: any, index: any) => [el, index]);
   stabilizedThis.sort((a: any, b: any) => {
     const order = comparator(a[0], b[0]);
@@ -152,13 +156,17 @@ interface UserData {
 // อินเทอร์เฟซของ TableadminStation ที่ปรับปรุงแล้ว
 interface Props {
   mergedData: User[];
+  stationId: string;
   callback: () => void;
   refetch: () => void;
 }
 
-
-
-function TableadminStation({ mergedData, callback, refetch }: Props) {
+function TableadminStation({
+  mergedData,
+  callback,
+  refetch,
+  stationId,
+}: Props) {
   const router = useRouter();
   const refetchTimer = useRef<any>(null);
   const [order, setOrder] = React.useState<"asc" | "desc">("asc");
@@ -178,12 +186,15 @@ function TableadminStation({ mergedData, callback, refetch }: Props) {
   // }, []);
 
   const handleDeleteClick = async (data: any) => {
+    console.log(stationId);
+    console.log(mergedData);
     try {
       const confirmationResult = await Swal.fire({
         title: "Are you sure?",
         html:
           "Do you want to remove <span style='color:red;'>" +
-          data.firstName + data.lastName +
+          data.firstName +
+          data.lastName +
           "</span> from the system?",
         icon: "warning",
         showCancelButton: true,
@@ -203,10 +214,8 @@ function TableadminStation({ mergedData, callback, refetch }: Props) {
             Swal.showLoading();
           },
         });
-        await axios.delete(
-          `/station_admin/${data.stationId}/admins/${data.userId}`
-        );
-          
+        await axios.delete(`/station_admin/${stationId}/admins/${data.id}`);
+
         // Close the loading modal
         Swal.close();
 
@@ -216,6 +225,9 @@ function TableadminStation({ mergedData, callback, refetch }: Props) {
           title: "Deleted!",
           text: "Station has been deleted successfully.",
         });
+
+        // Refetch data
+        refetch();
       }
     } catch (error) {
       console.log(error);
@@ -253,11 +265,13 @@ function TableadminStation({ mergedData, callback, refetch }: Props) {
   };
 
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - mergedData.length) : 0;
+    page > 0
+      ? Math.max(0, (1 + page) * rowsPerPage - (mergedData?.length || 0))
+      : 0;
 
   const visibleRows = React.useMemo(
     () =>
-      stableSort(mergedData, getComparator(order, orderBy)).slice(
+      stableSort(mergedData || [], getComparator(order, orderBy)).slice(
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage
       ),
@@ -280,45 +294,46 @@ function TableadminStation({ mergedData, callback, refetch }: Props) {
               order={order}
               orderBy={orderBy}
               onRequestSort={handleRequestSort}
-              rowCount={mergedData.length}
+              rowCount={(mergedData && mergedData.length) || 0} // Added null check
             />
 
-
             <TableBody>
-              {mergedData.map((row, index) => (
-                <TableRow key={index}>
-                  <TableCell>{row.firstName} {row.lastName}</TableCell>
-                  <TableCell>{row.email}</TableCell>
-                  <TableCell>{row.phoneNumber}</TableCell>
-                  {row ? (
+              {mergedData &&
+                mergedData.map((row, index) => (
+                  <TableRow key={index}>
                     <TableCell>
-                      <Badge color="success" variant="dot" sx={{ mr: 2 }} />
-                      Active
+                      {row.firstName} {row.lastName}
                     </TableCell>
-                  ) : (
+                    <TableCell>{row.email}</TableCell>
+                    <TableCell>{row.phoneNumber}</TableCell>
+                    {row.is_active ? (
+                      <TableCell>
+                        <Badge color="success" variant="dot" sx={{ mr: 2 }} />
+                        Active
+                      </TableCell>
+                    ) : (
+                      <TableCell>
+                        <Badge color="error" variant="dot" sx={{ mr: 2 }} />
+                        Inactive
+                      </TableCell>
+                    )}
                     <TableCell>
-                      <Badge color="error" variant="dot" sx={{ mr: 2 }} />
-                      Inactive
+                      <IconButton
+                        aria-label="delete"
+                        onClick={() => handleDeleteClick(row)}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
                     </TableCell>
-                  )}
-
-                  <TableCell>
-                    <IconButton
-                      aria-label="delete"
-                      onClick={() => handleDeleteClick(row)}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
+                  </TableRow>
+                ))}
             </TableBody>
           </Table>
         </TableContainer>
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={mergedData.length}
+          count={(mergedData && mergedData.length) || 0} // Added null check
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}

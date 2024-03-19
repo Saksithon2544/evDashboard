@@ -99,7 +99,10 @@ export default function ViewStation() {
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
-        <AddadminStationDialog callback={refetch} />
+        <AddadminStationDialog
+          stationId={id as string}
+          callback={refetch} 
+        />
       </Grid>
       <Grid item xs={12} paddingBottom={12}>
         <Card>

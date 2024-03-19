@@ -25,6 +25,7 @@ import { useQuery, useMutation, QueryClient } from "react-query";
 import { ok } from "assert";
 
 type Props = {
+  stationId: string;
   callback?: () => void;
 };
 
@@ -33,7 +34,7 @@ type FormData = {
   station_id: string;
 }
 
-export default function StationDialog({ callback }) {
+export default function StationDialog({ callback, stationId }: Props) {
   const { control, reset, handleSubmit, watch, setValue } = useForm();
 
   const roleWatch = watch("role");
@@ -59,7 +60,7 @@ export default function StationDialog({ callback }) {
   const handleClose = () => {
     reset({
       user_id: "",
-      station_id: "",
+      // station_id: "",
     });
     setOpen(false);
   };
@@ -78,10 +79,8 @@ export default function StationDialog({ callback }) {
         },
       });
 
-      console.log(data);
 
-
-      await axios.post(`/station_admin/${data.station_id}/admins/${data.user_id}`);
+      await axios.post(`/station_admin/${stationId}/admins/${data.user_id}`);
 
       await Swal.fire({
         title: "Success",
@@ -136,7 +135,7 @@ export default function StationDialog({ callback }) {
             )}
           />
 
-          <Controller
+          {/* <Controller
             name="station_id"
             control={control}
             defaultValue={""}
@@ -155,7 +154,7 @@ export default function StationDialog({ callback }) {
                 </Select>
               </FormControl>
             )}
-          />
+          /> */}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>

@@ -74,6 +74,11 @@ const StationsAllTable = () => {
               refetch={() => refetch()}
             />
           )}
+          {!isLoading ? (
+            <Typography variant="h6" align="center">
+              No Data
+            </Typography>
+          ) : null}
         </Card>
       </Grid>
     </Grid>

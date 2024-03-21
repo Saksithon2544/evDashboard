@@ -10,9 +10,7 @@ import TableTransactions, {
 import AddTransactionDialog from "@/views/dialogs/transaction-dialogs/AddTransactionDialog";
 
 import { useQuery } from "react-query";
-import {
-  Transaction as TransactionData,
-} from "@/interfaces/Transaction.interface";
+import { Transaction as TransactionData } from "@/interfaces/Transaction.interface";
 import { useState } from "react";
 import axios from "@/libs/Axios";
 import { Typography } from "@mui/material";
@@ -26,7 +24,7 @@ const TransactionsAllTable = () => {
     isLoading,
     refetch,
   } = useQuery<TransactionData[]>("transactions", async () => {
-    const res = await axios.get("/transactions");
+    const res = await axios.get("/transaction");
     const data = await res.data;
     // check data not array
     if (!Array.isArray(data)) {
@@ -85,6 +83,10 @@ const TransactionsAllTable = () => {
               callback={handleTable}
               refetch={() => refetch()}
             />
+          ) : TransactionsData && TransactionsData.length === 0 ? (
+            <Typography variant="h6" align="center">
+              No Data
+            </Typography>
           ) : (
             <Typography variant="h6" align="center">
               Loading...

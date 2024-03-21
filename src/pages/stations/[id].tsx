@@ -11,11 +11,13 @@ import CardHeader from "@mui/material/CardHeader";
 import TableadminStation from "src/views/tables/TableadminStation";
 import TableadCharging from "src/views/tables/TableCharging";
 import AddadminStationDialog from "@/views/dialogs/adminstation-dialogs/AddadminStationDialog";
+import AddadminChargingDialog from "@/views/dialogs/charging-dialogs/AddadminChargingDialog";
 
 import {
   Admin as AdminData,
   Station as StationData,
   User as UserData,
+  Charging as ChargingData,
 } from "@/interfaces/Adminstation.interface";
 
 export default function ViewStation() {
@@ -55,6 +57,8 @@ export default function ViewStation() {
   //   return res.data;
   // });
 
+  
+
   const {
     data: mergedData,
     isFetching,
@@ -62,16 +66,27 @@ export default function ViewStation() {
   } = useQuery(
     ["station", id],
     async () => {
-      const res1 = (await axios.get(`/station/${id}/admins`))
-        .data as AdminData[];
+      const res1 = (await axios.get(`/station/${id}/admins`)).data as AdminData[];
       const res2 = (await axios.get(`/station`)).data as StationData[];
       const res3 = (await axios.get("/super_admin/users")).data as UserData[];
+      const res4 = (await axios.get(`/charging_booth/${id}`)).data as ChargingData[];
 
-      const res = await Promise.all([res1, res2, res3]);
 
-      const [admins, stations, users] = res;
+      const res = await Promise.all([res1, res2, res3, res4]);
+
+      const [admins, stations, users, chargings] = res;
+
+     
 
       const mergedData = stations.find((station) => station.id === id);
+
+      const chargingBooth = chargings.map((charging) => {
+        const chargingId = charging.booth_id;
+
+        const chargingInfo = charging;
+
+        return chargingInfo;
+      }) as ChargingData[];
 
       const adminInStation = admins.map((admin) => {
         const adminId = admin.user_id;
@@ -81,9 +96,12 @@ export default function ViewStation() {
         return adminInfo;
       }) as UserData[];
 
+      console.log("mergedData", chargingBooth);
+
       return {
         ...mergedData,
         adminInStation: adminInStation,
+        chargingBooth: chargingBooth,
       };
     },
     {
@@ -99,20 +117,17 @@ export default function ViewStation() {
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
-        <AddadminStationDialog
-          stationId={id as string}
-          callback={refetch} 
-        />
+        <AddadminStationDialog stationId={id as string} callback={refetch} />
       </Grid>
       <Grid item xs={12} paddingBottom={12}>
         <Card>
           <CardHeader
-            title={`Admin Stations: ${mergedData?.name}`}
+            title={`Admin Stations (⛽️ ${mergedData?.name})`}
             titleTypographyProps={{ variant: "h6" }}
           />
           <TableadminStation
             mergedData={mergedData?.adminInStation}
-            stationId={id as string }
+            stationId={id as string}
             callback={() => {}}
             refetch={() => {
               refetch();
@@ -122,23 +137,22 @@ export default function ViewStation() {
       </Grid>
 
       <Grid item xs={12}>
-        {/* <AddadminStationDialog callback={refetchAdmins} /> */}
+        <AddadminChargingDialog stationId={id as string} callback={refetch} />
       </Grid>
       <Grid item xs={12}>
         <Card>
           <CardHeader
-            title="Station Charging Cabinet"
+            title="Charging Cabinet"
             titleTypographyProps={{ variant: "h6" }}
           />
-          {/* <TableadCharging
-            data={mergedData}
-            callback={handleTable}
+          <TableadCharging
+            mergedData={mergedData?.chargingBooth}
+            // stationId={id as string}
+            callback={() => {}}
             refetch={() => {
-              refetchAdmins();
-              refetchStations();
-              refetchUsers();
+              refetch();
             }}
-          /> */}
+          />
         </Card>
       </Grid>
     </Grid>

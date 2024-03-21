@@ -33,6 +33,16 @@ export type User = {
     balance?: number
 }
 
+export type Charging = {
+    booth_id: string
+    booth_name: string
+    station_id: string
+    status: string
+    charging_rate: number
+    created_at: string
+    updated_at: string
+}
+
 
 export interface MergedData {
     id: string

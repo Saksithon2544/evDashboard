@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 
-// const API_URL = 'https://ecochargingtest.up.railway.app';
-const API_URL = 'https://ecocharge-backend-production.up.railway.app';
+const API_URL = 'http://127.0.0.1:8000';
+// const API_URL = 'https://ecocharge-backend-production.up.railway.app';
 
 // Create a global Axios instance with default settings
 const Axios = axios.create({

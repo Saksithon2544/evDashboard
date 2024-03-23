@@ -181,7 +181,7 @@ Props) {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [dense, setDense] = React.useState(false);
   const [statusFilter, setStatusFilter] = useState<
-    "online" | "offline" | "all"
+    "online" | "offline" | "charging" | "all"
   >("all");
 
   // React.useEffect(() => {
@@ -273,9 +273,9 @@ Props) {
   };
 
   const handleStatusFilterChange = (
-    event: SelectChangeEvent<"online" | "offline" | "all">
+    event: SelectChangeEvent<"online" | "offline" | "charging" | "all">
   ) => {
-    setStatusFilter(event.target.value as "online" | "offline" | "all");
+    setStatusFilter(event.target.value as "online" | "offline" | "charging" | "all");
   };
 
   const emptyRows =
@@ -288,6 +288,7 @@ Props) {
         if (statusFilter === "all") return true;
         if (statusFilter === "online") return row.status === "online";
         if (statusFilter === "offline") return row.status === "offline";
+        if (statusFilter === "charging") return row.status === "charging";
         return true;
       })
     : [];
@@ -307,6 +308,7 @@ Props) {
             <MenuItem value="all">All</MenuItem>
             <MenuItem value="online">Online</MenuItem>
             <MenuItem value="offline">Offline</MenuItem>
+            <MenuItem value="charging">Charging</MenuItem>
           </Select>
         </FormControl>
       </div>
@@ -339,6 +341,11 @@ Props) {
                       <TableCell>
                         <Badge color="success" variant="dot" sx={{ mr: 2 }} />
                         Online
+                      </TableCell>
+                    ) : row.status === "charging" ? (
+                      <TableCell>
+                        <Badge color="warning" variant="dot" sx={{ mr: 2 }} />
+                        Charging
                       </TableCell>
                     ) : (
                       <TableCell>

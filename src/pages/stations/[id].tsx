@@ -60,7 +60,7 @@ export default function ViewStation() {
 
   const {
     data: mergedData,
-    isFetching,
+    isLoading,
     refetch,
   } = useQuery(
     ["station", id],
@@ -110,7 +110,7 @@ export default function ViewStation() {
     }
   );
 
-  if (isFetching) return <div>Loading...</div>;
+  // if (isLoading) return <div>Loading...</div>;
 
   return (
     <Grid container spacing={2}>
@@ -123,14 +123,27 @@ export default function ViewStation() {
             title={`Admin Stations (⛽️ ${mergedData?.name})`}
             titleTypographyProps={{ variant: "h6" }}
           />
-          <TableadminStation
-            mergedData={mergedData?.adminInStation}
-            stationId={id as string}
-            callback={() => {}}
-            refetch={() => {
-              refetch();
-            }}
-          />
+          {!isLoading &&
+          mergedData?.adminInStation &&
+          mergedData?.adminInStation.length > 0 ? (
+            <TableadminStation
+              mergedData={mergedData?.adminInStation}
+              stationId={id as string}
+              callback={() => {}}
+              refetch={() => {
+                refetch();
+              }}
+            />
+          ) : mergedData?.adminInStation &&
+            mergedData?.adminInStation.length == 0 ? (
+            <Typography variant="h6" align="center">
+              No Data
+            </Typography>
+          ) : (
+            <Typography variant="h6" align="center">
+              Loading...
+            </Typography>
+          )}
         </Card>
       </Grid>
 
@@ -143,12 +156,9 @@ export default function ViewStation() {
             title="Charging Cabinet"
             titleTypographyProps={{ variant: "h6" }}
           />
-          {isFetching && (
-            <Typography variant="h6" align="center">
-              Loading...
-            </Typography>
-          )}
-          {!isFetching && (
+          {!isLoading &&
+          mergedData?.chargingBooth &&
+          mergedData?.chargingBooth.length > 0 ? (
             <TableadCharging
               mergedData={mergedData?.chargingBooth}
               // stationId={id as string}
@@ -157,12 +167,16 @@ export default function ViewStation() {
                 refetch();
               }}
             />
-          )}
-          {!isFetching ? (
+          ) : mergedData?.chargingBooth &&
+            mergedData?.chargingBooth.length == 0 ? (
             <Typography variant="h6" align="center">
               No Data
             </Typography>
-          ) : null}
+          ) : (
+            <Typography variant="h6" align="center">
+              Loading...
+            </Typography>
+          )}
         </Card>
       </Grid>
     </Grid>

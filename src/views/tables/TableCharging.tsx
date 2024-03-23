@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import Box from "@mui/material/Box";
 import Badge from "@mui/material/Badge";
 import Table from "@mui/material/Table";
@@ -18,10 +18,17 @@ import { useRouter } from "next/router";
 
 import Swal from "sweetalert2";
 import axios from "@/libs/Axios";
-import { Button } from "@mui/material";
 import { visuallyHidden } from "@mui/utils";
 
 import type { Charging } from "@/interfaces/Adminstation.interface";
+import { dateFormate } from "@/libs/date";
+import {
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+} from "@mui/material";
 
 function descendingComparator(a: any, b: any, orderBy: any) {
   if (b[orderBy] < a[orderBy]) {
@@ -164,8 +171,8 @@ function TableCharging({
   mergedData,
   callback,
   refetch,
-  // stationId,
-}: Props) {
+}: // stationId,
+Props) {
   const router = useRouter();
   const refetchTimer = useRef<any>(null);
   const [order, setOrder] = React.useState<"asc" | "desc">("asc");
@@ -173,6 +180,9 @@ function TableCharging({
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [dense, setDense] = React.useState(false);
+  const [statusFilter, setStatusFilter] = useState<
+    "online" | "offline" | "all"
+  >("all");
 
   // React.useEffect(() => {
   //   refetchTimer.current = setInterval(() => {
@@ -262,22 +272,45 @@ function TableCharging({
     setDense(event.target.checked);
   };
 
+  const handleStatusFilterChange = (
+    event: SelectChangeEvent<"online" | "offline" | "all">
+  ) => {
+    setStatusFilter(event.target.value as "online" | "offline" | "all");
+  };
+
   const emptyRows =
     page > 0
       ? Math.max(0, (1 + page) * rowsPerPage - (mergedData?.length || 0))
       : 0;
 
-  const visibleRows = React.useMemo(
-    () =>
-      stableSort(mergedData || [], getComparator(order, orderBy)).slice(
-        page * rowsPerPage,
-        page * rowsPerPage + rowsPerPage
-      ),
-    [mergedData, order, orderBy, page, rowsPerPage]
-  );
+  const filteredRows = mergedData
+    ? mergedData.filter((row) => {
+        if (statusFilter === "all") return true;
+        if (statusFilter === "online") return row.status === "online";
+        if (statusFilter === "offline") return row.status === "offline";
+        return true;
+      })
+    : [];
 
   return (
     <Box style={{ width: "100%" }}>
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <FormControl style={{ marginRight: 50 }}>
+          <InputLabel id="status-filter-label">Status</InputLabel>
+          <Select
+            labelId="status-filter-label"
+            label="Status"
+            id="status-filter"
+            value={statusFilter}
+            onChange={handleStatusFilterChange}
+          >
+            <MenuItem value="all">All</MenuItem>
+            <MenuItem value="online">Online</MenuItem>
+            <MenuItem value="offline">Offline</MenuItem>
+          </Select>
+        </FormControl>
+      </div>
+
       <Paper style={{ width: "100%", marginBottom: 2 }}>
         <TableContainer component={Paper}>
           <Table
@@ -296,14 +329,12 @@ function TableCharging({
             />
 
             <TableBody>
-              {mergedData &&
-                mergedData.map((row, index) => (
+              {filteredRows &&
+                filteredRows.map((row, index) => (
                   <TableRow key={index}>
-                    <TableCell>
-                      {row.booth_name}
-                    </TableCell>
+                    <TableCell>{row.booth_name}</TableCell>
                     <TableCell>{row.charging_rate}</TableCell>
-                    <TableCell>{row.updated_at}</TableCell>
+                    <TableCell>{dateFormate(row.updated_at)}</TableCell>
                     {row.status === "online" ? (
                       <TableCell>
                         <Badge color="success" variant="dot" sx={{ mr: 2 }} />

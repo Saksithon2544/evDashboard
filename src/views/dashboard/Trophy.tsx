@@ -5,6 +5,9 @@ import Typography from '@mui/material/Typography'
 import CardContent from '@mui/material/CardContent'
 import { styled, useTheme } from '@mui/material/styles'
 
+import axios from "@/libs/Axios";
+
+
 // Styled component for the triangle shaped background image
 const TriangleImg = styled('img')({
   right: 0,

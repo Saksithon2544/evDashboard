@@ -31,7 +31,7 @@ type Props = {
 type FormData = {
   user_id: string;
   amount: number;
-  // Transaction_id: string;
+  select_topup: string;
 };
 
 export default function TransactionDialog({ callback }) {
@@ -74,7 +74,7 @@ export default function TransactionDialog({ callback }) {
 
       // console.log(data);
 
-      await axios.put(`/users/${data.user_id}/topup?amount=${data.amount}`);
+      await axios.put(`/top_up/${data.user_id}?amount=${data.amount}&select_topup=${data.select_topup}`);
 
       await Swal.fire({
         title: "Success",
@@ -142,6 +142,28 @@ export default function TransactionDialog({ callback }) {
                 fullWidth
                 {...field}
               />
+            )}
+          />
+
+          <Controller
+            name="select_topup"
+            control={control}
+            defaultValue={'cash'}
+            render={({ field }) => (
+              <FormControl fullWidth margin="dense">
+                <InputLabel id="select_topup">Select Top up</InputLabel>
+                <Select
+                  labelId="select_topup"
+                  label="select_topup"
+                  variant="outlined"
+                  {...field}
+                >
+                  <MenuItem value="cash">Cash</MenuItem>
+                  <MenuItem value="mastercard">Mastercard</MenuItem>
+                  <MenuItem value="visa">Visa</MenuItem>
+                  <MenuItem value="paypal">Paypal</MenuItem>
+                </Select>
+              </FormControl>
             )}
           />
         </DialogContent>

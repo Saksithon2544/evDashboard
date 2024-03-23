@@ -19,6 +19,7 @@ import {
   User as UserData,
   Charging as ChargingData,
 } from "@/interfaces/Adminstation.interface";
+import { Typography } from "@mui/material";
 
 export default function ViewStation() {
   const router = useRouter();
@@ -57,8 +58,6 @@ export default function ViewStation() {
   //   return res.data;
   // });
 
-  
-
   const {
     data: mergedData,
     isFetching,
@@ -66,17 +65,16 @@ export default function ViewStation() {
   } = useQuery(
     ["station", id],
     async () => {
-      const res1 = (await axios.get(`/station/${id}/admins`)).data as AdminData[];
+      const res1 = (await axios.get(`/station/${id}/admins`))
+        .data as AdminData[];
       const res2 = (await axios.get(`/station`)).data as StationData[];
       const res3 = (await axios.get("/super_admin/users")).data as UserData[];
-      const res4 = (await axios.get(`/charging_booth/${id}`)).data as ChargingData[];
-
+      const res4 = (await axios.get(`/charging_booth/${id}`))
+        .data as ChargingData[];
 
       const res = await Promise.all([res1, res2, res3, res4]);
 
       const [admins, stations, users, chargings] = res;
-
-     
 
       const mergedData = stations.find((station) => station.id === id);
 
@@ -145,14 +143,26 @@ export default function ViewStation() {
             title="Charging Cabinet"
             titleTypographyProps={{ variant: "h6" }}
           />
-          <TableadCharging
-            mergedData={mergedData?.chargingBooth}
-            // stationId={id as string}
-            callback={() => {}}
-            refetch={() => {
-              refetch();
-            }}
-          />
+          {isFetching && (
+            <Typography variant="h6" align="center">
+              Loading...
+            </Typography>
+          )}
+          {!isFetching && (
+            <TableadCharging
+              mergedData={mergedData?.chargingBooth}
+              // stationId={id as string}
+              callback={() => {}}
+              refetch={() => {
+                refetch();
+              }}
+            />
+          )}
+          {!isFetching ? (
+            <Typography variant="h6" align="center">
+              No Data
+            </Typography>
+          ) : null}
         </Card>
       </Grid>
     </Grid>

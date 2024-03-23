@@ -1,6 +1,5 @@
 import * as React from "react";
 import PropTypes from "prop-types";
-import { alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Badge from "@mui/material/Badge";
 import Table from "@mui/material/Table";
@@ -11,14 +10,9 @@ import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
-import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
-import IconButton from "@mui/material/IconButton";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import { useRouter } from "next/router";
 
 import Swal from "sweetalert2";
@@ -26,6 +20,7 @@ import Swal from "sweetalert2";
 import { visuallyHidden } from "@mui/utils";
 import { Transaction as TransactionData } from "@/interfaces/Transaction.interface";
 import axios from "@/libs/Axios";
+import { dateFormate } from "@/libs/date";
 
 function descendingComparator(a: any, b: any, orderBy: any) {
   if (b[orderBy] < a[orderBy]) {
@@ -63,28 +58,28 @@ const headCells = [
     label: "Name",
   },
   {
-    id: "location",
+    id: "email",
     numeric: false,
     disablePadding: false,
-    label: "Location",
+    label: "Email",
   },
   {
-    id: "status",
+    id: "amount",
     numeric: false,
     disablePadding: false,
-    label: "Status",
+    label: "Amount",
+  },
+  {
+    id: "transactionType",
+    numeric: false,
+    disablePadding: false,
+    label: "Transaction Type",
   },
   {
     id: "created",
     numeric: false,
     disablePadding: false,
     label: "Created",
-  },
-  {
-    id: "actions",
-    numeric: false,
-    disablePadding: false,
-    label: "Actions",
   },
 ];
 
@@ -148,74 +143,18 @@ type Props = {
   callback?: (data: CallBack) => void;
 };
 
-function TableTransactions({ Transactions = [], isLoading, refetch, callback }: Props) {
+function TableTransactions({
+  Transactions = [],
+  isLoading,
+  refetch,
+  callback,
+}: Props) {
   const router = useRouter();
   const [order, setOrder] = React.useState<"asc" | "desc">("asc");
   const [orderBy, setOrderBy] = React.useState<string>("name");
   const [page, setPage] = React.useState<number>(0);
   const [dense, setDense] = React.useState<boolean>(false);
   const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
-
-  const handleEditClick = (Transaction: TransactionData) => {
-    // console.log("Transaction", Transaction);
-    callback({
-      action: "edit",
-      Transaction,
-    });
-  };
-
-  const handleDeleteClick = async (Transaction: TransactionData) => {
-    try {
-      const confirmationResult = await Swal.fire({
-        title: "Are you sure?",
-        html:
-          "Do you want to remove <span style='color:red;'>" +
-          Transaction.id +
-          "</span> from the system?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes",
-        cancelButtonText: "No",
-        cancelButtonColor: "red",
-      });
-
-      if (confirmationResult.isConfirmed) {
-        // Show loading modal
-        Swal.fire({
-          title: "Please wait...",
-          text: "Deleting Transaction",
-          allowOutsideClick: false,
-          showConfirmButton: false,
-          willOpen: () => {
-            Swal.showLoading();
-          },
-        });
-        await axios.delete(`/transactions/${Transaction.id}`);
-        refetch?.(true);
-
-        // Close the loading modal
-        Swal.close();
-
-        // Show success message
-        Swal.fire({
-          icon: "success",
-          title: "Deleted!",
-          text: "Transaction has been deleted successfully.",
-        });
-      }
-    } catch (error) {
-      console.log(error);
-      let errorMessage = "An error occurred while deleting Transaction.";
-      if (error.response && error.response.data) {
-        errorMessage = error.response.data.detail;
-      }
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: errorMessage,
-      });
-    }
-  };
 
   const handleRequestSort = (event: React.MouseEvent, property: string) => {
     const isAsc = orderBy === property && order === "asc";
@@ -242,7 +181,10 @@ function TableTransactions({ Transactions = [], isLoading, refetch, callback }: 
 
   const emptyRows =
     page > 0
-      ? Math.max(0, (1 + page) * rowsPerPage - (Transactions ? Transactions.length : 0))
+      ? Math.max(
+          0,
+          (1 + page) * rowsPerPage - (Transactions ? Transactions.length : 0)
+        )
       : 0;
 
   const visibleRows = React.useMemo(
@@ -275,50 +217,40 @@ function TableTransactions({ Transactions = [], isLoading, refetch, callback }: 
             />
             <TableBody>
               {visibleRows.map((row: TransactionData) => {
-                // const isSelectedRow = isSelected(row.id);
-                const labelId = `enhanced-table-checkbox-${row.id}`;
 
                 return (
                   <TableRow key={row.id}>
-                    <TableCell
-                      component="th"
-                      id={labelId}
-                      scope="row"
-                      padding="none"
-                    >
-                      <IconButton
-                        aria-label="view"
-                        onClick={() => router.push(`/transactions/${row.id}`)}
-                      >
-                        <VisibilityIcon />
-                      </IconButton>
-                      {row.id}
-                    </TableCell>
-                    <TableCell>
-                      {row.userId}
-                    </TableCell>
-                    {row.transactionType === "topup" ? (
+                    <TableCell>{row.firstName}  {row.lastName}</TableCell>
+                    <TableCell>{row.email}</TableCell>
+                    <TableCell>{row.amount}</TableCell>
+                    {row.transactionType === "cash" ? (
                       <TableCell>
                         <Badge color="success" variant="dot" sx={{ mr: 2 }} />
                         {row.transactionType}
                       </TableCell>
+                    ) : row.transactionType === "mastercard" ? (
+                      <TableCell>
+                        <Badge color="warning" variant="dot" sx={{ mr: 2 }} />
+                        {row.transactionType}
+                      </TableCell>
+                    ) : row.transactionType === "visa" ? (
+                      <TableCell>
+                        <Badge color="primary" variant="dot" sx={{ mr: 2 }} />
+                        {row.transactionType}
+                      </TableCell>
+                    ) : row.transactionType === "paypal" ? (
+                      <TableCell>
+                        <Badge color="info" variant="dot" sx={{ mr: 2 }} />
+                        {row.transactionType}
+                      </TableCell>
                     ) : (
                       <TableCell>
-                        <Badge color="error" variant="dot" sx={{ mr: 2 }} />
+                        <Badge color="default" variant="dot" sx={{ mr: 2 }} />
                         {row.transactionType}
                       </TableCell>
                     )}
 
-                    {/* <TableCell>{row.status}</TableCell> */}
-                    <TableCell>{row.description}</TableCell>
-                    <TableCell>
-                      <IconButton
-                        aria-label="delete"
-                        onClick={() => handleDeleteClick(row)}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </TableCell>
+                    <TableCell>{dateFormate(row.created_at)}</TableCell>
                   </TableRow>
                 );
               })}

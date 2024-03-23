@@ -62,23 +62,22 @@ const StationsAllTable = () => {
             title="Station"
             titleTypographyProps={{ variant: "h6" }}
           />
-          {isLoading && (
-            <Typography variant="h6" align="center">
-              Loading...
-            </Typography>
-          )}
-          {!isLoading && (
+          
+          {!isLoading && Stations && Stations.length > 0 ? (
             <TableStation
               Stations={Stations}
               callback={handleTable}
               refetch={() => refetch()}
             />
-          )}
-          {!isLoading ? (
+          ) : Stations && Stations.length === 0 ? (
             <Typography variant="h6" align="center">
               No Data
             </Typography>
-          ) : null}
+          ) : (
+            <Typography variant="h6" align="center">
+              Loading...
+            </Typography>
+          )}
         </Card>
       </Grid>
     </Grid>

@@ -11,27 +11,34 @@ import AddTransactionDialog from "@/views/dialogs/transaction-dialogs/AddTransac
 
 import { useQuery } from "react-query";
 import { Transaction as TransactionData } from "@/interfaces/Transaction.interface";
+import { User as UserData } from "@/interfaces/User.interface";
 import { useState } from "react";
 import axios from "@/libs/Axios";
 import { Typography } from "@mui/material";
 
 const TransactionsAllTable = () => {
-  const [selectedTransaction, setSelectedTransaction] =
-    useState<TransactionData>();
+  const [selectedTransaction, setSelectedTransaction] = useState<TransactionData>();
+  const [selectedUser, setSelectedUser] = useState<UserData>();
 
   const {
     data: TransactionsData,
     isLoading,
     refetch,
   } = useQuery<TransactionData[]>("transactions", async () => {
-    const res = await axios.get("/transaction");
-    const data = await res.data;
-    // check data not array
-    if (!Array.isArray(data)) {
+    const [transactionsRes] = await Promise.all([
+      axios.get("/transaction"),
+      // axios.get("/super_admin/users"),
+    ]);
+
+    const transactionsData = await transactionsRes.data;
+    // const userData = await usersRes.data;
+
+    // Check if data is not an array and return empty array
+    if (!Array.isArray(transactionsData)) {
       return [];
     }
 
-    return data;
+    return transactionsData;
   });
 
   function handleCloseMoadal() {
@@ -52,17 +59,6 @@ const TransactionsAllTable = () => {
     }
   }
 
-  async function handleSave(data: TransactionData) {
-    // console.log("save", data);
-    try {
-      const res = await axios.put(`/transaction`, data);
-      const resData = await res.data;
-
-      // console.log("resData", resData);
-
-      refetch();
-    } catch (error) {}
-  }
 
   return (
     <Grid container>

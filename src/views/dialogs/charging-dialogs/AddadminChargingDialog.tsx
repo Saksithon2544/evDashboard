@@ -1,10 +1,6 @@
 import * as React from "react";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -22,7 +18,6 @@ import { useForm, Controller } from "react-hook-form";
 // ** Query Client Provider
 import axios from "@/libs/Axios";
 import { useQuery, useMutation, QueryClient } from "react-query";
-import { ok } from "assert";
 
 type Props = {
   stationId: string;
@@ -32,7 +27,7 @@ type Props = {
 type FormData = {
   user_id: string;
   station_id: string;
-}
+};
 
 export default function StationDialog({ callback, stationId }: Props) {
   const { control, reset, handleSubmit, watch, setValue } = useForm();
@@ -41,17 +36,15 @@ export default function StationDialog({ callback, stationId }: Props) {
 
   const [open, setOpen] = React.useState(false);
 
-  const {data:users} = useQuery<User[]>("users", async () => {
+  const { data: users } = useQuery<User[]>("users", async () => {
     const res = await axios.get("/super_admin/users");
     return res.data;
-  }
-  );
+  });
 
-  const {data:stations} = useQuery<Station[]>("stations", async () => {
+  const { data: stations } = useQuery<Station[]>("stations", async () => {
     const res = await axios.get("/station");
     return res.data;
-  }
-  );
+  });
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -71,7 +64,7 @@ export default function StationDialog({ callback, stationId }: Props) {
 
       Swal.fire({
         title: "Please wait...",
-        text: "Adding Admin Station",
+        text: "Adding Charging Cabinet",
         allowOutsideClick: false,
         showConfirmButton: false,
         willOpen: () => {
@@ -79,12 +72,12 @@ export default function StationDialog({ callback, stationId }: Props) {
         },
       });
 
-
-      await axios.post(`/station_admin/${stationId}/admins/${data.user_id}`);
+      // await axios.post(`/station_admin/${stationId}/admins/${data.user_id}`);
+      await axios.post(`/charging_booth/${stationId}`, data);
 
       await Swal.fire({
         title: "Success",
-        text: "Admin Station added successfully",
+        text: "Charging Cabinet added successfully",
         icon: "success",
       });
 
@@ -92,7 +85,7 @@ export default function StationDialog({ callback, stationId }: Props) {
 
       Swal.close();
     } catch (error) {
-      Swal.fire("Error", "Failed to add station", "error");
+      Swal.fire("Error", "Failed to add Charging Cabinet", "error");
     }
   });
 
@@ -113,28 +106,21 @@ export default function StationDialog({ callback, stationId }: Props) {
         Charging Cabinet
       </Button>
       <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-        <DialogTitle>Add Charging</DialogTitle>
+        <DialogTitle>Add Charger</DialogTitle>
         <DialogContent>
           <Controller
-            name="user_id"
+            name="booth_name"
             control={control}
             render={({ field }) => (
-              <FormControl fullWidth margin="dense">
-                <InputLabel id="user_id">User</InputLabel>
-                <Select
-                  labelId="user_id"
-                  label="user_id"
-                  variant="outlined"
-                  {...field}
-                >
-                  {users?.map((user) => (
-                    <MenuItem value={user.id}>{user.email} [{user.firstName} {user.lastName}]</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+              <TextField
+                margin="dense"
+                label="Charger name"
+                type="text"
+                fullWidth
+                {...field}
+              />
             )}
           />
-          
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>

@@ -20,6 +20,16 @@ const DashboardTable = () => {
     undefined
   );
 
+  // const {
+  //   data: users,
+  //   isLoading,
+  //   refetch,
+  // } = useQuery<UserData[]>("users", async () => {
+  //   const res = await axios.get<UserData[]>("/super_admin/users");
+  //   const data = res.data;
+  //   return data.slice(0, 10);
+  // });
+
   const {
     data: users,
     isLoading,
@@ -27,7 +37,12 @@ const DashboardTable = () => {
   } = useQuery<UserData[]>("users", async () => {
     const res = await axios.get<UserData[]>("/super_admin/users");
     const data = res.data;
-    return data.slice(0, 8);
+    const sortedUsers = data.sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    ); // เรียงจากวันที่ล่าสุดอยู่บนสุด
+    const latestUsers = sortedUsers.slice(0, 8); // เลือกข้อมูลเพียง 8 คนล่าสุด
+    return latestUsers;
   });
 
   function handleCloseModal() {
@@ -58,7 +73,36 @@ const DashboardTable = () => {
                   {row.firstName} {row.lastName}
                 </TableCell>
                 <TableCell>{row.email}</TableCell>
-                <TableCell>{row.role}</TableCell>
+                {/* <TableCell>{row.role}</TableCell> */}
+                {row.role === "superadmin" ? (
+                  <TableCell>
+                    <Chip
+                      color="primary"
+                      variant="outlined"
+                      sx={{ mr: 1 }}
+                      label="Super Admin"
+                    />
+                  </TableCell>
+                ) : row.role === "adminstation" ? (
+                  <TableCell>
+                    <Chip
+                      color="info"
+                      variant="outlined"
+                      sx={{ mr: 1 }}
+                      label="Admin Station"
+                    />
+                  </TableCell>
+                ) : (
+                  <TableCell>
+                    <Chip
+                      color="warning"
+                      variant="outlined"
+                      sx={{ mr: 1 }}
+                      label="User"
+                    />
+                  </TableCell>
+                )}
+
                 <TableCell>{dateFormate(row.created_at)}</TableCell>
                 {row.is_active ? (
                   <TableCell>

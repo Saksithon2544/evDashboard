@@ -26,7 +26,7 @@ import { SelectChangeEvent } from "@mui/material/Select";
 import { visuallyHidden } from "@mui/utils";
 import { User as UserData } from "@/interfaces/User.interface";
 import axios from "@/libs/Axios";
-import { Tab } from "@mui/material";
+import { Chip, Tab } from "@mui/material";
 import { dateFormate } from "@/libs/date";
 
 function descendingComparator(a: any, b: any, orderBy: string) {
@@ -191,7 +191,9 @@ function TableMember({ Users, isLoading, refetch, callback }: Props) {
       });
 
       if (result.isConfirmed) {
-        const { data } = await axios.put(`/super_admin/users/${user.id}/disable`);
+        const { data } = await axios.put(
+          `/super_admin/users/${user.id}/disable`
+        );
 
         if (data) {
           Swal.fire(
@@ -269,7 +271,7 @@ function TableMember({ Users, isLoading, refetch, callback }: Props) {
   return (
     <Box style={{ width: "100%" }}>
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <FormControl style={{marginRight: 50}}>
+        <FormControl style={{ marginRight: 50 }}>
           <InputLabel id="status-filter-label">Status</InputLabel>
           <Select
             labelId="status-filter-label"
@@ -317,18 +319,54 @@ function TableMember({ Users, isLoading, refetch, callback }: Props) {
                       {row.firstName + " " + row.lastName}
                     </TableCell>
                     <TableCell>{row.email}</TableCell>
-                    <TableCell>{row.role}</TableCell>
-
-                    <TableCell> { dateFormate(row.created_at)} </TableCell>
-                    {row.is_active ? (
+                    {/* <TableCell>{row.role}</TableCell> */}
+                    {row.role === "superadmin" ? (
                       <TableCell>
-                        <Badge color="success" variant="dot" sx={{ mr: 2 }} />
-                        Active
+                        <Chip
+                          color="primary"
+                          variant="outlined"
+                          sx={{ mr: 1 }}
+                          label="Super Admin"
+                        />
+                      </TableCell>
+                    ) : row.role === "adminstation" ? (
+                      <TableCell>
+                        <Chip
+                          color="info"
+                          variant="outlined"
+                          sx={{ mr: 1 }}
+                          label="Admin Station"
+                        />
                       </TableCell>
                     ) : (
                       <TableCell>
-                        <Badge color="error" variant="dot" sx={{ mr: 2 }} />
-                        Inactive
+                        <Chip
+                          color="warning"
+                          variant="outlined"
+                          sx={{ mr: 1 }}
+                          label="User"
+                        />
+                      </TableCell>
+                    )}
+
+                    <TableCell> {dateFormate(row.created_at)} </TableCell>
+                    {row.is_active ? (
+                      <TableCell>
+                        <Chip
+                          color="success"
+                          variant="filled"
+                          sx={{ mr: 2 }}
+                          label="Active"
+                        />
+                      </TableCell>
+                    ) : (
+                      <TableCell>
+                        <Chip
+                          color="error"
+                          variant="filled"
+                          sx={{ mr: 2 }}
+                          label="Inactive"
+                        />
                       </TableCell>
                     )}
                     <TableCell>

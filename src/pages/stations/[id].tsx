@@ -78,13 +78,9 @@ export default function ViewStation() {
 
       const mergedData = stations.find((station) => station.id === id);
 
-      const chargingBooth = chargings.map((charging) => {
-        const chargingId = charging.booth_id;
-
-        const chargingInfo = charging;
-
-        return chargingInfo;
-      }) as ChargingData[];
+      const chargingBooth = chargings
+        .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()) // เรียงตาม updated_at จากมากไปน้อย
+        .map((charging) => charging) as ChargingData[];
 
       const adminInStation = admins.map((admin) => {
         const adminId = admin.user_id;

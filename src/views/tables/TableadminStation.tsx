@@ -18,7 +18,7 @@ import { useRouter } from "next/router";
 
 import Swal from "sweetalert2";
 import axios from "@/libs/Axios";
-import { Button } from "@mui/material";
+import { Button, Chip } from "@mui/material";
 import { visuallyHidden } from "@mui/utils";
 
 import type { User } from "@/interfaces/Adminstation.interface";
@@ -308,13 +308,21 @@ function TableadminStation({
                     <TableCell>{row.phoneNumber}</TableCell>
                     {row.is_active ? (
                       <TableCell>
-                        <Badge color="success" variant="dot" sx={{ mr: 2 }} />
-                        Active
+                        <Chip
+                          color="success"
+                          variant="filled"
+                          sx={{ mr: 2 }}
+                          label="Active"
+                        />
                       </TableCell>
                     ) : (
                       <TableCell>
-                        <Badge color="error" variant="dot" sx={{ mr: 2 }} />
-                        Inactive
+                        <Chip
+                          color="error"
+                          variant="filled"
+                          sx={{ mr: 2 }}
+                          label="Inactive"
+                        />
                       </TableCell>
                     )}
                     <TableCell>

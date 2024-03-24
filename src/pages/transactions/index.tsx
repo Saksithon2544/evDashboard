@@ -17,7 +17,8 @@ import axios from "@/libs/Axios";
 import { Typography } from "@mui/material";
 
 const TransactionsAllTable = () => {
-  const [selectedTransaction, setSelectedTransaction] = useState<TransactionData>();
+  const [selectedTransaction, setSelectedTransaction] =
+    useState<TransactionData>();
   const [selectedUser, setSelectedUser] = useState<UserData>();
 
   const {
@@ -25,20 +26,24 @@ const TransactionsAllTable = () => {
     isLoading,
     refetch,
   } = useQuery<TransactionData[]>("transactions", async () => {
-    const [transactionsRes] = await Promise.all([
-      axios.get("/transaction"),
-      // axios.get("/super_admin/users"),
-    ]);
+    const [transactionsRes] = await Promise.all([axios.get("/transaction")]);
 
     const transactionsData = await transactionsRes.data;
-    // const userData = await usersRes.data;
 
     // Check if data is not an array and return empty array
     if (!Array.isArray(transactionsData)) {
       return [];
     }
 
-    return transactionsData;
+    // Sort transactions by created_at from newest to oldest
+    const sortedTransactions = transactionsData.sort(
+      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+
+    // Select the latest 100 transactions
+    const latestTransactions = sortedTransactions.slice(0, 100);
+
+    return latestTransactions;
   });
 
   function handleCloseMoadal() {
@@ -58,7 +63,6 @@ const TransactionsAllTable = () => {
         break;
     }
   }
-
 
   return (
     <Grid container>

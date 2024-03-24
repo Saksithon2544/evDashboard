@@ -24,7 +24,9 @@ const StationsAllTable = () => {
   } = useQuery<StationData[]>("stations", async () => {
     const res = await axios.get(`/station`);
     const data = await res.data;
-    return data;
+    const sortedStations = data.sort((a: StationData, b: StationData) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    const latestStations = sortedStations.slice(0, 100); // เลือกข้อมูลเพียง 100 คนล่าสุด
+    return latestStations;
   });
 
   function handleCloseMoadal() {

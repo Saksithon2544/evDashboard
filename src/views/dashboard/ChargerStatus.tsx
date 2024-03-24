@@ -20,6 +20,7 @@ import ReactApexcharts from "src/@core/components/react-apexcharts";
 // ===========================|| DASHBOARD - CHARGER STATUS ||=========================== //
 import axios from "@/libs/Axios";
 import {
+  Badge,
   Dialog,
   DialogActions,
   DialogContent,
@@ -216,15 +217,38 @@ const ChargerStatus = () => {
                   <TableRow>
                     <TableCell>Booth Name</TableCell>
                     <TableCell>Status</TableCell>
-                    <TableCell>Charging Rate</TableCell>
+                    <TableCell>Charging Rate (kW)</TableCell>
                   </TableRow>
                   {/* แสดงข้อมูลในตาราง */}
                   {filteredChargers
                     .slice(startIndex, endIndex)
-                    .map((charger) => (
+                    .map((charger : any) => (
                       <TableRow key={charger.booth_id}>
                         <TableCell>{charger.booth_name}</TableCell>
-                        <TableCell>{charger.status}</TableCell>
+                        {charger.status === "online" ? (
+                          <TableCell>
+                            <Badge
+                              color="success"
+                              variant="dot"
+                              sx={{ mr: 2 }}
+                            />
+                            Online
+                          </TableCell>
+                        ) : charger.status === "offline" ? (
+                          <TableCell>
+                            <Badge color="error" variant="dot" sx={{ mr: 2 }} />
+                            Offline
+                          </TableCell>
+                        ) : (
+                          <TableCell>
+                            <Badge
+                              color="warning"
+                              variant="dot"
+                              sx={{ mr: 2 }}
+                            />
+                            Charging
+                          </TableCell>
+                        )}
                         <TableCell>{charger.charging_rate}</TableCell>
                       </TableRow>
                     ))}

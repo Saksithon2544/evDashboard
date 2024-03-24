@@ -71,7 +71,7 @@ const headCells = [
     id: "Charging Rate",
     numeric: false,
     disablePadding: false,
-    label: "Charging Rate",
+    label: "Charging Rate (kW)",
   },
   {
     id: "updated_at",
@@ -335,7 +335,7 @@ Props) {
                 filteredRows.map((row, index) => (
                   <TableRow key={index}>
                     <TableCell>{row.booth_name}</TableCell>
-                    <TableCell>{row.charging_rate}</TableCell>
+                    <TableCell>{row.charging_rate} / kW</TableCell>
                     <TableCell>{dateFormate(row.updated_at)}</TableCell>
                     {row.status === "online" ? (
                       <TableCell>

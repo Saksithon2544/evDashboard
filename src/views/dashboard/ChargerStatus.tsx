@@ -19,6 +19,19 @@ import ReactApexcharts from "src/@core/components/react-apexcharts";
 
 // ===========================|| DASHBOARD - CHARGER STATUS ||=========================== //
 import axios from "@/libs/Axios";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  TextField,
+} from "@mui/material";
 
 const ChargerStatus = () => {
   // Hook
@@ -91,6 +104,40 @@ const ChargerStatus = () => {
     labels: ["Online", "Offline", "Charging"],
   };
 
+  const [open, setOpen] = useState(false);
+  const [page, setPage] = useState(0);
+  const [filterText, setFilterText] = useState("");
+  const itemsPerPage = 5; // จำนวนรายการต่อหน้า
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleNextPage = () => {
+    setPage((prevPage) => prevPage + 1);
+  };
+
+  const handlePrevPage = () => {
+    setPage((prevPage) => prevPage - 1);
+  };
+
+  const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFilterText(event.target.value);
+  };
+
+  const filteredChargers = chargerStatus.filter(
+    (charger) =>
+      charger.booth_name.toLowerCase().includes(filterText.toLowerCase()) ||
+      charger.status.toLowerCase().includes(filterText.toLowerCase())
+  );
+
+  const startIndex = page * itemsPerPage;
+  const endIndex = (page + 1) * itemsPerPage;
+
   return (
     <Card>
       <CardHeader
@@ -118,22 +165,93 @@ const ChargerStatus = () => {
           height={205}
           options={options}
           series={[
-            chargerStatus.filter((item: any) => item.status === "online").length,
-            chargerStatus.filter((item: any) => item.status === "offline").length,
-            chargerStatus.filter((item: any) => item.status === "charging").length,
+            chargerStatus.filter((item: any) => item.status === "online")
+              .length,
+            chargerStatus.filter((item: any) => item.status === "offline")
+              .length,
+            chargerStatus.filter((item: any) => item.status === "charging")
+              .length,
           ]}
         />
         <Box sx={{ mt: 3, display: "flex", alignItems: "center" }}>
           <Typography variant="h5" sx={{ mr: 4 }}>
-            {chargerStatus.filter((item: any) => item.status === "online").length}%
+            {
+              chargerStatus.filter((item: any) => item.status === "online")
+                .length
+            }
+            %
           </Typography>
           <Typography variant="body2">
             Chargers are currently available
           </Typography>
         </Box>
-        <Button fullWidth variant="contained" color="primary">
+        <Button
+          fullWidth
+          variant="contained"
+          color="primary"
+          onClick={handleClickOpen}
+        >
           View Chargers
         </Button>
+
+        <Dialog open={open} onClose={handleClose}>
+          <DialogTitle>Chargers Information</DialogTitle>
+          <DialogContent>
+            <TextField
+              type="text"
+              value={filterText}
+              onChange={handleFilterChange}
+              placeholder="Search"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+            <TableContainer component={Paper}>
+              <Table>
+                <TableBody>
+                  {/* ตัวอย่างข้อมูลสำหรับแสดงในตาราง */}
+                  <TableRow>
+                    <TableCell>Booth Name</TableCell>
+                    <TableCell>Status</TableCell>
+                    <TableCell>Charging Rate</TableCell>
+                  </TableRow>
+                  {/* แสดงข้อมูลในตาราง */}
+                  {filteredChargers
+                    .slice(startIndex, endIndex)
+                    .map((charger) => (
+                      <TableRow key={charger.booth_id}>
+                        <TableCell>{charger.booth_name}</TableCell>
+                        <TableCell>{charger.status}</TableCell>
+                        <TableCell>{charger.charging_rate}</TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={handlePrevPage}
+              color="primary"
+              disabled={page === 0}
+            >
+              Prev
+            </Button>
+            <Button
+              onClick={handleNextPage}
+              color="primary"
+              disabled={endIndex >= filteredChargers.length}
+            >
+              Next
+            </Button>
+            <Button onClick={handleClose} color="primary">
+              Close
+            </Button>
+          </DialogActions>
+        </Dialog>
       </CardContent>
     </Card>
   );

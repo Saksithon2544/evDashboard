@@ -6,6 +6,7 @@ import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
+import React, { useState, useEffect } from "react";
 
 // Icons Imports
 import DotsVertical from "mdi-material-ui/DotsVertical";
@@ -16,9 +17,25 @@ import { ApexOptions } from "apexcharts";
 // Custom Components Imports
 import ReactApexcharts from "src/@core/components/react-apexcharts";
 
+// ===========================|| DASHBOARD - CHARGER STATUS ||=========================== //
+import axios from "@/libs/Axios";
+
 const ChargerStatus = () => {
   // Hook
   const theme = useTheme();
+  const [chargerStatus, setChargerStatus] = useState<any>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get("/charging_booth/");
+        setChargerStatus(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchData(); // เรียกใช้งานฟังก์ชัน fetchData เมื่อ Component ถูกโหลด
+  }, []);
 
   const options: ApexOptions = {
     chart: {
@@ -69,13 +86,9 @@ const ChargerStatus = () => {
     colors: [
       theme.palette.success.main,
       theme.palette.error.main,
-      theme.palette.primary.main,
+      theme.palette.warning.main,
     ],
-    labels: [
-      "Online",
-      "Offline",
-      "Charging",
-    ],
+    labels: ["Online", "Offline", "Charging"],
   };
 
   return (
@@ -104,11 +117,15 @@ const ChargerStatus = () => {
           type="donut"
           height={205}
           options={options}
-          series={[30, 5, 15,]}
+          series={[
+            chargerStatus.filter((item: any) => item.status === "online").length,
+            chargerStatus.filter((item: any) => item.status === "offline").length,
+            chargerStatus.filter((item: any) => item.status === "charging").length,
+          ]}
         />
         <Box sx={{ mt: 3, display: "flex", alignItems: "center" }}>
           <Typography variant="h5" sx={{ mr: 4 }}>
-            30%
+            {chargerStatus.filter((item: any) => item.status === "online").length}%
           </Typography>
           <Typography variant="body2">
             Chargers are currently available

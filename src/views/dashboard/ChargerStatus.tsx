@@ -44,13 +44,15 @@ const ChargerStatus = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get("/charging_booth/");
-        setChargerStatus(response.data);
+        // เรียงลำดับข้อมูลตามวันที่
+        const sortedData = response.data.sort((olddate:any, newdate:any) => new Date(newdate.updated_at).getTime() - new Date(olddate.updated_at).getTime());
+        setChargerStatus(sortedData);
       } catch (error) {
         console.error(error);
       }
     };
     fetchData(); // เรียกใช้งานฟังก์ชัน fetchData เมื่อ Component ถูกโหลด
-  }, []);
+  }, []); // dependencies array เป็น []
 
   const options: ApexOptions = {
     chart: {

@@ -33,6 +33,7 @@ import {
   TableRow,
   TextField,
 } from "@mui/material";
+import { dateFormate } from "@/libs/date";
 
 const ChargerStatus = () => {
   // Hook
@@ -195,7 +196,7 @@ const ChargerStatus = () => {
           View Chargers
         </Button>
 
-        <Dialog open={open} onClose={handleClose}>
+        <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
           <DialogTitle>Chargers Information</DialogTitle>
           <DialogContent>
             <TextField
@@ -216,15 +217,17 @@ const ChargerStatus = () => {
                   {/* ตัวอย่างข้อมูลสำหรับแสดงในตาราง */}
                   <TableRow>
                     <TableCell>Booth Name</TableCell>
-                    <TableCell>Status</TableCell>
                     <TableCell>Charging Rate (kW)</TableCell>
+                    <TableCell>Status</TableCell>
+                    <TableCell>Last Update</TableCell>
                   </TableRow>
                   {/* แสดงข้อมูลในตาราง */}
                   {filteredChargers
                     .slice(startIndex, endIndex)
-                    .map((charger : any) => (
+                    .map((charger: any) => (
                       <TableRow key={charger.booth_id}>
                         <TableCell>{charger.booth_name}</TableCell>
+                        <TableCell>{charger.charging_rate}</TableCell>
                         {charger.status === "online" ? (
                           <TableCell>
                             <Badge
@@ -249,7 +252,7 @@ const ChargerStatus = () => {
                             Charging
                           </TableCell>
                         )}
-                        <TableCell>{charger.charging_rate}</TableCell>
+                        <TableCell>{dateFormate(charger.updated_at)}</TableCell>
                       </TableRow>
                     ))}
                 </TableBody>

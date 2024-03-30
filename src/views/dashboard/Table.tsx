@@ -20,16 +20,6 @@ const DashboardTable = () => {
     undefined
   );
 
-  // const {
-  //   data: users,
-  //   isLoading,
-  //   refetch,
-  // } = useQuery<UserData[]>("users", async () => {
-  //   const res = await axios.get<UserData[]>("/super_admin/users");
-  //   const data = res.data;
-  //   return data.slice(0, 10);
-  // });
-
   const {
     data: users,
     isLoading,
@@ -44,6 +34,7 @@ const DashboardTable = () => {
     const latestUsers = sortedUsers.slice(0, 8); // เลือกข้อมูลเพียง 8 คนล่าสุด
     return latestUsers;
   });
+
 
   function handleCloseModal() {
     setSelectedUser(undefined);

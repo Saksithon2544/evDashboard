@@ -169,7 +169,7 @@ const AccountSettings = () => {
                 <AccountOutline />
                 <TabName>Account</TabName>
               </Box>
-            }
+            } 
           />
           <Tab
             value="security"

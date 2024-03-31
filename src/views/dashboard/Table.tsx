@@ -54,7 +54,7 @@ const DashboardTable = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {users?.map((row) => (
+            {Array.isArray(users) && users.map((row) => (
               <TableRow
                 hover
                 key={row.id}

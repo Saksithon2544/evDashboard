@@ -7,7 +7,6 @@ import { styled, useTheme } from "@mui/material/styles";
 
 import axios from "@/libs/Axios";
 import { useQuery } from "react-query";
-import { User as UserData } from "@/interfaces/User.interface";
 
 // Styled component for the triangle shaped background image
 const TriangleImg = styled("img")({
@@ -32,16 +31,15 @@ const Trophy = () => {
   const imageSrc =
     theme.palette.mode === "light" ? "triangle-light.png" : "triangle-dark.png";
 
-  // const {
-  //   data: User,
-  //   isLoading,
-  //   refetch,
-  // } = useQuery<UserData>("users", async () => {
-  //   const res = await axios.get("/user/me");
-  //   const data = await res.data;
-
-  //   return data;
-  // });
+  const {
+    data: users,
+    isLoading,
+    refetch,
+  } = useQuery("me", async () => {
+    const res = await axios.get("/user/me");
+    const data = res.data;
+    return data;
+  });
 
 
   return (

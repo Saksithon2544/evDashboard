@@ -170,8 +170,8 @@ const LoginPage = () => {
               height={29}
               version="1.1"
               viewBox="0 0 30 23"
-              xmlns="http://www.w3.org/2000/svg"
-              xmlnsXlink="http://www.w3.org/1999/xlink"
+              xmlns="https://www.w3.org/2000/svg"
+              xmlnsXlink="https://www.w3.org/1999/xlink"
             >
               <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
                 <image

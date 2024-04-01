@@ -39,7 +39,7 @@ const StatisticsCard = () => {
       const { totalSales, totalEnergy, totalCustomers, totalStations } = salesData;
       const stats: DataType[] = [
         {
-          stats: `${totalEnergy} kWh`,
+          stats: `${totalEnergy} kW`,
           title: 'Energy usage',
           color: 'primary',
           icon: <TrendingUp sx={{ fontSize: '1.75rem' }} />,

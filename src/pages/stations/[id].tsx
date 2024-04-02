@@ -69,8 +69,7 @@ export default function ViewStation() {
         .data as AdminData[];
       const res2 = (await axios.get(`/station`)).data as StationData[];
       const res3 = (await axios.get("/super_admin/users")).data as UserData[];
-      const res4 = (await axios.get(`/charging_booth/${id}`))
-        .data as ChargingData[];
+      const res4 = (await axios.get(`/charging_booth/${id}`)).data as ChargingData[];
 
       const res = await Promise.all([res1, res2, res3, res4]);
 

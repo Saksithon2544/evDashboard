@@ -4,18 +4,17 @@ import Grid from "@mui/material/Grid";
 // ** Styled Component Import
 import ApexChartWrapper from "src/@core/styles/libs/react-apexcharts";
 
-// ** Demo Components Imports
-import Table from "src/views/dashboard/Table";
-import Trophy from "src/views/dashboard/Trophy";
-import TotalEarning from "src/views/dashboard/TotalEarning";
-import StatisticsCard from "src/views/dashboard/StatisticsCard";
-// import WeeklyOverview from 'src/views/dashboard/WeeklyOverview'
-import ChargerStatus from "src/views/dashboard/ChargerStatus";
-import SalesByCountries from "@/views/dashboard/SalesByChargingBooth";
+// ** Components Superadmin Imports
+import Table from "@/views/dashboard/superadmin/Table";
+import Trophy from "@/views/dashboard/superadmin/Trophy";
+import TotalEarning from "@/views/dashboard/superadmin/TotalEarning";
+import StatisticsCard from "@/views/dashboard/superadmin/StatisticsCard";
+import WeeklyOverview from '@/views/dashboard/superadmin/WeeklyOverview'
+import ChargerStatus from "@/views/dashboard/superadmin/ChargerStatus";
+import SalesByCountries from "@/views/dashboard/superadmin/SalesByChargingBooth";
 
 import { useQuery } from "react-query";
 import axios from "@/libs/Axios";
-import WeeklyOverview from "@/views/dashboard/WeeklyOverview";
 
 const Dashboard = () => {
   const { data: userRole } = useQuery("userRole", async () => {

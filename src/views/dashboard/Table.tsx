@@ -74,7 +74,7 @@ const DashboardTable = () => {
                       label="Super Admin"
                     />
                   </TableCell>
-                ) : row.role === "adminstation" ? (
+                ) : row.role === "stationadmin" ? (
                   <TableCell>
                     <Chip
                       color="info"

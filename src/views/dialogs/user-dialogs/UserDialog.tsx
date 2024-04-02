@@ -96,7 +96,7 @@ export default function UserDialog({ callback }) {
   });
 
   React.useEffect(() => {
-    if (roleWatch !== "adminstation") {
+    if (roleWatch !== "stationadmin") {
       setValue("station", "");
     }
   }, [roleWatch]);
@@ -182,7 +182,7 @@ export default function UserDialog({ callback }) {
                   {...field}
                 >
                   <MenuItem value={"superadmin"}>Super Admin</MenuItem>
-                  <MenuItem value={"adminstation"}>Admin Station</MenuItem>
+                  <MenuItem value={"stationadmin"}>Admin Station</MenuItem>
                   <MenuItem value={"user"}>User</MenuItem>
                 </Select>
               </FormControl>

@@ -166,7 +166,7 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({
                   // ในกรณีของ Select component จะไม่มี helperText เนื่องจากมีการแสดงชื่อตัวเลือกไว้แล้ว
                 >
                   <MenuItem value={"superadmin"}>Super Admin</MenuItem>
-                  <MenuItem value={"adminstation"}>Admin Station</MenuItem>
+                  <MenuItem value={"stationadmin"}>Admin Station</MenuItem>
                   <MenuItem value={"user"}>User</MenuItem>
                 </Select>
               </FormControl>

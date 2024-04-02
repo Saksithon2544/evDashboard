@@ -329,7 +329,7 @@ function TableMember({ Users, isLoading, refetch, callback }: Props) {
                           label="Super Admin"
                         />
                       </TableCell>
-                    ) : row.role === "adminstation" ? (
+                    ) : row.role === "stationadmin" ? (
                       <TableCell>
                         <Chip
                           color="info"

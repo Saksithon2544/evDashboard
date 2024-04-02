@@ -79,7 +79,7 @@ export default function StationDialog({ callback }) {
   });
 
   React.useEffect(() => {
-    if (roleWatch !== "adminstation") {
+    if (roleWatch !== "stationadmin") {
       setValue("station", "");
     }
   }, [roleWatch]);

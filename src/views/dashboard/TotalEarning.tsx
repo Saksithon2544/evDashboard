@@ -71,8 +71,8 @@ const TotalEarning = () => {
     return {
       progress,
       imgHeight: 27, // ตั้งค่า imgHeight ตามต้องการ
-      title: `${station.name} Station`,
-      color: 'warning', // ตั้งค่า color ตามต้องการ
+      title: `${station.name}`,
+      color: 'success', // ตั้งค่า color ตามต้องการ
       amount: `฿${totalChargingRate}`,
       subtitle: `${growthRate}% Growth Rate`, // ใช้อัตราการเติบโตใน subtitle
       imgSrc: '/images/cards/logo-bitbank.png' // ตั้งค่า imgSrc ตามต้องการ
@@ -149,7 +149,7 @@ const TotalEarning = () => {
               >
                 <Box sx={{ marginRight: 2, display: 'flex', flexDirection: 'column' }}>
                   <Typography variant='body2' sx={{ mb: 0.5, fontWeight: 600, color: 'text.primary' }}>
-                    {item.title}
+                    <span style={{ color: 'red' }}>{item.title} </span> Station
                   </Typography>
                   <Typography variant='caption'>{item.subtitle}</Typography>
                 </Box>

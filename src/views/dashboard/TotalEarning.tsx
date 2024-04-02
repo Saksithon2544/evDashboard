@@ -1,3 +1,5 @@
+import React, { useEffect, useState } from 'react'
+import { useQuery } from 'react-query'
 // ** MUI Imports
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
@@ -15,6 +17,12 @@ import DotsVertical from 'mdi-material-ui/DotsVertical'
 // ** Types
 import { ThemeColor } from 'src/@core/layouts/types'
 
+import axios from '@/libs/Axios'
+import { 
+  Station as StationData,
+  Charging as ChargingData,
+} from '@/interfaces/Adminstation.interface'
+
 interface DataType {
   title: string
   imgSrc: string
@@ -25,37 +33,62 @@ interface DataType {
   imgHeight: number
 }
 
-const data: DataType[] = [
-  {
-    progress: 75,
-    imgHeight: 20,
-    title: 'Zipcar',
-    color: 'primary',
-    amount: '$24,895.65',
-    subtitle: 'Vuejs, React & HTML',
-    imgSrc: '/images/cards/logo-zipcar.png'
-  },
-  {
-    progress: 50,
-    color: 'info',
-    imgHeight: 27,
-    title: 'Bitbank',
-    amount: '$8,650.20',
-    subtitle: 'Sketch, Figma & XD',
-    imgSrc: '/images/cards/logo-bitbank.png'
-  },
-  {
-    progress: 20,
-    imgHeight: 20,
-    title: 'Aviato',
-    color: 'secondary',
-    amount: '$1,245.80',
-    subtitle: 'HTML & Angular',
-    imgSrc: '/images/cards/logo-aviato.png'
-  }
-]
-
 const TotalEarning = () => {
+  const { data: stationData, isLoading: totalSalesIsLoading, refetch: totalSalesRefetch } = useQuery(
+    'stationData',
+    async () => {
+      const res1 = (await axios.get('/station')).data as StationData[];
+      const res2 = (await axios.get('/charging_booth')).data as ChargingData[];
+      const totalSales = res2.reduce((acc, curr) => acc + curr.charging_rate * 10, 0);
+      const totalEnergy = res2.reduce((acc, curr) => acc + curr.charging_rate, 0);
+      const totalCustomers = res1.length;
+      const totalStations = res2.length;
+      const data = res1.map((station) => {
+        return {
+          id: station.id,
+          name: station.name,
+          location: station.location,
+          total_charging_booth: res2.filter((charging) => charging.station_id === station.id).length,
+          total_charging_rate: res2.filter((charging) => charging.station_id === station.id).reduce((acc, curr) => acc + (curr.charging_rate * 10), 0),
+        };
+      }
+      );
+      return { totalSales, totalEnergy, totalCustomers, totalStations , data};
+    },
+    {
+      refetchInterval: 60000,
+    }
+  );
+
+  const data: DataType[] = (stationData?.data || [])
+  .sort((a, b) => b.total_charging_rate - a.total_charging_rate) // เรียงลำดับจากมากไปน้อย
+  .slice(0, 3) // ดึงเอาเพียง 3 อันดับแรก
+  .map((station: any) => {
+    const MAX_CHARGING_RATE = 1000; // ตั้งค่า MAX_CHARGING_RATE ตามต้องการ
+    const totalChargingRate = station.total_charging_rate || 0; // หากไม่มีค่าให้เป็น 0
+    const progress = Math.min((totalChargingRate / MAX_CHARGING_RATE) * 100, 100); // คำนวณ progress ตามต้องการ
+    const growthRate = calculateGrowthRate(station); // คำนวณอัตราการเติบโต
+    return {
+      progress,
+      imgHeight: 27, // ตั้งค่า imgHeight ตามต้องการ
+      title: `${station.name} Station`,
+      color: 'warning', // ตั้งค่า color ตามต้องการ
+      amount: `฿${totalChargingRate}`,
+      subtitle: `${growthRate}% Growth Rate`, // ใช้อัตราการเติบโตใน subtitle
+      imgSrc: '/images/cards/logo-bitbank.png' // ตั้งค่า imgSrc ตามต้องการ
+    };
+  }) || [];
+
+  function calculateGrowthRate(station: any) {
+    const MAX_CHARGING_RATE = 1000; // ตั้งค่า MAX_CHARGING_RATE ตามต้องการ
+    const totalChargingRate = station.total_charging_rate || 0; // หากไม่มีค่าให้เป็น 0
+    const growthRate = Math.min((totalChargingRate / MAX_CHARGING_RATE) * 100, 100); // คำนวณ growthRate ตามต้องการ
+    return growthRate;
+  }
+  
+  
+
+
   return (
     <Card>
       <CardHeader
@@ -70,18 +103,18 @@ const TotalEarning = () => {
       <CardContent sx={{ pt: theme => `${theme.spacing(2.25)} !important` }}>
         <Box sx={{ mb: 1.5, display: 'flex', alignItems: 'center' }}>
           <Typography variant='h4' sx={{ fontWeight: 600, fontSize: '2.125rem !important' }}>
-            $24,895
+            ฿{stationData?.totalSales}
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', color: 'success.main' }}>
             <MenuUp sx={{ fontSize: '1.875rem', verticalAlign: 'middle' }} />
             <Typography variant='body2' sx={{ fontWeight: 600, color: 'success.main' }}>
-              10%
+              {stationData?.totalEnergy}%
             </Typography>
           </Box>
         </Box>
 
         <Typography component='p' variant='caption' sx={{ mb: 10 }}>
-          Compared to $84,325 last year
+          Compared to ฿{stationData?.totalSales - stationData?.totalEnergy} in the last 24 hours
         </Typography>
 
         {data.map((item: DataType, index: number) => {

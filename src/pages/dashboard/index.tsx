@@ -13,6 +13,16 @@ import WeeklyOverview from '@/views/dashboard/superadmin/WeeklyOverview'
 import ChargerStatus from "@/views/dashboard/superadmin/ChargerStatus";
 import SalesByCountries from "@/views/dashboard/superadmin/SalesByChargingBooth";
 
+// ** Components Stationadmin Imports
+import StationadminTable from "@/views/dashboard/stationadmin/stationadminTable";
+import StationadminTrophy from "@/views/dashboard/stationadmin/stationadminTrophy";
+import StationadminTotalEarning from "@/views/dashboard/stationadmin/stationadminTotalEarning";
+import StationadminStatisticsCard from "@/views/dashboard/stationadmin/stationadminStatisticsCard";
+import StationadminWeeklyOverview from '@/views/dashboard/stationadmin/stationadminWeeklyOverview'
+import StationadminChargerStatus from "@/views/dashboard/stationadmin/stationadminChargerStatus";
+import StationadminSalesByCountries from "@/views/dashboard/stationadmin/stationadminSalesByChargingBooth";
+
+
 import { useQuery } from "react-query";
 import axios from "@/libs/Axios";
 
@@ -53,23 +63,22 @@ const Dashboard = () => {
       {userRole === "stationadmin" && (
         <Grid container spacing={6}>
         <Grid item xs={12} md={4}>
-          <Trophy />
+          <StationadminTrophy />
         </Grid>
         <Grid item xs={12} md={8}>
-          <StatisticsCard />
+          <StationadminStatisticsCard />
         </Grid>
         <Grid item xs={12} md={4} lg={4}>
-          {/* <WeeklyOverview /> */}
-          <ChargerStatus />
+          <StationadminChargerStatus />
         </Grid>
         <Grid item xs={12} md={4} lg={4}>
-          <TotalEarning />
+          <StationadminTotalEarning />
         </Grid>
         <Grid item xs={12} md={4} lg={4}>
-          <SalesByCountries />
+          <StationadminSalesByCountries />
         </Grid>
         <Grid item xs={12}>
-          <Table />
+          <StationadminTable />
         </Grid>
       </Grid>
       )}

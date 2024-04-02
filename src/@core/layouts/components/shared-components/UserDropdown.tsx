@@ -4,6 +4,7 @@ import { useState, SyntheticEvent, Fragment } from "react";
 // ** Next Import
 import { useRouter } from "next/router";
 import axios from "@/libs/Axios";
+import { User as UserInfo } from "@/interfaces/User.interface";
 import Swal from "sweetalert2";
 
 // ** MUI Imports
@@ -23,6 +24,7 @@ import EmailOutline from "mdi-material-ui/EmailOutline";
 import LogoutVariant from "mdi-material-ui/LogoutVariant";
 import AccountOutline from "mdi-material-ui/AccountOutline";
 import HelpCircleOutline from "mdi-material-ui/HelpCircleOutline";
+import { useQuery } from "react-query";
 
 // ** Styled Components
 const BadgeContentSpan = styled("span")(({ theme }) => ({
@@ -97,6 +99,11 @@ const UserDropdown = () => {
       color: "text.secondary",
     },
   };
+  const { data: UserInfo } = useQuery<UserInfo>("UserInfo", async () => {
+    const res = await axios.get("/user/me");
+    const data = res.data;
+    return data;
+  });
 
   return (
     <Fragment>
@@ -143,12 +150,12 @@ const UserDropdown = () => {
                 flexDirection: "column",
               }}
             >
-              <Typography sx={{ fontWeight: 600 }}>John Doe</Typography>
+              <Typography sx={{ fontWeight: 600 }}>{UserInfo?.firstName}</Typography>
               <Typography
                 variant="body2"
                 sx={{ fontSize: "0.8rem", color: "text.disabled" }}
               >
-                Admin
+                {UserInfo?.role}
               </Typography>
             </Box>
           </Box>

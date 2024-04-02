@@ -20,7 +20,7 @@ import TotalEarning from 'src/views/dashboard/TotalEarning'
 import StatisticsCard from 'src/views/dashboard/StatisticsCard'
 // import WeeklyOverview from 'src/views/dashboard/WeeklyOverview'
 import ChargerStatus from 'src/views/dashboard/ChargerStatus'
-import SalesByCountries from 'src/views/dashboard/SalesByCountries'
+import SalesByCountries from '@/views/dashboard/SalesByChargingBooth'
 
 const Dashboard = () => {
   return (

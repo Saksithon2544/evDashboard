@@ -199,6 +199,7 @@ const LoginPage = () => {
         // Find user with 'admin' or 'superadmin' role from the response
         const adminUser =
           userResponse.data.role === "stationadmin" ||
+          userResponse.data.role === "adminstation" ||
           userResponse.data.role === "superadmin";
 
         // Check if adminUser is found

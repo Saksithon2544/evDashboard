@@ -69,12 +69,12 @@ const headCells = [
     disablePadding: false,
     label: "Location",
   },
-  {
-    id: "income",
-    numeric: true,
-    disablePadding: false,
-    label: "Income",
-  },
+  // {
+  //   id: "income",
+  //   numeric: true,
+  //   disablePadding: false,
+  //   label: "Income",
+  // },
   {
     id: "created",
     numeric: false,
@@ -299,7 +299,7 @@ function TableStation({ Stations = [], isLoading, refetch, callback }: Props) {
                       {row.location[0]}, {row.location[1]}
                     </TableCell>
 
-                    <TableCell>{row.id}</TableCell>
+                    {/* <TableCell>{row.id}</TableCell> */}
 
                     <TableCell> {dateFormate(row.created_at)}</TableCell>
                     <TableCell>

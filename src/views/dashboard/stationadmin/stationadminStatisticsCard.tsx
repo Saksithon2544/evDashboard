@@ -1,7 +1,12 @@
 import React from 'react';
 import { useQuery } from 'react-query';
 import axios from '@/libs/Axios';
-import { Charging as ChargingData } from '@/interfaces/Adminstation.interface';
+import { 
+  Admin as AdminData,
+  Station as StationData,
+  User as UserData,
+  Charging as ChargingData,
+} from '@/interfaces/Adminstation.interface';
 import { Grid, Box, Card, Avatar, Typography, CardContent } from '@mui/material';
 import CardHeader from '@mui/material/CardHeader';
 import IconButton from '@mui/material/IconButton';
@@ -19,20 +24,16 @@ interface DataType {
 }
 
 const StatisticsCard = () => {
-  const { data: salesData, isLoading: totalSalesIsLoading, refetch: totalSalesRefetch } = useQuery(
-    'salesData',
-    async () => {
-      const res1 = (await axios.get('/charging_booth')).data as ChargingData[];
-      const totalSales = res1.reduce((acc, curr) => acc + curr.charging_rate * 10, 0);
-      const totalEnergy = res1.reduce((acc, curr) => acc + curr.charging_rate, 0);
-      const totalCustomers = (await axios.get('/super_admin/users')).data.length;
-      const totalStations = (await axios.get('/station')).data.length;
-      return { totalSales, totalEnergy, totalCustomers, totalStations };
-    },
-    {
-      refetchInterval: 60000,
-    }
-  );
+  const { data: salesData } = useQuery('merdata', async () => {
+    const res1 = await axios.get('/station');
+    const res2 = await axios.get('/charging_booth');
+    const res3 = await axios.get(`/station_admin/${res1.data[0].id}`);
+    const totalStations = res1.data.length;
+    const totalEnergy = res2.data.reduce((acc: number, item: ChargingData) => acc + item.charging_rate, 0);
+    const totalSales = res2.data.reduce((acc: number, item: ChargingData) => acc + item.charging_rate * 10, 0);
+    const data = res1.data;
+    return {data, totalStations, totalSales, totalEnergy, totalCustomers: 0};
+  });
 
   const renderStats = () => {
     if (salesData) {

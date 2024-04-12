@@ -5,7 +5,6 @@ export type Station = {
     location: [number, number]
     status: string,
     created_at: string,
-    total_charging_rate: number;
 };
 
 export type Admin = {

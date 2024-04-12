@@ -1,8 +1,6 @@
 import * as React from "react";
 import PropTypes from "prop-types";
-import { alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
-import Badge from "@mui/material/Badge";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -11,7 +9,6 @@ import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
-import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -21,14 +18,12 @@ import EditIcon from "@mui/icons-material/Edit";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { useRouter } from "next/router";
 import { dateFormate } from "@/libs/date";
-
 import Swal from "sweetalert2";
-
 import { visuallyHidden } from "@mui/utils";
-import { Station as StationData } from "@/interfaces/Station.interface";
 import axios from "@/libs/Axios";
+import { FormControl, TextField } from "@mui/material";
 
-function descendingComparator(a: any, b: any, orderBy: any) {
+function descendingComparator(a: any, b: any, orderBy: string) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
   }
@@ -38,13 +33,13 @@ function descendingComparator(a: any, b: any, orderBy: any) {
   return 0;
 }
 
-function getComparator(order: any, orderBy: any) {
+function getComparator(order: "asc" | "desc", orderBy: string) {
   return order === "desc"
     ? (a: any, b: any) => descendingComparator(a, b, orderBy)
     : (a: any, b: any) => -descendingComparator(a, b, orderBy);
 }
 
-function stableSort(array, comparator) {
+function stableSort(array: any[], comparator: any) {
   const stabilizedThis = array.map((el, index) => [el, index]);
   stabilizedThis.sort((a, b) => {
     const order = comparator(a[0], b[0]);
@@ -69,14 +64,14 @@ const headCells = [
     disablePadding: false,
     label: "Location",
   },
-  // {
-  //   id: "income",
-  //   numeric: true,
-  //   disablePadding: false,
-  //   label: "Income",
-  // },
   {
-    id: "created",
+    id: "income",
+    numeric: true,
+    disablePadding: false,
+    label: "Income",
+  },
+  {
+    id: "created_at",
     numeric: false,
     disablePadding: false,
     label: "Created",
@@ -95,17 +90,17 @@ const headCells = [
   },
 ];
 
-interface EnhancedTableProps {
-  onRequestSort: (event: React.MouseEvent, property: string) => void;
+interface EnhancedTableHeadProps {
+  onRequestSort: (property: string) => void;
   order: "asc" | "desc";
   orderBy: string;
 }
 
-function EnhancedTableHead(props: EnhancedTableProps) {
+function EnhancedTableHead(props: EnhancedTableHeadProps) {
   const { order, orderBy, onRequestSort } = props;
 
   const createSortHandler = (property: string) => (event: React.MouseEvent) => {
-    onRequestSort(event, property);
+    onRequestSort(property);
   };
 
   return (
@@ -143,32 +138,52 @@ EnhancedTableHead.propTypes = {
   orderBy: PropTypes.string.isRequired,
 };
 
+export interface StationData {
+  id: string;
+  name: string;
+  location: [number, number];
+  created_at: string;
+  total_charging_booth: number;
+  total_charging_rate: number;
+}
+
+export interface ChargingData {
+  id: string;
+  station_id: string;
+  charging_rate: number;
+  created_at: string;
+}
+
 export type CallBack = {
   action: "edit" | "delete";
   station: StationData | null | any;
 };
 
-type Props = {
-  Stations: StationData[];
+interface Props {
+  Stations: {
+    latestStations: StationData[];
+    data: StationData[];
+  };
   isLoading?: boolean;
-  refetch?: (data: boolean) => void;
+  refetch?: () => void;
   callback?: (data: CallBack) => void;
-};
+}
 
-function TableStation({ Stations = [], isLoading, refetch, callback }: Props) {
-  const router = useRouter();
+function TableStation({ Stations, isLoading, refetch, callback }: Props) {
   const [order, setOrder] = React.useState<"asc" | "desc">("asc");
-  const [orderBy, setOrderBy] = React.useState<string>("name");
-  const [page, setPage] = React.useState<number>(0);
+  const [orderBy, setOrderBy] = React.useState<string>("created_at");
+  const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState<boolean>(false);
-  const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const router = useRouter();
+  const [searchValue, setSearchValue] = React.useState("");
 
   const handleEditClick = (station: StationData) => {
-    // console.log("station", station);
-    callback({
-      action: "edit",
-      station,
-    });
+    callback &&
+      callback({
+        action: "edit",
+        station,
+      });
   };
 
   const handleDeleteClick = async (station: StationData) => {
@@ -187,7 +202,6 @@ function TableStation({ Stations = [], isLoading, refetch, callback }: Props) {
       });
 
       if (confirmationResult.isConfirmed) {
-        // Show loading modal
         Swal.fire({
           title: "Please wait...",
           text: "Deleting station",
@@ -198,12 +212,9 @@ function TableStation({ Stations = [], isLoading, refetch, callback }: Props) {
           },
         });
         await axios.delete(`/station/${station.id}`);
-        refetch?.(true);
+        refetch && refetch();
 
-        // Close the loading modal
         Swal.close();
-
-        // Show success message
         Swal.fire({
           icon: "success",
           title: "Deleted!",
@@ -211,7 +222,6 @@ function TableStation({ Stations = [], isLoading, refetch, callback }: Props) {
         });
       }
     } catch (error) {
-      console.log(error);
       let errorMessage = "An error occurred while deleting station.";
       if (error.response && error.response.data) {
         errorMessage = error.response.data.detail;
@@ -224,7 +234,7 @@ function TableStation({ Stations = [], isLoading, refetch, callback }: Props) {
     }
   };
 
-  const handleRequestSort = (event: React.MouseEvent, property: string) => {
+  const handleRequestSort = (property: string) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
@@ -245,48 +255,78 @@ function TableStation({ Stations = [], isLoading, refetch, callback }: Props) {
     setDense(event.target.checked);
   };
 
-  // const isSelected = (id: string) => selected.indexOf(id) !== -1;
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(event.target.value);
+  };
 
   const emptyRows =
     page > 0
-      ? Math.max(0, (1 + page) * rowsPerPage - (Stations ? Stations.length : 0))
+      ? Math.max(
+          0,
+          (1 + page) * rowsPerPage - (Stations.latestStations.length || 0)
+        )
       : 0;
+
+  const filteredRows = Stations.latestStations.filter((station) => {
+    return (
+      station.name.toLowerCase().includes(searchValue.toLowerCase()) ||
+      station.location[0].toString().includes(searchValue) ||
+      station.location[1].toString().includes(searchValue) ||
+      station.total_charging_rate.toString().includes(searchValue) ||
+      dateFormate(station.created_at).includes(searchValue)
+    );
+  });
 
   const visibleRows = React.useMemo(
     () =>
-      stableSort(Stations || [], getComparator(order, orderBy)).slice(
+      stableSort(filteredRows, getComparator(order, orderBy)).slice(
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage
       ),
-    [Stations, order, orderBy, page, rowsPerPage]
+    [filteredRows, order, orderBy, page, rowsPerPage]
   );
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <Box style={{ width: "100%" }}>
+      <Box
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          marginBottom: 10,
+        }}
+      >
+        <FormControl style={{ marginRight: 50 }}>
+          <TextField
+            label="🔍 Search..."
+            id="search"
+            value={searchValue}
+            onChange={handleSearchChange}
+            variant="outlined"
+          />
+        </FormControl>
+      </Box>
       <Paper style={{ width: "100%", marginBottom: 2 }}>
         <TableContainer component={Paper}>
           <Table
-            style={{ minWidth: 750 }}
+            sx={{ minWidth: 750 }}
             aria-labelledby="tableTitle"
             size={dense ? "small" : "medium"}
           >
             <EnhancedTableHead
               order={order}
               orderBy={orderBy}
-              // onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
             />
             <TableBody>
-              {visibleRows.map((row: StationData) => {
-                // const isSelectedRow = isSelected(row.id);
-                const labelId = `enhanced-table-checkbox-${row.id}`;
-
+              {visibleRows.map((row) => {
+                const labelId = `enhanced-table-checkbox-${row.userId}`;
                 return (
-                  <TableRow key={row.id}>
+                  <TableRow
+                    hover
+                    role="checkbox"
+                    tabIndex={-1}
+                    key={row.userId}
+                  >
                     <TableCell
                       component="th"
                       id={labelId}
@@ -298,10 +338,8 @@ function TableStation({ Stations = [], isLoading, refetch, callback }: Props) {
                     <TableCell>
                       {row.location[0]}, {row.location[1]}
                     </TableCell>
-
-                    {/* <TableCell>{row.id}</TableCell> */}
-
-                    <TableCell> {dateFormate(row.created_at)}</TableCell>
+                    <TableCell>{row.total_charging_rate}</TableCell>
+                    <TableCell>{dateFormate(row.created_at)}</TableCell>
                     <TableCell>
                       <IconButton
                         aria-label="edit"
@@ -316,7 +354,6 @@ function TableStation({ Stations = [], isLoading, refetch, callback }: Props) {
                         <DeleteIcon />
                       </IconButton>
                     </TableCell>
-
                     <TableCell>
                       <IconButton
                         aria-label="view"
@@ -334,7 +371,7 @@ function TableStation({ Stations = [], isLoading, refetch, callback }: Props) {
                     height: (dense ? 33 : 53) * emptyRows,
                   }}
                 >
-                  <TableCell colSpan={4} />
+                  <TableCell colSpan={6} />
                 </TableRow>
               )}
             </TableBody>
@@ -343,7 +380,7 @@ function TableStation({ Stations = [], isLoading, refetch, callback }: Props) {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={Stations.length}
+          count={filteredRows.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
@@ -353,6 +390,7 @@ function TableStation({ Stations = [], isLoading, refetch, callback }: Props) {
       <FormControlLabel
         control={<Switch checked={dense} onChange={handleChangeDense} />}
         label="Dense padding"
+        style={{ marginLeft: 10 }}
       />
     </Box>
   );

@@ -1,6 +1,5 @@
 import React, { useRef } from "react";
 import Box from "@mui/material/Box";
-import Badge from "@mui/material/Badge";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -18,7 +17,15 @@ import { useRouter } from "next/router";
 
 import Swal from "sweetalert2";
 import axios from "@/libs/Axios";
-import { Button, Chip } from "@mui/material";
+import {
+  Button,
+  Chip,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+} from "@mui/material";
 import { visuallyHidden } from "@mui/utils";
 
 import type { User } from "@/interfaces/Adminstation.interface";
@@ -174,6 +181,10 @@ function TableadminStation({
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [dense, setDense] = React.useState(false);
+  const [statusFilter, setStatusFilter] = React.useState<
+    "active" | "inactive" | "all"
+  >("all");
+  const [searchValue, setSearchValue] = React.useState("");
 
   // React.useEffect(() => {
   //   refetchTimer.current = setInterval(() => {
@@ -264,22 +275,90 @@ function TableadminStation({
     setDense(event.target.checked);
   };
 
+  const handStatusFilterChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setStatusFilter(event.target.value as "active" | "inactive" | "all");
+  };
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(event.target.value);
+  };
+
   const emptyRows =
     page > 0
       ? Math.max(0, (1 + page) * rowsPerPage - (mergedData?.length || 0))
       : 0;
 
+  const filteredRows = mergedData
+    ? mergedData
+        .filter((data) => {
+          if (statusFilter === "all") {
+            return true;
+          } else if (statusFilter === "active") {
+            return data.is_active;
+          } else {
+            return !data.is_active;
+          }
+        })
+        .filter((data) => {
+          if (searchValue === "") {
+            return true;
+          } else {
+            return (
+              data.firstName
+                .toLowerCase()
+                .includes(searchValue.toLowerCase()) ||
+              data.lastName.toLowerCase().includes(searchValue.toLowerCase()) ||
+              data.email.toLowerCase().includes(searchValue.toLowerCase()) ||
+              data.phoneNumber.toLowerCase().includes(searchValue.toLowerCase())
+            );
+          }
+        })
+    : [];
+
   const visibleRows = React.useMemo(
     () =>
-      stableSort(mergedData || [], getComparator(order, orderBy)).slice(
+      stableSort(filteredRows || [], getComparator(order, orderBy)).slice(
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage
       ),
-    [mergedData, order, orderBy, page, rowsPerPage]
+    [filteredRows, order, orderBy, page, rowsPerPage]
   );
 
   return (
     <Box style={{ width: "100%" }}>
+      <Box
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          marginBottom: 10,
+        }}
+      >
+        <FormControl style={{ marginRight: 50 }}>
+          <TextField
+            label="🔍 Search..."
+            id="search"
+            value={searchValue}
+            onChange={handleSearchChange}
+            variant="outlined"
+          />
+        </FormControl>
+        <FormControl style={{ marginRight: 50 }}>
+          <InputLabel id="status-filter-label">Status</InputLabel>
+          <Select
+            labelId="status-filter-label"
+            label="Status"
+            id="status-filter"
+            value={statusFilter}
+            onChange={handStatusFilterChange}
+          >
+            <MenuItem value="all">All</MenuItem>
+            <MenuItem value="active">Active</MenuItem>
+            <MenuItem value="inactive">Inactive</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
       <Paper style={{ width: "100%", marginBottom: 2 }}>
         <TableContainer component={Paper}>
           <Table
@@ -298,8 +377,8 @@ function TableadminStation({
             />
 
             <TableBody>
-              {mergedData &&
-                mergedData.map((row, index) => (
+              {visibleRows &&
+                visibleRows.map((row, index) => (
                   <TableRow key={index}>
                     <TableCell>
                       {row.firstName} {row.lastName}
@@ -335,13 +414,22 @@ function TableadminStation({
                     </TableCell>
                   </TableRow>
                 ))}
+              {emptyRows > 0 && (
+                <TableRow
+                  style={{
+                    height: (dense ? 33 : 53) * emptyRows,
+                  }}
+                >
+                  <TableCell colSpan={6} />
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </TableContainer>
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={(mergedData && mergedData.length) || 0} // Added null check
+          count={(filteredRows && filteredRows.length) || 0} // Added null check
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}

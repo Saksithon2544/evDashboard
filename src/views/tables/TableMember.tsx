@@ -1,7 +1,6 @@
 import * as React from "react";
 import PropTypes from "prop-types";
 import Box from "@mui/material/Box";
-import Badge from "@mui/material/Badge";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -26,7 +25,7 @@ import { SelectChangeEvent } from "@mui/material/Select";
 import { visuallyHidden } from "@mui/utils";
 import { User as UserData } from "@/interfaces/User.interface";
 import axios from "@/libs/Axios";
-import { Chip, Tab } from "@mui/material";
+import { Chip, TextField } from "@mui/material";
 import { dateFormate } from "@/libs/date";
 
 function descendingComparator(a: any, b: any, orderBy: string) {
@@ -165,6 +164,10 @@ function TableMember({ Users, isLoading, refetch, callback }: Props) {
   const [statusFilter, setStatusFilter] = React.useState<
     "active" | "inactive" | "all"
   >("all");
+  const [roleFilter, setRoleFilter] = React.useState<
+    "all" | "superadmin" | "stationadmin" | "user"
+  >("all");
+  const [searchValue, setSearchValue] = React.useState<string>("");
 
   const handleEditClick = (user: UserData) => {
     callback({
@@ -241,6 +244,18 @@ function TableMember({ Users, isLoading, refetch, callback }: Props) {
     setStatusFilter(event.target.value as "active" | "inactive" | "all");
   };
 
+  const handleRoleFilterChange = (
+    event: SelectChangeEvent<"all" | "superadmin" | "stationadmin" | "user">
+  ) => {
+    setRoleFilter(
+      event.target.value as "all" | "superadmin" | "stationadmin" | "user"
+    );
+  };
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(event.target.value);
+  };
+
   const emptyRows =
     page > 0
       ? Math.max(0, (1 + page) * rowsPerPage - (Users ? Users.length : 0))
@@ -253,6 +268,20 @@ function TableMember({ Users, isLoading, refetch, callback }: Props) {
         if (statusFilter === "inactive") return !user.is_active;
         return true;
       })
+        .filter((user) => {
+          if (roleFilter === "all") return true;
+          if (roleFilter === "superadmin") return user.role === "superadmin";
+          if (roleFilter === "stationadmin")
+            return user.role === "stationadmin";
+          if (roleFilter === "user") return user.role === "user";
+          return true;
+        })
+        .filter(
+          (user) =>
+            user.firstName.toLowerCase().includes(searchValue.toLowerCase()) ||
+            user.lastName.toLowerCase().includes(searchValue.toLowerCase()) ||
+            user.email.toLowerCase().includes(searchValue.toLowerCase())
+        )
     : [];
 
   const visibleRows = React.useMemo(
@@ -270,7 +299,38 @@ function TableMember({ Users, isLoading, refetch, callback }: Props) {
 
   return (
     <Box style={{ width: "100%" }}>
-      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+      <Box
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          marginBottom: 10,
+        }}
+      >
+        <FormControl style={{ marginRight: 50 }}>
+          <TextField
+            label="🔍 Search..."
+            id="search"
+            value={searchValue}
+            onChange={handleSearchChange}
+            variant="outlined"
+          />
+        </FormControl>
+        <FormControl style={{ marginRight: 50 }}>
+          <InputLabel id="role-filter-label">Role</InputLabel>
+          <Select
+            labelId="role-filter-label"
+            label="Role"
+            id="role-filter"
+            value={roleFilter}
+            onChange={handleRoleFilterChange}
+          >
+            <MenuItem value="all">All</MenuItem>
+            <MenuItem value="superadmin">Super Admin</MenuItem>
+            <MenuItem value="stationadmin">Admin Station</MenuItem>
+            <MenuItem value="user">User</MenuItem>
+          </Select>
+        </FormControl>
+
         <FormControl style={{ marginRight: 50 }}>
           <InputLabel id="status-filter-label">Status</InputLabel>
           <Select
@@ -285,7 +345,7 @@ function TableMember({ Users, isLoading, refetch, callback }: Props) {
             <MenuItem value="inactive">Inactive</MenuItem>
           </Select>
         </FormControl>
-      </div>
+      </Box>
 
       <Paper style={{ width: "100%", marginBottom: 2 }}>
         <TableContainer component={Paper}>
@@ -401,7 +461,7 @@ function TableMember({ Users, isLoading, refetch, callback }: Props) {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={filteredRows.length}
+          count={(filteredRows && filteredRows.length) || 0} // Added null check
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}

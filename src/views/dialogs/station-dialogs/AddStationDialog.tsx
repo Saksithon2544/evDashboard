@@ -137,28 +137,6 @@ export default function StationDialog({ callback }) {
               />
             )}
           />
-          <Controller
-            name="status"
-            control={control}
-            defaultValue={"online"}
-            render={({ field }) => (
-              <FormControl fullWidth margin="dense">
-                <InputLabel id="status">Status</InputLabel>
-                <Select
-                  labelId="status"
-                  label="Status"
-                  variant="outlined"
-                  {...field}
-                  onChange={(e: SelectChangeEvent) => {
-                    field.onChange(e.target.value);
-                  }}
-                >
-                  <MenuItem value="online">Online</MenuItem>
-                  <MenuItem value="offline">Offline</MenuItem>
-                </Select>
-              </FormControl>
-            )}
-          />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>

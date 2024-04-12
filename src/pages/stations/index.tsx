@@ -1,32 +1,39 @@
-// ** MUI Imports
+import * as React from "react";
+import { useState } from "react";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
-
-// ** Demo Components Imports
-import TableStation, { type CallBack } from "src/views/tables/TableStation";
+import TableStation, { CallBack, StationData,ChargingData  } from "src/views/tables/TableStation";
 import AddStationDialog from "@/views/dialogs/station-dialogs/AddStationDialog";
 import EditStationDialog from "@/views/dialogs/station-dialogs/EditStationDialog";
-
 import { useQuery } from "react-query";
-import { Station as StationData } from "@/interfaces/Station.interface";
-import { useState } from "react";
 import axios from "@/libs/Axios";
 import { Typography } from "@mui/material";
+
+interface StationProps {
+  latestStations: StationData[];
+  data: StationData[] & ChargingData[]; // Use the ChargingData type
+}
 
 const StationsAllTable = () => {
   const [selectedStation, setSelectedStation] = useState<StationData>();
 
-  const {
-    data: Stations,
-    isLoading,
-    refetch,
-  } = useQuery<StationData[]>("stations", async () => {
-    const res = await axios.get(`/station`);
-    const data = await res.data;
-    const sortedStations = data.sort((a: StationData, b: StationData) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-    const latestStations = sortedStations.slice(0, 100); // เลือกข้อมูลเพียง 100 คนล่าสุด
-    return latestStations;
+  const { data: Stations, isLoading, refetch } = useQuery("stations", async () => {
+    const res1 = await (await axios.get(`/station`)).data as StationData[];
+    const res2 = await (await axios.get(`/charging_booth`)).data as ChargingData[];
+    const data = res1.map((station) => {
+      return {
+        id: station.id,
+        name: station.name,
+        location: station.location,
+        created_at: station.created_at,
+        total_charging_booth: res2.filter((charging) => charging.station_id === station.id).length,
+        total_charging_rate: res2.filter((charging) => charging.station_id === station.id).reduce((acc, curr) => acc + (curr.charging_rate * 10), 0),
+      };
+    });
+    const sortedStations = data.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    const latestStations = sortedStations.slice(0, 100);
+    return { latestStations, data };
   });
 
   function handleCloseMoadal() {
@@ -36,11 +43,9 @@ const StationsAllTable = () => {
   function handleTable(data: CallBack) {
     switch (data.action) {
       case "edit":
-        // console.log("edit", data.station);
         setSelectedStation(data.station);
         break;
       case "delete":
-        // console.log("delete", data.station);
         break;
       default:
         break;
@@ -50,7 +55,6 @@ const StationsAllTable = () => {
   return (
     <Grid container>
       <Grid item xs={12}>
-        {/* {JSON.stringify(selectedStation)} */}
         <AddStationDialog callback={refetch} />
         <EditStationDialog
           station={selectedStation}
@@ -64,14 +68,13 @@ const StationsAllTable = () => {
             title="Station"
             titleTypographyProps={{ variant: "h6" }}
           />
-          
-          {!isLoading && Stations && Stations.length > 0 ? (
+          {!isLoading && Stations && Stations.data.length > 0 ? (
             <TableStation
               Stations={Stations}
               callback={handleTable}
               refetch={() => refetch()}
             />
-          ) : Stations && Stations.length === 0 ? (
+          ) : Stations && Stations.data.length === 0 ? (
             <Typography variant="h6" align="center">
               No Data
             </Typography>

@@ -28,6 +28,7 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
+  TextField,
 } from "@mui/material";
 
 function descendingComparator(a: any, b: any, orderBy: any) {
@@ -180,9 +181,10 @@ Props) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [dense, setDense] = React.useState(false);
-  const [statusFilter, setStatusFilter] = useState<
+  const [statusFilter, setStatusFilter] = React.useState<
     "online" | "offline" | "charging" | "all"
   >("all");
+  const [searchValue, setSearchValue] = React.useState("");
 
   // React.useEffect(() => {
   //   refetchTimer.current = setInterval(() => {
@@ -275,7 +277,13 @@ Props) {
   const handleStatusFilterChange = (
     event: SelectChangeEvent<"online" | "offline" | "charging" | "all">
   ) => {
-    setStatusFilter(event.target.value as "online" | "offline" | "charging" | "all");
+    setStatusFilter(
+      event.target.value as "online" | "offline" | "charging" | "all"
+    );
+  };
+
+  const handSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(event.target.value);
   };
 
   const emptyRows =
@@ -284,18 +292,40 @@ Props) {
       : 0;
 
   const filteredRows = mergedData
-    ? mergedData.filter((row) => {
-        if (statusFilter === "all") return true;
-        if (statusFilter === "online") return row.status === "online";
-        if (statusFilter === "offline") return row.status === "offline";
-        if (statusFilter === "charging") return row.status === "charging";
-        return true;
-      })
+    ? mergedData
+        .filter((row) => {
+          if (statusFilter === "all") return true;
+          if (statusFilter === "online") return row.status === "online";
+          if (statusFilter === "offline") return row.status === "offline";
+          if (statusFilter === "charging") return row.status === "charging";
+          return true;
+        })
+        .filter((row) => {
+          if (searchValue === "") return true;
+          return row.booth_name
+            .toLowerCase()
+            .includes(searchValue.toLowerCase());
+        })
     : [];
 
   return (
     <Box style={{ width: "100%" }}>
-      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+      <Box
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          marginBottom: 10,
+        }}
+      >
+        <FormControl style={{ marginRight: 50 }}>
+          <TextField
+            id="search"
+            label="🔍 Charger Search..."
+            variant="outlined"
+            value={searchValue}
+            onChange={handSearchChange}
+          />
+        </FormControl>
         <FormControl style={{ marginRight: 50 }}>
           <InputLabel id="status-filter-label">Status</InputLabel>
           <Select
@@ -311,7 +341,7 @@ Props) {
             <MenuItem value="charging">Charging</MenuItem>
           </Select>
         </FormControl>
-      </div>
+      </Box>
 
       <Paper style={{ width: "100%", marginBottom: 2 }}>
         <TableContainer component={Paper}>

@@ -2,10 +2,10 @@ export type Station = {
     id?: string,
     stationId: string,
     name: string,
-    location: string
+    location: [number, number]
     status: string,
     created_at: string,
-
+    total_charging_rate: number;
 };
 
 export type Admin = {

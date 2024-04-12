@@ -28,36 +28,6 @@ export default function ViewStation() {
   const [setSelectedStation] = useState(null);
   const handleTable = (station: any) => setSelectedStation(station);
 
-  // const {
-  //   data: adminsData,
-  //   isLoading: adminsLoading,
-  //   refetch: refetchAdmins,
-  // } = useQuery<AdminData[]>("admins", async () => {
-  //   const res = await axios.get(`/station/${id}/admins`);
-  //   console.log("admins", res.data);
-  //   return res.data;
-  // });
-
-  // const {
-  //   data: stationsData,
-  //   isLoading: stationsLoading,
-  //   refetch: refetchStations,
-  // } = useQuery<StationData[]>("stations", async () => {
-  //   const res = await axios.get(`/station`);
-  //   console.log("stations", res.data);
-  //   return res.data;
-  // });
-
-  // const {
-  //   data: usersData,
-  //   isLoading: usersLoading,
-  //   refetch: refetchUsers,
-  // } = useQuery<UserData[]>("users", async () => {
-  //   const res = await axios.get("/super_admin/users");
-  //   console.log("users", res.data);
-  //   return res.data;
-  // });
-
   const {
     data: mergedData,
     isLoading,
@@ -69,7 +39,7 @@ export default function ViewStation() {
         .data as AdminData[];
       const res2 = (await axios.get(`/station`)).data as StationData[];
       const res3 = (await axios.get("/super_admin/users")).data as UserData[];
-      const res4 = (await axios.get(`/charging_booth/${id}`)).data as ChargingData[];
+      const res4 = (await axios.get(`/charging_booth/station/${id}`)).data as ChargingData[];
 
       const res = await Promise.all([res1, res2, res3, res4]);
 

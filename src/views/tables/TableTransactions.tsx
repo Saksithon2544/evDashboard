@@ -14,6 +14,12 @@ import Paper from "@mui/material/Paper";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import { useRouter } from "next/router";
+import IconButton from "@mui/material/IconButton";
+import { DateRange, DateRangePicker } from "@mui/x-date-pickers-pro";
+import { LocalizationProvider } from "@mui/x-date-pickers-pro";
+import { AdapterDateFns } from '@mui/x-date-pickers-pro/AdapterDateFns';
+
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 
 import Swal from "sweetalert2";
 
@@ -21,6 +27,13 @@ import { visuallyHidden } from "@mui/utils";
 import { Transaction as TransactionData } from "@/interfaces/Transaction.interface";
 import axios from "@/libs/Axios";
 import { dateFormate } from "@/libs/date";
+import {
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+} from "@mui/material";
 
 function descendingComparator(a: any, b: any, orderBy: any) {
   if (b[orderBy] < a[orderBy]) {
@@ -155,6 +168,15 @@ function TableTransactions({
   const [page, setPage] = React.useState<number>(0);
   const [dense, setDense] = React.useState<boolean>(false);
   const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
+  const [transactionType, setTransactionType] = React.useState<
+    "all" | "cash" | "mastercard" | "visa" | "paypal"
+  >("all");
+  const [searchValue, setSearchValue] = React.useState<string>("");
+  const [selectedDateRange, setSelectedDateRange] = React.useState<
+    [Date | null, Date | null]
+  >([null, null]);
+  const [isDatePickerOpen, setIsDatePickerOpen] =
+    React.useState<boolean>(false);
 
   const handleRequestSort = (event: React.MouseEvent, property: string) => {
     const isAsc = orderBy === property && order === "asc";
@@ -177,7 +199,17 @@ function TableTransactions({
     setDense(event.target.checked);
   };
 
-  // const isSelected = (id: string) => selected.indexOf(id) !== -1;
+  const handleTransactionType = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setTransactionType(
+      event.target.value as "all" | "cash" | "mastercard" | "visa" | "paypal"
+    );
+  };
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(event.target.value);
+  };
 
   const emptyRows =
     page > 0
@@ -187,13 +219,48 @@ function TableTransactions({
         )
       : 0;
 
+  const filteredRows = Transactions
+    ? Transactions.filter((row) => {
+        if (searchValue === "") {
+          return true;
+        }
+        return (
+          row.firstName.toLowerCase().includes(searchValue.toLowerCase()) ||
+          row.lastName.toLowerCase().includes(searchValue.toLowerCase()) ||
+          row.email.toLowerCase().includes(searchValue.toLowerCase()) ||
+          row.amount
+            .toString()
+            .toLowerCase()
+            .includes(searchValue.toLowerCase())
+        );
+      })
+        .filter((row) => {
+          if (transactionType === "all") return true;
+          if (transactionType === row.transactionType) return true;
+          return false;
+        })
+        .filter((row) => {
+          if (!selectedDateRange[0] && !selectedDateRange[1]) return true;
+          if (selectedDateRange[0] && !selectedDateRange[1]) {
+            return new Date(row.created_at) >= selectedDateRange[0]!;
+          }
+          if (!selectedDateRange[0] && selectedDateRange[1]) {
+            return new Date(row.created_at) <= selectedDateRange[1]!;
+          }
+          return (
+            new Date(row.created_at) >= selectedDateRange[0]! &&
+            new Date(row.created_at) <= selectedDateRange[1]!
+          );
+        })
+    : [];
+
   const visibleRows = React.useMemo(
     () =>
-      stableSort(Transactions || [], getComparator(order, orderBy)).slice(
+      stableSort(filteredRows, getComparator(order, orderBy)).slice(
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage
       ),
-    [Transactions, order, orderBy, page, rowsPerPage]
+    [filteredRows, order, orderBy, page, rowsPerPage]
   );
 
   if (isLoading) {
@@ -201,86 +268,134 @@ function TableTransactions({
   }
 
   return (
-    <Box style={{ width: "100%" }}>
-      <Paper style={{ width: "100%", marginBottom: 2 }}>
-        <TableContainer component={Paper}>
-          <Table
-            style={{ minWidth: 750 }}
-            aria-labelledby="tableTitle"
-            size={dense ? "small" : "medium"}
-          >
-            <EnhancedTableHead
-              order={order}
-              orderBy={orderBy}
-              // onSelectAllClick={handleSelectAllClick}
-              onRequestSort={handleRequestSort}
+    <LocalizationProvider dateAdapter={AdapterDateFns as any}>
+      <Box style={{ width: "100%" }}>
+        <Box
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: 10,
+          }}
+        >
+          <FormControl style={{ marginRight: 50 }}>
+            <TextField
+              label="🔍 Search..."
+              id="search"
+              value={searchValue}
+              onChange={handleSearch}
+              variant="outlined"
             />
-            <TableBody>
-              {visibleRows.map((row: TransactionData) => {
+          </FormControl>
+          <FormControl style={{ marginRight: 50 }}>
+            <InputLabel id="status-filter-label">Transaction Type</InputLabel>
+            <Select
+              labelId="status-filter-label"
+              id="status-filter"
+              value={transactionType}
+              label="Transaction Type"
+              onChange={handleTransactionType}
+            >
+              <MenuItem value="all">All</MenuItem>
+              <MenuItem value="cash">Cash</MenuItem>
+              <MenuItem value="mastercard">Mastercard</MenuItem>
+              <MenuItem value="visa">Visa</MenuItem>
+              <MenuItem value="paypal">Paypal</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl style={{ marginRight: 50 }}>
+            <IconButton onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}>
+              <CalendarTodayIcon />
+            </IconButton>
+            <DateRangePicker
+              open={isDatePickerOpen}
+              value={selectedDateRange as DateRange<never>}
+              onChange={(newValue) => {
+                setSelectedDateRange(newValue);
+              }}
+              onClose={() => setIsDatePickerOpen(false)}
+            />
+          </FormControl>
+        </Box>
+        <Paper style={{ width: "100%", marginBottom: 2 }}>
+          <TableContainer component={Paper}>
+            <Table
+              style={{ minWidth: 750 }}
+              aria-labelledby="tableTitle"
+              size={dense ? "small" : "medium"}
+            >
+              <EnhancedTableHead
+                order={order}
+                orderBy={orderBy}
+                onRequestSort={handleRequestSort}
+              />
+              <TableBody>
+                {visibleRows.map((row: TransactionData) => {
+                  return (
+                    <TableRow key={row.id}>
+                      <TableCell>
+                        {row.firstName} {row.lastName}
+                      </TableCell>
+                      <TableCell>{row.email}</TableCell>
+                      <TableCell>{row.amount}</TableCell>
+                      {row.transactionType === "cash" ? (
+                        <TableCell>
+                          <Badge color="success" variant="dot" sx={{ mr: 2 }} />
+                          {row.transactionType}
+                        </TableCell>
+                      ) : row.transactionType === "mastercard" ? (
+                        <TableCell>
+                          <Badge color="warning" variant="dot" sx={{ mr: 2 }} />
+                          {row.transactionType}
+                        </TableCell>
+                      ) : row.transactionType === "visa" ? (
+                        <TableCell>
+                          <Badge color="primary" variant="dot" sx={{ mr: 2 }} />
+                          {row.transactionType}
+                        </TableCell>
+                      ) : row.transactionType === "paypal" ? (
+                        <TableCell>
+                          <Badge color="info" variant="dot" sx={{ mr: 2 }} />
+                          {row.transactionType}
+                        </TableCell>
+                      ) : (
+                        <TableCell>
+                          <Badge color="default" variant="dot" sx={{ mr: 2 }} />
+                          {row.transactionType}
+                        </TableCell>
+                      )}
 
-                return (
-                  <TableRow key={row.id}>
-                    <TableCell>{row.firstName}  {row.lastName}</TableCell>
-                    <TableCell>{row.email}</TableCell>
-                    <TableCell>{row.amount}</TableCell>
-                    {row.transactionType === "cash" ? (
-                      <TableCell>
-                        <Badge color="success" variant="dot" sx={{ mr: 2 }} />
-                        {row.transactionType}
-                      </TableCell>
-                    ) : row.transactionType === "mastercard" ? (
-                      <TableCell>
-                        <Badge color="warning" variant="dot" sx={{ mr: 2 }} />
-                        {row.transactionType}
-                      </TableCell>
-                    ) : row.transactionType === "visa" ? (
-                      <TableCell>
-                        <Badge color="primary" variant="dot" sx={{ mr: 2 }} />
-                        {row.transactionType}
-                      </TableCell>
-                    ) : row.transactionType === "paypal" ? (
-                      <TableCell>
-                        <Badge color="info" variant="dot" sx={{ mr: 2 }} />
-                        {row.transactionType}
-                      </TableCell>
-                    ) : (
-                      <TableCell>
-                        <Badge color="default" variant="dot" sx={{ mr: 2 }} />
-                        {row.transactionType}
-                      </TableCell>
-                    )}
-
-                    <TableCell>{dateFormate(row.created_at)}</TableCell>
+                      <TableCell>{dateFormate(row.created_at)}</TableCell>
+                    </TableRow>
+                  );
+                })}
+                {emptyRows > 0 && (
+                  <TableRow
+                    style={{
+                      height: (dense ? 33 : 53) * emptyRows,
+                    }}
+                  >
+                    <TableCell colSpan={4} />
                   </TableRow>
-                );
-              })}
-              {emptyRows > 0 && (
-                <TableRow
-                  style={{
-                    height: (dense ? 33 : 53) * emptyRows,
-                  }}
-                >
-                  <TableCell colSpan={4} />
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={Transactions.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={filteredRows.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </Paper>
+        <FormControlLabel
+          control={<Switch checked={dense} onChange={handleChangeDense} />}
+          label="Dense padding"
         />
-      </Paper>
-      <FormControlLabel
-        control={<Switch checked={dense} onChange={handleChangeDense} />}
-        label="Dense padding"
-      />
-    </Box>
+      </Box>
+    </LocalizationProvider>
   );
 }
 

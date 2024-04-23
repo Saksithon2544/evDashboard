@@ -14,15 +14,7 @@ import Paper from "@mui/material/Paper";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import { useRouter } from "next/router";
-import IconButton from "@mui/material/IconButton";
-import { DateRange, DateRangePicker } from "@mui/x-date-pickers-pro";
-import { LocalizationProvider } from "@mui/x-date-pickers-pro";
-import { AdapterDateFns } from '@mui/x-date-pickers-pro/AdapterDateFns';
-
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-
 import Swal from "sweetalert2";
-
 import { visuallyHidden } from "@mui/utils";
 import { Transaction as TransactionData } from "@/interfaces/Transaction.interface";
 import axios from "@/libs/Axios";
@@ -34,8 +26,11 @@ import {
   Select,
   TextField,
 } from "@mui/material";
+import { DatePicker } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 
-function descendingComparator(a: any, b: any, orderBy: any) {
+function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
   }
@@ -45,10 +40,10 @@ function descendingComparator(a: any, b: any, orderBy: any) {
   return 0;
 }
 
-function getComparator(order: any, orderBy: any) {
+function getComparator(order, orderBy) {
   return order === "desc"
-    ? (a: any, b: any) => descendingComparator(a, b, orderBy)
-    : (a: any, b: any) => -descendingComparator(a, b, orderBy);
+    ? (a, b) => descendingComparator(a, b, orderBy)
+    : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
 function stableSort(array, comparator) {
@@ -96,16 +91,10 @@ const headCells = [
   },
 ];
 
-interface EnhancedTableProps {
-  onRequestSort: (event: React.MouseEvent, property: string) => void;
-  order: "asc" | "desc";
-  orderBy: string;
-}
-
-function EnhancedTableHead(props: EnhancedTableProps) {
+function EnhancedTableHead(props) {
   const { order, orderBy, onRequestSort } = props;
 
-  const createSortHandler = (property: string) => (event: React.MouseEvent) => {
+  const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
 
@@ -172,43 +161,56 @@ function TableTransactions({
     "all" | "cash" | "mastercard" | "visa" | "paypal"
   >("all");
   const [searchValue, setSearchValue] = React.useState<string>("");
-  const [selectedDateRange, setSelectedDateRange] = React.useState<
-    [Date | null, Date | null]
-  >([null, null]);
-  const [isDatePickerOpen, setIsDatePickerOpen] =
-    React.useState<boolean>(false);
+  const [startDate, setStartDate] = React.useState<Date | null>(null);
+  const [endDate, setEndDate] = React.useState<Date | null>(null);
 
-  const handleRequestSort = (event: React.MouseEvent, property: string) => {
+  const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
   };
 
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
-  const handleChangeDense = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeDense = (event) => {
     setDense(event.target.checked);
   };
 
-  const handleTransactionType = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleTransactionType = (event) => {
     setTransactionType(
       event.target.value as "all" | "cash" | "mastercard" | "visa" | "paypal"
     );
   };
 
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearch = (event) => {
     setSearchValue(event.target.value);
+  };
+
+  const handleStartDateChange = (newValue) => {
+    if (newValue && endDate && newValue > endDate) {
+      setStartDate(null);
+      setEndDate(null);
+      Swal.fire("Start Date cannot be after End Date");
+      return;
+    }
+    setStartDate(newValue);
+  };
+
+  const handleEndDateChange = (newValue) => {
+    if (newValue && startDate && newValue < startDate) {
+      setStartDate(null);
+      setEndDate(null);
+      Swal.fire("End Date cannot be before Start Date");
+      return;
+    }
+    setEndDate(newValue);
   };
 
   const emptyRows =
@@ -240,17 +242,38 @@ function TableTransactions({
           return false;
         })
         .filter((row) => {
-          if (!selectedDateRange[0] && !selectedDateRange[1]) return true;
-          if (selectedDateRange[0] && !selectedDateRange[1]) {
-            return new Date(row.created_at) >= selectedDateRange[0]!;
-          }
-          if (!selectedDateRange[0] && selectedDateRange[1]) {
-            return new Date(row.created_at) <= selectedDateRange[1]!;
-          }
-          return (
-            new Date(row.created_at) >= selectedDateRange[0]! &&
-            new Date(row.created_at) <= selectedDateRange[1]!
+          if (!startDate && !endDate) return true;
+
+          // Convert dates to a single day by ignoring time
+          const rowDate = new Date(row.created_at);
+          const rowDateWithoutTime = new Date(
+            rowDate.getFullYear(),
+            rowDate.getMonth(),
+            rowDate.getDate()
           );
+
+          const startDateTime = startDate ? startDate.getTime() : null;
+          const endDateTime = endDate ? endDate.getTime() : null;
+          const rowDateTime = rowDateWithoutTime.getTime();
+
+          if (startDateTime === rowDateTime && endDateTime === rowDateTime) {
+            // When start date and end date are the same, include data only for that day
+            return true;
+          }
+
+          if (startDateTime && endDateTime) {
+            return rowDateTime >= startDateTime && rowDateTime <= endDateTime;
+          }
+
+          if (startDateTime && !endDateTime) {
+            return rowDateTime >= startDateTime;
+          }
+
+          if (!startDateTime && endDateTime) {
+            return rowDateTime <= endDateTime;
+          }
+
+          return false;
         })
     : [];
 
@@ -268,7 +291,7 @@ function TableTransactions({
   }
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDateFns as any}>
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
       <Box style={{ width: "100%" }}>
         <Box
           style={{
@@ -302,17 +325,18 @@ function TableTransactions({
               <MenuItem value="paypal">Paypal</MenuItem>
             </Select>
           </FormControl>
+          <FormControl style={{ marginRight: 20 }}>
+            <DatePicker
+              label="Start Date"
+              value={startDate}
+              onChange={handleStartDateChange}
+            />
+          </FormControl>
           <FormControl style={{ marginRight: 50 }}>
-            <IconButton onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}>
-              <CalendarTodayIcon />
-            </IconButton>
-            <DateRangePicker
-              open={isDatePickerOpen}
-              value={selectedDateRange as DateRange<never>}
-              onChange={(newValue) => {
-                setSelectedDateRange(newValue);
-              }}
-              onClose={() => setIsDatePickerOpen(false)}
+            <DatePicker
+              label="End Date"
+              value={endDate}
+              onChange={handleEndDateChange}
             />
           </FormControl>
         </Box>

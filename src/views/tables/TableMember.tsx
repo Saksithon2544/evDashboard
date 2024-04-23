@@ -28,6 +28,11 @@ import axios from "@/libs/Axios";
 import { Chip, TextField } from "@mui/material";
 import { dateFormate } from "@/libs/date";
 
+import { DatePicker } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { Margin } from "mdi-material-ui";
+
 function descendingComparator(a: any, b: any, orderBy: string) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -168,6 +173,8 @@ function TableMember({ Users, isLoading, refetch, callback }: Props) {
     "all" | "superadmin" | "stationadmin" | "user"
   >("all");
   const [searchValue, setSearchValue] = React.useState<string>("");
+  const [startDate, setStartDate] = React.useState<Date | null>(null);
+  const [endDate, setEndDate] = React.useState<Date | null>(null);
 
   const handleEditClick = (user: UserData) => {
     callback({
@@ -256,6 +263,26 @@ function TableMember({ Users, isLoading, refetch, callback }: Props) {
     setSearchValue(event.target.value);
   };
 
+  const handleStartDateChange = (newValue) => {
+    if (newValue && endDate && newValue > endDate) {
+      setStartDate(null);
+      setEndDate(null);
+      Swal.fire("Start Date cannot be after End Date");
+      return;
+    }
+    setStartDate(newValue);
+  };
+
+  const handleEndDateChange = (newValue) => {
+    if (newValue && startDate && newValue < startDate) {
+      setStartDate(null);
+      setEndDate(null);
+      Swal.fire("End Date cannot be before Start Date");
+      return;
+    }
+    setEndDate(newValue);
+  };
+
   const emptyRows =
     page > 0
       ? Math.max(0, (1 + page) * rowsPerPage - (Users ? Users.length : 0))
@@ -282,6 +309,40 @@ function TableMember({ Users, isLoading, refetch, callback }: Props) {
             user.lastName.toLowerCase().includes(searchValue.toLowerCase()) ||
             user.email.toLowerCase().includes(searchValue.toLowerCase())
         )
+        .filter((user) => {
+          if (!startDate && !endDate) return true;
+
+          // Convert dates to a single day by ignoring time
+          const rowDate = new Date(user.created_at);
+          const rowDateWithoutTime = new Date(
+            rowDate.getFullYear(),
+            rowDate.getMonth(),
+            rowDate.getDate()
+          );
+
+          const startDateTime = startDate ? startDate.getTime() : null;
+          const endDateTime = endDate ? endDate.getTime() : null;
+          const rowDateTime = rowDateWithoutTime.getTime();
+
+          if (startDateTime === rowDateTime && endDateTime === rowDateTime) {
+            // When start date and end date are the same, include data only for that day
+            return true;
+          }
+
+          if (startDateTime && endDateTime) {
+            return rowDateTime >= startDateTime && rowDateTime <= endDateTime;
+          }
+
+          if (startDateTime && !endDateTime) {
+            return rowDateTime >= startDateTime;
+          }
+
+          if (!startDateTime && endDateTime) {
+            return rowDateTime <= endDateTime;
+          }
+
+          return false;
+        })
     : [];
 
   const visibleRows = React.useMemo(
@@ -298,182 +359,200 @@ function TableMember({ Users, isLoading, refetch, callback }: Props) {
   }
 
   return (
-    <Box style={{ width: "100%" }}>
-      <Box
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          marginBottom: 10,
-        }}
-      >
-        <FormControl style={{ marginRight: 50 }}>
-          <TextField
-            label="🔍 Search..."
-            id="search"
-            value={searchValue}
-            onChange={handleSearchChange}
-            variant="outlined"
-          />
-        </FormControl>
-        <FormControl style={{ marginRight: 50 }}>
-          <InputLabel id="role-filter-label">Role</InputLabel>
-          <Select
-            labelId="role-filter-label"
-            label="Role"
-            id="role-filter"
-            value={roleFilter}
-            onChange={handleRoleFilterChange}
-          >
-            <MenuItem value="all">All</MenuItem>
-            <MenuItem value="superadmin">Super Admin</MenuItem>
-            <MenuItem value="stationadmin">Admin Station</MenuItem>
-            <MenuItem value="user">User</MenuItem>
-          </Select>
-        </FormControl>
-
-        <FormControl style={{ marginRight: 50 }}>
-          <InputLabel id="status-filter-label">Status</InputLabel>
-          <Select
-            labelId="status-filter-label"
-            label="Status"
-            id="status-filter"
-            value={statusFilter}
-            onChange={handleStatusFilterChange}
-          >
-            <MenuItem value="all">All</MenuItem>
-            <MenuItem value="active">Active</MenuItem>
-            <MenuItem value="inactive">Inactive</MenuItem>
-          </Select>
-        </FormControl>
-      </Box>
-
-      <Paper style={{ width: "100%", marginBottom: 2 }}>
-        <TableContainer component={Paper}>
-          <Table
-            style={{ minWidth: 750 }}
-            aria-labelledby="tableTitle"
-            size={dense ? "small" : "medium"}
-          >
-            <EnhancedTableHead
-              order={order}
-              orderBy={orderBy}
-              onRequestSort={handleRequestSort}
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <Box style={{ width: "100%" }}>
+        <Box
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: 10,
+          }}
+        >
+          <FormControl style={{ marginRight: 50, marginLeft: 50 }}>
+            <TextField
+              label="🔍 Search..."
+              id="search"
+              value={searchValue}
+              onChange={handleSearchChange}
+              variant="outlined"
             />
-            <TableBody>
-              {visibleRows.map((row: UserData) => {
-                const labelId = `enhanced-table-checkbox-${row.userId}`;
+          </FormControl>
+          <FormControl style={{ marginRight: 50 }}>
+            <InputLabel id="role-filter-label">Role</InputLabel>
+            <Select
+              labelId="role-filter-label"
+              label="Role"
+              id="role-filter"
+              value={roleFilter}
+              onChange={handleRoleFilterChange}
+            >
+              <MenuItem value="all">All</MenuItem>
+              <MenuItem value="superadmin">Super Admin</MenuItem>
+              <MenuItem value="stationadmin">Admin Station</MenuItem>
+              <MenuItem value="user">User</MenuItem>
+            </Select>
+          </FormControl>
 
-                return (
-                  <TableRow
-                    hover
-                    role="checkbox"
-                    tabIndex={-1}
-                    key={row.userId}
-                  >
-                    <TableCell
-                      component="th"
-                      id={labelId}
-                      scope="row"
-                      padding="none"
+          <FormControl style={{ marginRight: 50 }}>
+            <InputLabel id="status-filter-label">Status</InputLabel>
+            <Select
+              labelId="status-filter-label"
+              label="Status"
+              id="status-filter"
+              value={statusFilter}
+              onChange={handleStatusFilterChange}
+            >
+              <MenuItem value="all">All</MenuItem>
+              <MenuItem value="active">Active</MenuItem>
+              <MenuItem value="inactive">Inactive</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
+        <Box style={{ display: "flex", justifyContent: "flex-end", marginBottom: 10 }}>
+          <FormControl style={{ marginRight: 20, marginLeft: 50}}>
+            <DatePicker
+              label="Start Date"
+              value={startDate}
+              onChange={handleStartDateChange}
+            />
+          </FormControl>
+          <FormControl style={{ marginRight: 50 }}>
+            <DatePicker
+              label="End Date"
+              value={endDate}
+              onChange={handleEndDateChange}
+            />
+          </FormControl>
+        </Box>
+
+        <Paper style={{ width: "100%", marginBottom: 2 }}>
+          <TableContainer component={Paper}>
+            <Table
+              style={{ minWidth: 750 }}
+              aria-labelledby="tableTitle"
+              size={dense ? "small" : "medium"}
+            >
+              <EnhancedTableHead
+                order={order}
+                orderBy={orderBy}
+                onRequestSort={handleRequestSort}
+              />
+              <TableBody>
+                {visibleRows.map((row: UserData) => {
+                  const labelId = `enhanced-table-checkbox-${row.userId}`;
+
+                  return (
+                    <TableRow
+                      hover
+                      role="checkbox"
+                      tabIndex={-1}
+                      key={row.userId}
                     >
-                      {row.firstName + " " + row.lastName}
-                    </TableCell>
-                    <TableCell>{row.email}</TableCell>
-                    {/* <TableCell>{row.role}</TableCell> */}
-                    {row.role === "superadmin" ? (
-                      <TableCell>
-                        <Chip
-                          color="primary"
-                          variant="outlined"
-                          sx={{ mr: 1 }}
-                          label="Super Admin"
-                        />
+                      <TableCell
+                        component="th"
+                        id={labelId}
+                        scope="row"
+                        padding="none"
+                      >
+                        {row.firstName + " " + row.lastName}
                       </TableCell>
-                    ) : row.role === "stationadmin" ? (
-                      <TableCell>
-                        <Chip
-                          color="info"
-                          variant="outlined"
-                          sx={{ mr: 1 }}
-                          label="Admin Station"
-                        />
-                      </TableCell>
-                    ) : (
-                      <TableCell>
-                        <Chip
-                          color="warning"
-                          variant="outlined"
-                          sx={{ mr: 1 }}
-                          label="User"
-                        />
-                      </TableCell>
-                    )}
+                      <TableCell>{row.email}</TableCell>
+                      {/* <TableCell>{row.role}</TableCell> */}
+                      {row.role === "superadmin" ? (
+                        <TableCell>
+                          <Chip
+                            color="primary"
+                            variant="outlined"
+                            sx={{ mr: 1 }}
+                            label="Super Admin"
+                          />
+                        </TableCell>
+                      ) : row.role === "stationadmin" ? (
+                        <TableCell>
+                          <Chip
+                            color="info"
+                            variant="outlined"
+                            sx={{ mr: 1 }}
+                            label="Admin Station"
+                          />
+                        </TableCell>
+                      ) : (
+                        <TableCell>
+                          <Chip
+                            color="warning"
+                            variant="outlined"
+                            sx={{ mr: 1 }}
+                            label="User"
+                          />
+                        </TableCell>
+                      )}
 
-                    <TableCell> {dateFormate(row.created_at)} </TableCell>
-                    {row.is_active ? (
+                      <TableCell> {dateFormate(row.created_at)} </TableCell>
+                      {row.is_active ? (
+                        <TableCell>
+                          <Chip
+                            color="success"
+                            variant="filled"
+                            sx={{ mr: 2 }}
+                            label="Active"
+                          />
+                        </TableCell>
+                      ) : (
+                        <TableCell>
+                          <Chip
+                            color="error"
+                            variant="filled"
+                            sx={{ mr: 2 }}
+                            label="Inactive"
+                          />
+                        </TableCell>
+                      )}
                       <TableCell>
-                        <Chip
-                          color="success"
-                          variant="filled"
-                          sx={{ mr: 2 }}
-                          label="Active"
-                        />
+                        <IconButton
+                          aria-label="edit"
+                          onClick={() => handleEditClick(row)}
+                        >
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton
+                          aria-label="delete"
+                          onClick={() => handleDeleteClick(row)}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
                       </TableCell>
-                    ) : (
-                      <TableCell>
-                        <Chip
-                          color="error"
-                          variant="filled"
-                          sx={{ mr: 2 }}
-                          label="Inactive"
-                        />
-                      </TableCell>
-                    )}
-                    <TableCell>
-                      <IconButton
-                        aria-label="edit"
-                        onClick={() => handleEditClick(row)}
-                      >
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton
-                        aria-label="delete"
-                        onClick={() => handleDeleteClick(row)}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </TableCell>
+                    </TableRow>
+                  );
+                })}
+                {emptyRows > 0 && (
+                  <TableRow
+                    style={{
+                      height: (dense ? 33 : 53) * emptyRows,
+                    }}
+                  >
+                    <TableCell colSpan={5} />
                   </TableRow>
-                );
-              })}
-              {emptyRows > 0 && (
-                <TableRow
-                  style={{
-                    height: (dense ? 33 : 53) * emptyRows,
-                  }}
-                >
-                  <TableCell colSpan={5} />
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={(filteredRows && filteredRows.length) || 0} // Added null check
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={(filteredRows && filteredRows.length) || 0} // Added null check
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </Paper>
+        <FormControlLabel
+          control={<Switch checked={dense} onChange={handleChangeDense} />}
+          label="Dense padding"
+          style={{ marginLeft: 10 }}
         />
-      </Paper>
-      <FormControlLabel
-        control={<Switch checked={dense} onChange={handleChangeDense} />}
-        label="Dense padding"
-        style={{ marginLeft: 10 }}
-      />
-    </Box>
+      </Box>
+    </LocalizationProvider>
   );
 }
 

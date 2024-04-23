@@ -300,7 +300,7 @@ function TableTransactions({
             marginBottom: 10,
           }}
         >
-          <FormControl style={{ marginRight: 50 }}>
+          <FormControl style={{ marginRight: 50, marginLeft: 50 }}>
             <TextField
               label="🔍 Search..."
               id="search"
@@ -325,7 +325,16 @@ function TableTransactions({
               <MenuItem value="paypal">Paypal</MenuItem>
             </Select>
           </FormControl>
-          <FormControl style={{ marginRight: 20 }}>
+        </Box>
+
+        <Box
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: 10,
+          }}
+        >
+          <FormControl style={{ marginRight: 20, marginLeft: 50 }}>
             <DatePicker
               label="Start Date"
               value={startDate}

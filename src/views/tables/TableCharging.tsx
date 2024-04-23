@@ -30,6 +30,9 @@ import {
   SelectChangeEvent,
   TextField,
 } from "@mui/material";
+import { DatePicker } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 
 function descendingComparator(a: any, b: any, orderBy: any) {
   if (b[orderBy] < a[orderBy]) {
@@ -185,6 +188,8 @@ Props) {
     "online" | "offline" | "charging" | "all"
   >("all");
   const [searchValue, setSearchValue] = React.useState("");
+  const [startDate, setStartDate] = React.useState<Date | null>(null);
+  const [endDate, setEndDate] = React.useState<Date | null>(null);
 
   // React.useEffect(() => {
   //   refetchTimer.current = setInterval(() => {
@@ -286,6 +291,26 @@ Props) {
     setSearchValue(event.target.value);
   };
 
+  const handleStartDateChange = (newValue) => {
+    if (newValue && endDate && newValue > endDate) {
+      setStartDate(null);
+      setEndDate(null);
+      Swal.fire("Start Date cannot be after End Date");
+      return;
+    }
+    setStartDate(newValue);
+  };
+
+  const handleEndDateChange = (newValue) => {
+    if (newValue && startDate && newValue < startDate) {
+      setStartDate(null);
+      setEndDate(null);
+      Swal.fire("End Date cannot be before Start Date");
+      return;
+    }
+    setEndDate(newValue);
+  };
+
   const emptyRows =
     page > 0
       ? Math.max(0, (1 + page) * rowsPerPage - (mergedData?.length || 0))
@@ -306,111 +331,170 @@ Props) {
             .toLowerCase()
             .includes(searchValue.toLowerCase());
         })
+        .filter((row) => {
+          if (!startDate && !endDate) return true;
+
+          // Convert dates to a single day by ignoring time
+          const rowDate = new Date(row.created_at);
+          const rowDateWithoutTime = new Date(
+            rowDate.getFullYear(),
+            rowDate.getMonth(),
+            rowDate.getDate()
+          );
+
+          const startDateTime = startDate ? startDate.getTime() : null;
+          const endDateTime = endDate ? endDate.getTime() : null;
+          const rowDateTime = rowDateWithoutTime.getTime();
+
+          if (startDateTime === rowDateTime && endDateTime === rowDateTime) {
+            // When start date and end date are the same, include data only for that day
+            return true;
+          }
+
+          if (startDateTime && endDateTime) {
+            return rowDateTime >= startDateTime && rowDateTime <= endDateTime;
+          }
+
+          if (startDateTime && !endDateTime) {
+            return rowDateTime >= startDateTime;
+          }
+
+          if (!startDateTime && endDateTime) {
+            return rowDateTime <= endDateTime;
+          }
+
+          return false;
+        })
     : [];
 
   return (
-    <Box style={{ width: "100%" }}>
-      <Box
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          marginBottom: 10,
-        }}
-      >
-        <FormControl style={{ marginRight: 50 }}>
-          <TextField
-            id="search"
-            label="🔍 Charger Search..."
-            variant="outlined"
-            value={searchValue}
-            onChange={handSearchChange}
-          />
-        </FormControl>
-        <FormControl style={{ marginRight: 50 }}>
-          <InputLabel id="status-filter-label">Status</InputLabel>
-          <Select
-            labelId="status-filter-label"
-            label="Status"
-            id="status-filter"
-            value={statusFilter}
-            onChange={handleStatusFilterChange}
-          >
-            <MenuItem value="all">All</MenuItem>
-            <MenuItem value="online">Online</MenuItem>
-            <MenuItem value="offline">Offline</MenuItem>
-            <MenuItem value="charging">Charging</MenuItem>
-          </Select>
-        </FormControl>
-      </Box>
-
-      <Paper style={{ width: "100%", marginBottom: 2 }}>
-        <TableContainer component={Paper}>
-          <Table
-            style={{ minWidth: 750 }}
-            aria-labelledby="tableTitle"
-            size={dense ? "small" : "medium"}
-          >
-            <EnhancedTableHead
-              classes={{}}
-              numSelected={0}
-              onSelectAllClick={() => {}}
-              order={order}
-              orderBy={orderBy}
-              onRequestSort={handleRequestSort}
-              rowCount={(mergedData && mergedData.length) || 0} // Added null check
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <Box style={{ width: "100%" }}>
+        <Box
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: 10,
+          }}
+        >
+          <FormControl style={{ marginRight: 50 }}>
+            <TextField
+              id="search"
+              label="🔍 Charger Search..."
+              variant="outlined"
+              value={searchValue}
+              onChange={handSearchChange}
             />
+          </FormControl>
+          <FormControl style={{ marginRight: 50 }}>
+            <InputLabel id="status-filter-label">Status</InputLabel>
+            <Select
+              labelId="status-filter-label"
+              label="Status"
+              id="status-filter"
+              value={statusFilter}
+              onChange={handleStatusFilterChange}
+            >
+              <MenuItem value="all">All</MenuItem>
+              <MenuItem value="online">Online</MenuItem>
+              <MenuItem value="offline">Offline</MenuItem>
+              <MenuItem value="charging">Charging</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
 
-            <TableBody>
-              {filteredRows &&
-                filteredRows.map((row, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{row.booth_name}</TableCell>
-                    <TableCell>{row.charging_rate} / kW</TableCell>
-                    <TableCell>{dateFormate(row.updated_at)}</TableCell>
-                    {row.status === "online" ? (
+        <Box
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: 10,
+          }}
+        >
+          <FormControl style={{ marginRight: 20, marginLeft: 50 }}>
+            <DatePicker
+              label="Start Date"
+              value={startDate}
+              onChange={handleStartDateChange}
+            />
+          </FormControl>
+          <FormControl style={{ marginRight: 50 }}>
+            <DatePicker
+              label="End Date"
+              value={endDate}
+              onChange={handleEndDateChange}
+            />
+          </FormControl>
+        </Box>
+
+        <Paper style={{ width: "100%", marginBottom: 2 }}>
+          <TableContainer component={Paper}>
+            <Table
+              style={{ minWidth: 750 }}
+              aria-labelledby="tableTitle"
+              size={dense ? "small" : "medium"}
+            >
+              <EnhancedTableHead
+                classes={{}}
+                numSelected={0}
+                onSelectAllClick={() => {}}
+                order={order}
+                orderBy={orderBy}
+                onRequestSort={handleRequestSort}
+                rowCount={(mergedData && mergedData.length) || 0} // Added null check
+              />
+
+              <TableBody>
+                {filteredRows &&
+                  filteredRows.map((row, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{row.booth_name}</TableCell>
+                      <TableCell>{row.charging_rate} / kW</TableCell>
+                      <TableCell>{dateFormate(row.updated_at)}</TableCell>
+                      {row.status === "online" ? (
+                        <TableCell>
+                          <Badge color="success" variant="dot" sx={{ mr: 2 }} />
+                          Online
+                        </TableCell>
+                      ) : row.status === "charging" ? (
+                        <TableCell>
+                          <Badge color="warning" variant="dot" sx={{ mr: 2 }} />
+                          Charging
+                        </TableCell>
+                      ) : (
+                        <TableCell>
+                          <Badge color="error" variant="dot" sx={{ mr: 2 }} />
+                          Offline
+                        </TableCell>
+                      )}
                       <TableCell>
-                        <Badge color="success" variant="dot" sx={{ mr: 2 }} />
-                        Online
+                        <IconButton
+                          aria-label="delete"
+                          onClick={() => handleDeleteClick(row)}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
                       </TableCell>
-                    ) : row.status === "charging" ? (
-                      <TableCell>
-                        <Badge color="warning" variant="dot" sx={{ mr: 2 }} />
-                        Charging
-                      </TableCell>
-                    ) : (
-                      <TableCell>
-                        <Badge color="error" variant="dot" sx={{ mr: 2 }} />
-                        Offline
-                      </TableCell>
-                    )}
-                    <TableCell>
-                      <IconButton
-                        aria-label="delete"
-                        onClick={() => handleDeleteClick(row)}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={(mergedData && mergedData.length) || 0} // Added null check
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={(mergedData && mergedData.length) || 0} // Added null check
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </Paper>
+        <FormControlLabel
+          control={<Switch checked={dense} onChange={handleChangeDense} />}
+          label="Dense padding"
         />
-      </Paper>
-      <FormControlLabel
-        control={<Switch checked={dense} onChange={handleChangeDense} />}
-        label="Dense padding"
-      />
-    </Box>
+      </Box>
+    </LocalizationProvider>
   );
 }
 

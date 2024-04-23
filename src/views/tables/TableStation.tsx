@@ -22,6 +22,9 @@ import Swal from "sweetalert2";
 import { visuallyHidden } from "@mui/utils";
 import axios from "@/libs/Axios";
 import { FormControl, TextField } from "@mui/material";
+import { DatePicker } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 
 function descendingComparator(a: any, b: any, orderBy: string) {
   if (b[orderBy] < a[orderBy]) {
@@ -177,6 +180,8 @@ function TableStation({ Stations, isLoading, refetch, callback }: Props) {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const router = useRouter();
   const [searchValue, setSearchValue] = React.useState("");
+  const [startDate, setStartDate] = React.useState<Date | null>(null);
+  const [endDate, setEndDate] = React.useState<Date | null>(null);
 
   const handleEditClick = (station: StationData) => {
     callback &&
@@ -259,6 +264,26 @@ function TableStation({ Stations, isLoading, refetch, callback }: Props) {
     setSearchValue(event.target.value);
   };
 
+  const handleStartDateChange = (newValue) => {
+    if (newValue && endDate && newValue > endDate) {
+      setStartDate(null);
+      setEndDate(null);
+      Swal.fire("Start Date cannot be after End Date");
+      return;
+    }
+    setStartDate(newValue);
+  };
+
+  const handleEndDateChange = (newValue) => {
+    if (newValue && startDate && newValue < startDate) {
+      setStartDate(null);
+      setEndDate(null);
+      Swal.fire("End Date cannot be before Start Date");
+      return;
+    }
+    setEndDate(newValue);
+  };
+
   const emptyRows =
     page > 0
       ? Math.max(
@@ -267,15 +292,52 @@ function TableStation({ Stations, isLoading, refetch, callback }: Props) {
         )
       : 0;
 
-  const filteredRows = Stations.latestStations.filter((station) => {
-    return (
-      station.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-      station.location[0].toString().includes(searchValue) ||
-      station.location[1].toString().includes(searchValue) ||
-      station.total_charging_rate.toString().includes(searchValue) ||
-      dateFormate(station.created_at).includes(searchValue)
-    );
-  });
+  const filteredRows = Stations.latestStations
+    ? Stations.latestStations
+        .filter((station) => {
+          return (
+            station.name.toLowerCase().includes(searchValue.toLowerCase()) ||
+            station.location[0].toString().includes(searchValue) ||
+            station.location[1].toString().includes(searchValue) ||
+            station.total_charging_rate.toString().includes(searchValue) ||
+            dateFormate(station.created_at).includes(searchValue)
+          );
+        })
+        .filter((station) => {
+          if (!startDate && !endDate) return true;
+
+          // Convert dates to a single day by ignoring time
+          const rowDate = new Date(station.created_at);
+          const rowDateWithoutTime = new Date(
+            rowDate.getFullYear(),
+            rowDate.getMonth(),
+            rowDate.getDate()
+          );
+
+          const startDateTime = startDate ? startDate.getTime() : null;
+          const endDateTime = endDate ? endDate.getTime() : null;
+          const rowDateTime = rowDateWithoutTime.getTime();
+
+          if (startDateTime === rowDateTime && endDateTime === rowDateTime) {
+            // When start date and end date are the same, include data only for that day
+            return true;
+          }
+
+          if (startDateTime && endDateTime) {
+            return rowDateTime >= startDateTime && rowDateTime <= endDateTime;
+          }
+
+          if (startDateTime && !endDateTime) {
+            return rowDateTime >= startDateTime;
+          }
+
+          if (!startDateTime && endDateTime) {
+            return rowDateTime <= endDateTime;
+          }
+
+          return false;
+        })
+    : [];
 
   const visibleRows = React.useMemo(
     () =>
@@ -287,112 +349,137 @@ function TableStation({ Stations, isLoading, refetch, callback }: Props) {
   );
 
   return (
-    <Box style={{ width: "100%" }}>
-      <Box
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          marginBottom: 10,
-        }}
-      >
-        <FormControl style={{ marginRight: 50 }}>
-          <TextField
-            label="🔍 Search..."
-            id="search"
-            value={searchValue}
-            onChange={handleSearchChange}
-            variant="outlined"
-          />
-        </FormControl>
-      </Box>
-      <Paper style={{ width: "100%", marginBottom: 2 }}>
-        <TableContainer component={Paper}>
-          <Table
-            sx={{ minWidth: 750 }}
-            aria-labelledby="tableTitle"
-            size={dense ? "small" : "medium"}
-          >
-            <EnhancedTableHead
-              order={order}
-              orderBy={orderBy}
-              onRequestSort={handleRequestSort}
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <Box style={{ width: "100%" }}>
+        <Box
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: 10,
+          }}
+        >
+          <FormControl style={{ marginRight: 50 }}>
+            <TextField
+              label="🔍 Search..."
+              id="search"
+              value={searchValue}
+              onChange={handleSearchChange}
+              variant="outlined"
             />
-            <TableBody>
-              {visibleRows.map((row) => {
-                const labelId = `enhanced-table-checkbox-${row.userId}`;
-                return (
-                  <TableRow
-                    hover
-                    role="checkbox"
-                    tabIndex={-1}
-                    key={row.userId}
-                  >
-                    <TableCell
-                      component="th"
-                      id={labelId}
-                      scope="row"
-                      padding="none"
+          </FormControl>
+        </Box>
+        <Box
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: 10,
+          }}
+        >
+          <FormControl style={{ marginRight: 20, marginLeft: 50 }}>
+            <DatePicker
+              label="Start Date"
+              value={startDate}
+              onChange={handleStartDateChange}
+            />
+          </FormControl>
+          <FormControl style={{ marginRight: 50 }}>
+            <DatePicker
+              label="End Date"
+              value={endDate}
+              onChange={handleEndDateChange}
+            />
+          </FormControl>
+        </Box>
+
+        <Paper style={{ width: "100%", marginBottom: 2 }}>
+          <TableContainer component={Paper}>
+            <Table
+              sx={{ minWidth: 750 }}
+              aria-labelledby="tableTitle"
+              size={dense ? "small" : "medium"}
+            >
+              <EnhancedTableHead
+                order={order}
+                orderBy={orderBy}
+                onRequestSort={handleRequestSort}
+              />
+              <TableBody>
+                {visibleRows.map((row) => {
+                  const labelId = `enhanced-table-checkbox-${row.userId}`;
+                  return (
+                    <TableRow
+                      hover
+                      role="checkbox"
+                      tabIndex={-1}
+                      key={row.userId}
                     >
-                      {row.name}
-                    </TableCell>
-                    <TableCell>
-                      {row.location[0]}, {row.location[1]}
-                    </TableCell>
-                    <TableCell>{row.total_charging_rate}</TableCell>
-                    <TableCell>{dateFormate(row.created_at)}</TableCell>
-                    <TableCell>
-                      <IconButton
-                        aria-label="edit"
-                        onClick={() => handleEditClick(row)}
+                      <TableCell
+                        component="th"
+                        id={labelId}
+                        scope="row"
+                        padding="none"
                       >
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton
-                        aria-label="delete"
-                        onClick={() => handleDeleteClick(row)}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </TableCell>
-                    <TableCell>
-                      <IconButton
-                        aria-label="view"
-                        onClick={() => router.push(`/stations/${row.id}`)}
-                      >
-                        <VisibilityIcon />
-                      </IconButton>
-                    </TableCell>
+                        {row.name}
+                      </TableCell>
+                      <TableCell>
+                        {row.location[0]}, {row.location[1]}
+                      </TableCell>
+                      <TableCell>{row.total_charging_rate}</TableCell>
+                      <TableCell>{dateFormate(row.created_at)}</TableCell>
+                      <TableCell>
+                        <IconButton
+                          aria-label="edit"
+                          onClick={() => handleEditClick(row)}
+                        >
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton
+                          aria-label="delete"
+                          onClick={() => handleDeleteClick(row)}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </TableCell>
+                      <TableCell>
+                        <IconButton
+                          aria-label="view"
+                          onClick={() => router.push(`/stations/${row.id}`)}
+                        >
+                          <VisibilityIcon />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+                {emptyRows > 0 && (
+                  <TableRow
+                    style={{
+                      height: (dense ? 33 : 53) * emptyRows,
+                    }}
+                  >
+                    <TableCell colSpan={6} />
                   </TableRow>
-                );
-              })}
-              {emptyRows > 0 && (
-                <TableRow
-                  style={{
-                    height: (dense ? 33 : 53) * emptyRows,
-                  }}
-                >
-                  <TableCell colSpan={6} />
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={filteredRows.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={filteredRows.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </Paper>
+        <FormControlLabel
+          control={<Switch checked={dense} onChange={handleChangeDense} />}
+          label="Dense padding"
+          style={{ marginLeft: 10 }}
         />
-      </Paper>
-      <FormControlLabel
-        control={<Switch checked={dense} onChange={handleChangeDense} />}
-        label="Dense padding"
-        style={{ marginLeft: 10 }}
-      />
-    </Box>
+      </Box>
+    </LocalizationProvider>
   );
 }
 

@@ -85,7 +85,7 @@ export default function ViewStation() {
       <Grid item xs={12} paddingBottom={12}>
         <Card>
           <CardHeader
-            title={`Admin Stations (⛽️ ${mergedData?.name})`}
+            title={`Admin Stations of (⛽️ ${mergedData?.name})`}
             titleTypographyProps={{ variant: "h6" }}
           />
           {!isLoading &&
@@ -118,7 +118,7 @@ export default function ViewStation() {
       <Grid item xs={12}>
         <Card>
           <CardHeader
-            title="Charging Cabinet"
+            title={`Charging Cabinet of (⛽️ ${mergedData?.name})`}
             titleTypographyProps={{ variant: "h6" }}
           />
           {!isLoading &&

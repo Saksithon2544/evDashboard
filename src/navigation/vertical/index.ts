@@ -63,6 +63,14 @@ const navigation = (): VerticalNavItemsType => {
       icon: HistoryEduOutlined,
       path: '/transactions',
     },
+    {
+      sectionTitle: 'Top-up Management'
+    },
+    {
+      title: 'Top-up',
+      icon: CreditCardOutline,
+      path: '/top-up',
+    },
     // {
     //   sectionTitle: 'Pages'
     // },

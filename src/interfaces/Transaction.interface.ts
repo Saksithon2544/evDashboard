@@ -8,4 +8,5 @@ export type Transaction = {
     transactionType: string
     description: string
     created_at: string
+    status_approved: boolean
 }

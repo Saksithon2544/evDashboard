@@ -4,9 +4,9 @@ import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
 
 // ** Demo Components Imports
-import TableTransactions, {
+import TableTopup, {
   type CallBack,
-} from "src/views/tables/TableTransactions";
+} from "src/views/tables/TableTopup";
 import AddTransactionDialog from "@/views/dialogs/transaction-dialogs/AddTransactionDialog";
 
 import { useQuery } from "react-query";
@@ -26,7 +26,10 @@ const TopupTable = () => {
     isLoading,
     refetch,
   } = useQuery<TransactionData[]>("transactions", async () => {
-    const [transactionsRes] = await Promise.all([axios.get("/transaction/all")]);
+    
+    const [transactionsRes] = await Promise.all([
+      axios.get("/top_up")
+    ]);
 
     const transactionsData = await transactionsRes.data;
 
@@ -50,19 +53,18 @@ const TopupTable = () => {
     setSelectedTransaction(undefined);
   }
 
-  function handleTable(data: CallBack) {
-    switch (data.action) {
-      case "edit":
-        // console.log("edit", data.transaction);
-        setSelectedTransaction(data.Transaction);
-        break;
-      case "delete":
-        // console.log("delete", data.transaction);
-        break;
-      default:
-        break;
-    }
-  }
+  // function handleTable(data: CallBack) {
+  //   switch (data.action) {
+  //     case "edit":
+  //       setSelectedTransaction(data.Transaction);
+  //       break;
+  //     case "delete":
+  //       // console.log("delete", data.transaction);
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  // }
 
   return (
     <Grid container>
@@ -76,11 +78,11 @@ const TopupTable = () => {
             title="Top-up"
             titleTypographyProps={{ variant: "h6" }}
           />
-          {/* <TableTransactions /> */}
+          {/* <TableTopup /> */}
           {!isLoading && TransactionsData && TransactionsData.length > 0 ? (
-            <TableTransactions
-              Transactions={TransactionsData}
-              callback={handleTable}
+            <TableTopup
+              Topups={TransactionsData}
+              // callback={handleTable}
               refetch={() => refetch()}
             />
           ) : TransactionsData && TransactionsData.length === 0 ? (

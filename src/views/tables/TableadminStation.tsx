@@ -147,7 +147,7 @@ EnhancedTableHead.prototype = {
   onRequestSort: () => {},
   onSelectAllClick: () => {},
   order: "asc",
-  orderBy: "calories",
+  orderBy: "adminStation",
   rowCount: 0,
 };
 
@@ -177,7 +177,7 @@ function TableadminStation({
   const router = useRouter();
   const refetchTimer = useRef<any>(null);
   const [order, setOrder] = React.useState<"asc" | "desc">("asc");
-  const [orderBy, setOrderBy] = React.useState("calories");
+  const [orderBy, setOrderBy] = React.useState("adminStation");
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [dense, setDense] = React.useState(false);

@@ -31,6 +31,9 @@ import { DatePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 
+import Button from "@mui/material/Button";
+import ReceiptDialog from "@/views/dialogs/receipt-dialogs/ReceiptDialog";
+
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -79,17 +82,23 @@ const headCells = [
     label: "Amount",
   },
   {
+    id: "created",
+    numeric: false,
+    disablePadding: false,
+    label: "Created",
+  },
+  {
     id: "Status",
     numeric: false,
     disablePadding: false,
     label: "Status",
   },
   {
-    id: "created",
+    id:"Receipt Image",
     numeric: false,
     disablePadding: false,
-    label: "Created",
-  },
+    label: "Receipt Image",
+  }
 ];
 
 function EnhancedTableHead(props) {
@@ -358,6 +367,7 @@ function TableTopup({ Topups = [], isLoading, refetch, callback }: Props) {
                       </TableCell>
                       <TableCell>{row.email}</TableCell>
                       <TableCell>{row.amount}</TableCell>
+                      <TableCell>{dateFormate(row.created_at)}</TableCell>
                       {row.status_approved === true ? (
                         <TableCell>
                         <Chip
@@ -386,8 +396,13 @@ function TableTopup({ Topups = [], isLoading, refetch, callback }: Props) {
                         />
                       </TableCell>
                       )}
-
-                      <TableCell>{dateFormate(row.created_at)}</TableCell>
+                      <TableCell>
+                        <ReceiptDialog 
+                        userId={row.userId} 
+                        id={row.id}
+                        callback={refetch}
+                        />
+                      </TableCell>
                     </TableRow>
                   );
                 })}

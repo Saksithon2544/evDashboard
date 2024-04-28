@@ -69,6 +69,7 @@
     "react-perfect-scrollbar": "^1.5.8",
     "react-popper": "^2.2.5",
     "react-query": "^3.39.3",
+    "recharts": "^2.12.6",
     "sweetalert2": "^11.7.31"
   },
   "devDependencies": {

@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { useQuery } from "react-query";
 import axios from "@/libs/Axios";
-import { Charging as ChargingData,
+import {
+  Charging as ChargingData,
   User as UserData,
   Station as StationData,
- } from "@/interfaces/Adminstation.interface";
+} from "@/interfaces/Adminstation.interface";
 import {
   Grid,
   Box,
@@ -13,6 +14,14 @@ import {
   Typography,
   CardContent,
   TextField,
+  TableContainer,
+  Paper,
+  Table,
+  TableHead,
+  TableCell,
+  TableRow,
+  TableBody,
+  Chip,
 } from "@mui/material";
 import CardHeader from "@mui/material/CardHeader";
 import IconButton from "@mui/material/IconButton";
@@ -26,6 +35,9 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
+import { dateFormate } from "@/libs/date";
+import { PieChart, Pie, Cell } from 'recharts';
+
 
 interface DataType {
   stats: string;
@@ -35,17 +47,25 @@ interface DataType {
 }
 
 const StatisticsCard = () => {
-  const [openDialog, setOpenDialog] = useState(false); // State เพื่อเก็บสถานะการเปิดหรือปิด dialog
+  const [OpenDialogUser, setOpenDialogUserg] = useState(false);
+  const [OpenDialogStation, setOpenDialogStation] = useState(false);
   const [page, setPage] = useState(0);
-  const [filterText, setFilterText] = useState("");
   const itemsPerPage = 5; // จำนวนรายการต่อหน้า
 
   const handleOpenDialogUser = () => {
-    setOpenDialog(true);
+    setOpenDialogUserg(true);
   };
 
   const handleCloseDialog = () => {
-    setOpenDialog(false);
+    setOpenDialogUserg(false);
+  };
+
+  const handleOpenDialogStation = () => {
+    setOpenDialogStation(true);
+  };
+
+  const handleCloseDialogStation = () => {
+    setOpenDialogStation(false);
   };
 
   const handleNextPage = () => {
@@ -54,10 +74,9 @@ const StatisticsCard = () => {
 
   const handlePrevPage = () => {
     setPage((prevPage) => prevPage - 1);
-  };
 
-  const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFilterText(event.target.value);
+    const startIndex = page * itemsPerPage;
+    const endIndex = (page + 1) * itemsPerPage;
   };
 
   const {
@@ -68,7 +87,9 @@ const StatisticsCard = () => {
     "salesData",
     async () => {
       const res1 = (await axios.get("/charging_booth/")).data as ChargingData[];
-      const resUsers = (await axios.get("/super_admin/users")).data as UserData[];
+      const resUsers = (await axios.get("/super_admin/users"))
+        .data as UserData[];
+      const resStations = (await axios.get("/station/")).data as StationData[];
       const totalSales = res1.reduce(
         (acc, curr) => acc + curr.charging_rate * 10,
         0
@@ -80,12 +101,24 @@ const StatisticsCard = () => {
       const totalCustomers = (await axios.get("/super_admin/users")).data
         .length;
       const totalStations = (await axios.get("/station/")).data.length;
-      return { totalSales, totalEnergy, totalCustomers, totalStations, resUsers};
+      return {
+        totalSales,
+        totalEnergy,
+        totalCustomers,
+        totalStations,
+        resUsers,
+        resStations,
+      };
     },
     {
       refetchInterval: 60000,
     }
   );
+
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28'];
+
+  // State สำหรับข้อมูล role และสีของ Pie Chart
+  const [roleData, setRoleData] = useState([]);
 
   const renderStats = () => {
     if (salesData) {
@@ -113,7 +146,12 @@ const StatisticsCard = () => {
           stats: `⛽️ ${totalStations}`,
           color: "warning",
           title: "Stations",
-          icon: <CellphoneLink sx={{ fontSize: "1.75rem" }} />,
+          icon: (
+            <CellphoneLink
+              sx={{ fontSize: "1.75rem" }}
+              onClick={handleOpenDialogStation}
+            />
+          ),
         },
         {
           stats: `฿ ${totalSales}`,
@@ -149,6 +187,30 @@ const StatisticsCard = () => {
     } else {
       return null;
     }
+
+    // สร้างข้อมูลสำหรับ Pie Chart
+      const roles = salesData.resUsers.map((user) => user.role);
+      const roleCounts = roles.reduce((acc, role) => {
+        acc[role] = (acc[role] || 0) + 1;
+        return acc;
+      }, {});
+      const roleData = Object.keys(roleCounts).map((role) => ({
+        name: role,
+        value: roleCounts[role],
+      }));
+
+      setRoleData(roleData);
+  };
+
+  const [filterText, setFilterText] = useState("");
+  const [filterRole, setFilterRole] = useState("");
+
+  const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFilterText(event.target.value);
+  };
+
+  const handleFilterRole = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFilterRole(event.target.value);
   };
 
   return (
@@ -191,7 +253,7 @@ const StatisticsCard = () => {
       </CardContent>
       {/* Dialog เพื่อแสดงข้อมูลผู้ใช้งาน */}
       <Dialog
-        open={openDialog}
+        open={OpenDialogUser}
         onClose={handleCloseDialog}
         maxWidth="md"
         fullWidth
@@ -210,9 +272,173 @@ const StatisticsCard = () => {
               shrink: true,
             }}
           />
+
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Email</TableCell>
+                  <TableCell>Role</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {salesData?.resUsers
+                  ?.filter(
+                    (user) =>
+                      user.firstName
+                        .toLowerCase()
+                        .includes(filterText.toLowerCase()) ||
+                      user.lastName
+                        .toLowerCase()
+                        .includes(filterText.toLowerCase()) ||
+                      user.email
+                        .toLowerCase()
+                        .includes(filterText.toLowerCase()) ||
+                      user.role.toLowerCase().includes(filterText.toLowerCase())
+                  )
+                  .slice(
+                    page * itemsPerPage,
+                    page * itemsPerPage + itemsPerPage
+                  )
+                  .map((user: UserData) => (
+                    <TableRow key={user.id}>
+                      <TableCell>
+                        {user.firstName} {user.lastName}
+                      </TableCell>
+                      <TableCell>{user.email}</TableCell>
+
+                      {user.role === "superadmin" ? (
+                        <TableCell>
+                          <Chip
+                            color="primary"
+                            variant="outlined"
+                            sx={{ mr: 1 }}
+                            label="Super Admin"
+                          />
+                        </TableCell>
+                      ) : user.role === "stationadmin" ? (
+                        <TableCell>
+                          <Chip
+                            color="info"
+                            variant="outlined"
+                            sx={{ mr: 1 }}
+                            label="Admin Station"
+                          />
+                        </TableCell>
+                      ) : (
+                        <TableCell>
+                          <Chip
+                            color="warning"
+                            variant="outlined"
+                            sx={{ mr: 1 }}
+                            label="User"
+                          />
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog}>Close</Button>
+          <Button
+            onClick={handlePrevPage}
+            color="primary"
+            disabled={page === 0}
+          >
+            Prev
+          </Button>
+          <Button
+            onClick={handleNextPage}
+            color="primary"
+            disabled={
+              page * itemsPerPage + itemsPerPage >= salesData?.resUsers?.length
+            }
+          >
+            Next
+          </Button>
+          <Button onClick={handleCloseDialog} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Dialog เพื่อแสดงข้อมูลสถานีชาร์จ */}
+      <Dialog
+        open={OpenDialogStation}
+        onClose={handleCloseDialogStation}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>Station Information</DialogTitle>
+        <DialogContent>
+          <TextField
+            type="text"
+            value={filterText}
+            onChange={handleFilterChange}
+            placeholder="Search"
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            InputLabelProps={{
+              shrink: true,
+            }}
+          />
+
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Station Name</TableCell>
+                  <TableCell>Location</TableCell>
+                  <TableCell>Created At</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {salesData?.resStations
+                  ?.filter((station) =>
+                    station.name
+                      .toLowerCase()
+                      .includes(filterText.toLowerCase())
+                  )
+                  .slice(
+                    page * itemsPerPage,
+                    page * itemsPerPage + itemsPerPage
+                  )
+                  .map((station: StationData) => (
+                    <TableRow key={station.id}>
+                      <TableCell>{station.name}</TableCell>
+                      <TableCell>{station.location}</TableCell>
+                      <TableCell>{dateFormate(station.created_at)}</TableCell>
+
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={handlePrevPage}
+            color="primary"
+            disabled={page === 0}
+          >
+            Prev
+          </Button>
+          <Button
+            onClick={handleNextPage}
+            color="primary"
+            disabled={
+              page * itemsPerPage + itemsPerPage >= salesData?.resStations?.length
+            }
+          >
+            Next
+          </Button>
+          <Button onClick={handleCloseDialogStation} color="primary">
+            Close
+          </Button>
         </DialogActions>
       </Dialog>
     </Card>
@@ -220,4 +446,3 @@ const StatisticsCard = () => {
 };
 
 export default StatisticsCard;
-

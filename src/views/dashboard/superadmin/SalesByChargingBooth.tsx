@@ -194,7 +194,7 @@ const SalesByCountries = () => {
                     {item.sales}
                   </Typography>
                   <Typography variant="caption" sx={{ lineHeight: 1.5 }}>
-                    kW
+                    kWh
                   </Typography>
                 </Box>
               </Box>

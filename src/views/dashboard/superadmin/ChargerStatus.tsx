@@ -219,7 +219,7 @@ const ChargerStatus = () => {
                   {/* ตัวอย่างข้อมูลสำหรับแสดงในตาราง */}
                   <TableRow>
                     <TableCell>Booth Name</TableCell>
-                    <TableCell>Charging Rate (kW)</TableCell>
+                    <TableCell>Charging Rate (kWh)</TableCell>
                     <TableCell>Status</TableCell>
                     <TableCell>Last Update</TableCell>
                   </TableRow>

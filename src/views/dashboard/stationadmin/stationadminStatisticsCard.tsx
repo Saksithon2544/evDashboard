@@ -25,7 +25,7 @@ interface DataType {
 
 const StatisticsCard = () => {
   const { data: salesData } = useQuery('merdata', async () => {
-    const res1 = await axios.get("/station/");
+    const res1 = await axios.get('/station/');
     const res2 = await axios.get('/charging_booth/');
     const res3 = await axios.get(`/station_admin/${res1.data[0].id}`);
     const totalStations = res1.data.length;

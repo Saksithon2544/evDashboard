@@ -22,7 +22,7 @@ const StatisticsCard = () => {
   const { data: salesData, isLoading: totalSalesIsLoading, refetch: totalSalesRefetch } = useQuery(
     'salesData',
     async () => {
-      const res1 = (await axios.get('/charging_booth')).data as ChargingData[];
+      const res1 = (await axios.get('/charging_booth/')).data as ChargingData[];
       const totalSales = res1.reduce((acc, curr) => acc + curr.charging_rate * 10, 0);
       const totalEnergy = res1.reduce((acc, curr) => acc + curr.charging_rate, 0);
       const totalCustomers = (await axios.get('/super_admin/users')).data.length;

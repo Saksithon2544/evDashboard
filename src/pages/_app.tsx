@@ -73,7 +73,14 @@ const App = (props: ExtendedAppProps) => {
   const getLayout =
     Component.getLayout ?? ((page) => <UserLayout>{page}</UserLayout>);
 
-  const queryClient = new QueryClient();
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: false,
+        retry: false,
+      },
+    },
+  });
 
   return (
     <CacheProvider value={emotionCache}>

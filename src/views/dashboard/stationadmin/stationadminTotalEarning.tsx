@@ -38,7 +38,7 @@ const TotalEarning = () => {
     'stationData',
     async () => {
       const res1 = (await axios.get('/station')).data as StationData[];
-      const res2 = (await axios.get('/charging_booth')).data as ChargingData[];
+      const res2 = (await axios.get('/charging_booth/')).data as ChargingData[];
       const totalSales = res2.reduce((acc, curr) => acc + curr.charging_rate * 10, 0);
       const totalEnergy = res2.reduce((acc, curr) => acc + curr.charging_rate, 0);
       const totalCustomers = res1.length;

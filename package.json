@@ -51,6 +51,7 @@
     "@mui/icons-material": "^5.15.15",
     "@mui/lab": "5.0.0-alpha.170",
     "@mui/material": "^5.15.15",
+    "@mui/utils": "^5.15.14",
     "@mui/x-date-pickers": "^7.3.1",
     "@popperjs/core": "^2.11.8",
     "apexcharts-clevision": "3.28.5",

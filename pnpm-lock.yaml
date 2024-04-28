@@ -26,6 +26,9 @@ dependencies:
   '@mui/material':
     specifier: ^5.15.15
     version: 5.15.15(@emotion/react@11.11.4)(@emotion/styled@11.11.5)(@types/react@17.0.37)(react-dom@17.0.2)(react@17.0.2)
+  '@mui/utils':
+    specifier: ^5.15.14
+    version: 5.15.14(@types/react@17.0.37)(react@17.0.2)
   '@mui/x-date-pickers':
     specifier: ^7.3.1
     version: 7.3.1(@emotion/react@11.11.4)(@emotion/styled@11.11.5)(@mui/material@5.15.15)(@types/react@17.0.37)(react-dom@17.0.2)(react@17.0.2)

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
+    "baseUrl": "./",
     "rootDir": "src",
     "target": "es6",
     "lib": [
@@ -21,6 +21,7 @@
     "jsx": "preserve",
     "incremental": true,
     "paths": {
+      "@mui/*": ["node_modules/@mui/*/"],
       "@/*": [
         "./src/*" // Update the path to match your project structure
       ],

@@ -53,18 +53,6 @@ const TopupTable = () => {
     setSelectedTransaction(undefined);
   }
 
-  // function handleTable(data: CallBack) {
-  //   switch (data.action) {
-  //     case "edit":
-  //       setSelectedTransaction(data.Transaction);
-  //       break;
-  //     case "delete":
-  //       // console.log("delete", data.transaction);
-  //       break;
-  //     default:
-  //       break;
-  //   }
-  // }
 
   return (
     <Grid container>

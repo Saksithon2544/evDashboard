@@ -392,7 +392,7 @@ function TableTransactions({
                         </TableCell>
                       ) : (
                         <TableCell>
-                          <Badge color="default" variant="dot" sx={{ mr: 2 }} />
+                          <Badge color="info" variant="dot" sx={{ mr: 2 }} />
                           {row.transactionType}
                         </TableCell>
                       )}

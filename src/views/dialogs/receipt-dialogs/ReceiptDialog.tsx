@@ -85,7 +85,7 @@ export default function ReceiptDialog(props: Props) {
             props.callback && props.callback(true);
             handleClose();
           } catch (error) {
-            Swal.fire("Error!", "An error occurred.", "error");
+            Swal.fire("Error!", `${error.response.data.detail}`, "error");
           } finally {
             setLoading(false); // หยุดแสดง Loading
           }
@@ -95,7 +95,11 @@ export default function ReceiptDialog(props: Props) {
         }
       });
     } catch (error) {
-      Swal.fire("Error!", "An error occurred.", "error");
+      Swal.fire(
+        "Error!",
+       `An error occurred. ${error.messag}`,
+        "error"
+      );
     }
     
   }

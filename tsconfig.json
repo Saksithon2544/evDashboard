@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
+    "baseUrl": "./",
     "rootDir": "src",
     "target": "es6",
     "lib": [
@@ -29,7 +29,8 @@
       ],
       "apexcharts/*": [
         "./node_modules/apexcharts-clevision/*"
-      ]
+      ],
+      "@mui/*": ["node_modules/@mui/*/"]
     }
   },
   "include": [

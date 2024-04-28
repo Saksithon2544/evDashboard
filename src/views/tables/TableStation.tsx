@@ -25,6 +25,7 @@ import { FormControl, TextField } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import MapIcon from "@mui/icons-material/Map";
 
 function descendingComparator(a: any, b: any, orderBy: string) {
   if (b[orderBy] < a[orderBy]) {
@@ -422,7 +423,21 @@ function TableStation({ Stations, isLoading, refetch, callback }: Props) {
                         {row.name}
                       </TableCell>
                       <TableCell>
-                        {row.location[0]}, {row.location[1]}
+                        Click 👉
+                        <IconButton
+                          aria-label="view-map"
+                          onClick={() => {
+                            const lat = row.location[0]; // ละติจูด
+                            const lng = row.location[1]; // ลองติจูด
+                            const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+                            window.open(mapsUrl, "_blank");
+                            {
+                              console.log(mapsUrl);
+                            }
+                          }}
+                        >
+                          <MapIcon color="error" />
+                        </IconButton>
                       </TableCell>
                       <TableCell>{row.total_charging_rate}</TableCell>
                       <TableCell>{dateFormate(row.created_at)}</TableCell>

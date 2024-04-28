@@ -37,7 +37,7 @@ export default function ViewStation() {
     async () => {
       const res1 = (await axios.get(`/station/${id}/admins`))
         .data as AdminData[];
-      const res2 = (await axios.get(`/station`)).data as StationData[];
+      const res2 = (await axios.get(`/station/`)).data as StationData[];
       const res3 = (await axios.get("/super_admin/users")).data as UserData[];
       const res4 = (await axios.get(`/charging_booth/station/${id}`)).data as ChargingData[];
 

@@ -197,7 +197,7 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({
         </form>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} disabled={isLoading}>
+        <Button onClick={onClose} disabled={isLoading} color="error">
           Cancel
         </Button>
         <Button

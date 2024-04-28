@@ -359,7 +359,7 @@ const StatisticsCard = () => {
           >
             Next
           </Button>
-          <Button onClick={handleCloseDialog} color="primary">
+          <Button onClick={handleCloseDialog} color="error">
             Close
           </Button>
         </DialogActions>
@@ -436,7 +436,7 @@ const StatisticsCard = () => {
           >
             Next
           </Button>
-          <Button onClick={handleCloseDialogStation} color="primary">
+          <Button onClick={handleCloseDialogStation} color="error">
             Close
           </Button>
         </DialogActions>

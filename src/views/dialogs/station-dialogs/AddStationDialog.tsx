@@ -139,7 +139,7 @@ export default function StationDialog({ callback }) {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={handleClose} color="error">Cancel</Button>
           <Button onClick={onSubmit}>Submit</Button>
         </DialogActions>
       </Dialog>

@@ -198,6 +198,7 @@ function TableMember({ Users, isLoading, refetch, callback }: Props) {
         showCancelButton: true,
         confirmButtonText: "Yes",
         cancelButtonText: "No",
+        cancelButtonColor: "red",
       });
 
       if (result.isConfirmed) {
@@ -511,12 +512,14 @@ function TableMember({ Users, isLoading, refetch, callback }: Props) {
                         <IconButton
                           aria-label="edit"
                           onClick={() => handleEditClick(row)}
+                          color="primary"
                         >
                           <EditIcon />
                         </IconButton>
                         <IconButton
                           aria-label="delete"
                           onClick={() => handleDeleteClick(row)}
+                          color="error"
                         >
                           <DeleteIcon />
                         </IconButton>

@@ -118,7 +118,7 @@ const EditStationDialog: React.FC<EditStationDialogProps> = ({
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose} color="error">Cancel</Button>
         <Button onClick={handleSubmit(handleSave)}>Save</Button>
       </DialogActions>
     </Dialog>

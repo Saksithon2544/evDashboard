@@ -21,7 +21,7 @@ import { dateFormate } from "@/libs/date";
 import Swal from "sweetalert2";
 import { visuallyHidden } from "@mui/utils";
 import axios from "@/libs/Axios";
-import { FormControl, TextField } from "@mui/material";
+import { Button, FormControl, TextField } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -423,9 +423,8 @@ function TableStation({ Stations, isLoading, refetch, callback }: Props) {
                         {row.name}
                       </TableCell>
                       <TableCell>
-                        Click 👉
-                        <IconButton
-                          aria-label="view-map"
+                        <Button
+                          variant="outlined"
                           onClick={() => {
                             const lat = row.location[0]; // ละติจูด
                             const lng = row.location[1]; // ลองติจูด
@@ -435,9 +434,10 @@ function TableStation({ Stations, isLoading, refetch, callback }: Props) {
                               console.log(mapsUrl);
                             }
                           }}
+                          startIcon={<MapIcon color="error" />}
                         >
-                          <MapIcon color="error" />
-                        </IconButton>
+                          view
+                        </Button>
                       </TableCell>
                       <TableCell>{row.total_charging_rate}</TableCell>
                       <TableCell>{dateFormate(row.created_at)}</TableCell>
@@ -445,23 +445,27 @@ function TableStation({ Stations, isLoading, refetch, callback }: Props) {
                         <IconButton
                           aria-label="edit"
                           onClick={() => handleEditClick(row)}
+                          color="primary"
                         >
                           <EditIcon />
                         </IconButton>
                         <IconButton
                           aria-label="delete"
                           onClick={() => handleDeleteClick(row)}
+                          color="error"
                         >
                           <DeleteIcon />
                         </IconButton>
                       </TableCell>
                       <TableCell>
-                        <IconButton
-                          aria-label="view"
+                        <Button 
+                          variant="outlined"
                           onClick={() => router.push(`/stations/${row.id}`)}
+                          startIcon={<VisibilityIcon />}
                         >
-                          <VisibilityIcon />
-                        </IconButton>
+                          Click
+                        </Button>
+
                       </TableCell>
                     </TableRow>
                   );

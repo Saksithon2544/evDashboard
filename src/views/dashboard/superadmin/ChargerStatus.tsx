@@ -276,7 +276,7 @@ const ChargerStatus = () => {
             >
               Next
             </Button>
-            <Button onClick={handleClose} color="primary">
+            <Button onClick={handleClose} color="error">
               Close
             </Button>
           </DialogActions>

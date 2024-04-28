@@ -39,7 +39,7 @@ const StatisticsCard = () => {
       const { totalSales, totalEnergy, totalCustomers, totalStations } = salesData;
       const stats: DataType[] = [
         {
-          stats: `${totalEnergy} kW`,
+          stats: `${totalEnergy} kWh`,
           title: 'Energy usage',
           color: 'primary',
           icon: <TrendingUp sx={{ fontSize: '1.75rem' }} />,
@@ -104,9 +104,9 @@ const StatisticsCard = () => {
         subheader={
           <Typography variant='body2'>
             <Box component='span' sx={{ fontWeight: 600, color: 'text.primary' }}>
-              Total 48.5% growth
+              Total growth 
             </Box>{' '}
-            😎 this month
+            📈 this all
           </Typography>
         }
         titleTypographyProps={{

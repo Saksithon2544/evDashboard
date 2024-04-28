@@ -42,7 +42,7 @@ export default function StationDialog({ callback, stationId }: Props) {
   });
 
   const { data: stations } = useQuery<Station[]>("stations", async () => {
-    const res = await axios.get("/station");
+    const res = await axios.get("/station/");
     return res.data;
   });
 

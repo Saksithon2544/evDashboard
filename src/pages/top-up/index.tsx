@@ -28,7 +28,7 @@ const TopupTable = () => {
   } = useQuery<TransactionData[]>("transactions", async () => {
     
     const [transactionsRes] = await Promise.all([
-      axios.get("/top_up")
+      axios.get("/top_up/")
     ]);
 
     const transactionsData = await transactionsRes.data;

@@ -1,6 +1,6 @@
 // ** MUI Theme Provider
 import { deepmerge } from '@mui/utils'
-import { ThemeOptions } from '@mui/material'
+import { ThemeOptions } from '@mui/material/styles'
 
 
 // ** Type Import

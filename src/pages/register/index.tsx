@@ -35,6 +35,7 @@ import BlankLayout from "src/@core/layouts/BlankLayout";
 
 // ** Demo Imports
 import FooterIllustrationsV1 from "src/views/pages/auth/FooterIllustration";
+import { Grid } from "@mui/material";
 
 interface State {
   password: string;
@@ -81,7 +82,6 @@ const RegisterPage = () => {
 
   // ** Hook
   const theme = useTheme();
-  
 
   return (
     <Box className="content-center">
@@ -136,43 +136,107 @@ const RegisterPage = () => {
               Create an account 🚀
             </Typography>
           </Box>
-          <form
-            noValidate
-            autoComplete="off"
-            onSubmit={(e) => e.preventDefault()}
+          <FormControl
+            fullWidth
+            variant="outlined"
+            sx={{ marginBottom: 4 }}
+            size="small"
           >
-            <TextField
-              autoFocus
-              fullWidth
-              id="full-name"
-              label="Full Name"
-              sx={{ marginBottom: 4 }}
-            />
-            <TextField
-              fullWidth
-              type="email"
-              label="Email"
-              sx={{ marginBottom: 4 }}
-            />
-            <TextField
-              fullWidth
-              type="email"
-              label="Email"
-              sx={{ marginBottom: 4 }}
-            />
-             <TextField
-              fullWidth
-              type="password"
-              label="Password"
-              sx={{ marginBottom: 4 }}
-            />
-            <TextField
-              fullWidth
-              type="password"
-              label="Confirm Password"
-              sx={{ marginBottom: 4 }}
-            />
-  
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <TextField
+                  id="firstName"
+                  label="First Name"
+                  fullWidth
+                  sx={{ marginBottom: 4 }}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  id="lastName"
+                  label="Last Name"
+                  fullWidth
+                  sx={{ marginBottom: 4 }}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  id="email"
+                  type="email"
+                  label="Email"
+                  fullWidth
+                  sx={{ marginBottom: 4 }}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  id="phoneNumber"
+                  label="Phone Number"
+                  fullWidth
+                  sx={{ marginBottom: 4 }}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  id="password"
+                  type={values.showPassword ? "text" : "password"}
+                  label="Password"
+                  fullWidth
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          edge="end"
+                          onClick={() =>
+                            setValues({
+                              ...values,
+                              showPassword: !values.showPassword,
+                            })
+                          }
+                        >
+                          {values.showPassword ? (
+                            <EyeOutline />
+                          ) : (
+                            <EyeOffOutline />
+                          )}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{ marginBottom: 4 }}
+                />
+
+                <TextField
+                  id="confirmPassword"
+                  type={values.showconfirmPassword ? "text" : "password"}
+                  label="Confirm Password"
+                  fullWidth
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          edge="end"
+                          onClick={() =>
+                            setValues({
+                              ...values,
+                              showconfirmPassword: !values.showconfirmPassword,
+                            })
+                          }
+                        >
+                          {values.showconfirmPassword ? (
+                            <EyeOutline />
+                          ) : (
+                            <EyeOffOutline />
+                          )}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{ marginBottom: 4 }}
+                />
+              </Grid>
+            </Grid>
+
             <FormControlLabel
               control={<Checkbox />}
               label={
@@ -216,7 +280,7 @@ const RegisterPage = () => {
                 </Link>
               </Typography>
             </Box>
-          </form>
+          </FormControl>
         </CardContent>
       </Card>
       <FooterIllustrationsV1 />

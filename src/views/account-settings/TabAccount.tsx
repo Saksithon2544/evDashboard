@@ -84,7 +84,7 @@ const TabAccount = ({ User,onSaved }: TabAccountProps) => {
           <Grid item xs={12} sx={{ marginTop: 4.8, marginBottom: 3 }}>
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <ImgStyled src={imgSrc} alt="Profile Pic" />
-              {/* <Box>
+              <Box>
                 <ButtonStyled
                   component="label"
                   variant="contained"
@@ -109,7 +109,7 @@ const TabAccount = ({ User,onSaved }: TabAccountProps) => {
                 <Typography variant="body2" sx={{ marginTop: 5 }}>
                   Allowed PNG or JPEG. Max size of 800K.
                 </Typography>
-              </Box> */}
+              </Box>
             </Box>
           </Grid>
 

@@ -1,6 +1,7 @@
 // ** React Imports
 import { ChangeEvent, MouseEvent, ReactNode, useState } from "react";
 import axios from "@/libs/Axios";
+import { useEffect } from "react";
 import Swal from "sweetalert2";
 
 // ** Next Imports
@@ -98,6 +99,13 @@ const LoginPage = () => {
 
   const handleRememberMeChange = () => {
     setValues({ ...values, rememberMe: !values.rememberMe });
+    if (!values.rememberMe) {
+      localStorage.setItem("remembered_username", values.username);
+      localStorage.setItem("remembered_password", values.password);
+    } else {
+      localStorage.removeItem("remembered_username");
+      localStorage.removeItem("remembered_password");
+    }
   };
 
   const handleLogin = async () => {
@@ -185,6 +193,39 @@ const LoginPage = () => {
     }
   };
 
+  useEffect(() => {
+    const accessToken = localStorage.getItem("access_token");
+    const tokenType = localStorage.getItem("token_type");
+    const rememberedUsername = localStorage.getItem("remembered_username");
+    const rememberedPassword = localStorage.getItem("remembered_password");
+    if (accessToken && tokenType) {
+      (async () => {
+        try {
+          const response = await axios.get("/user/me", {
+            headers: {
+              Authorization: `${tokenType} ${accessToken}`,
+            },
+          });
+          const { role } = response.data;
+          const isAdmin = role === "stationadmin" || role === "superadmin";
+          if (isAdmin) {
+            router.push("/dashboard");
+          }
+        } catch (error) {
+          console.error("Error checking user role:", error);
+        }
+      })();
+    }
+    if (rememberedUsername && rememberedPassword) {
+      setValues({
+        ...values,
+        username: rememberedUsername,
+        password: rememberedPassword,
+        rememberMe: true,
+      });
+    }
+  }, []);
+
   return (
     <Box className="content-center">
       <Card sx={{ zIndex: 1 }}>
@@ -248,18 +289,18 @@ const LoginPage = () => {
             <TextField
               autoFocus
               fullWidth
-              id="username" // Change the ID to "username"
-              label="Username" // Change the label to "username"
+              id="username"
+              label="Username"
               sx={{ marginBottom: 4 }}
-              value={values.username} // Update to use values.username
+              value={values.username} // Use state value for username
               autoComplete="username"
-              onChange={handleChange("username")} // Update the handleChange function
+              onChange={handleChange("username")}
             />
             <FormControl fullWidth>
               <InputLabel htmlFor="auth-login-password">Password</InputLabel>
               <OutlinedInput
                 label="Password"
-                value={values.password}
+                value={values.password} // Use state value for password
                 autoComplete="current-password"
                 id="auth-login-password"
                 onChange={handleChange("password")}
@@ -278,6 +319,7 @@ const LoginPage = () => {
                 }
               />
             </FormControl>
+
             <Box
               sx={{
                 mb: 4,

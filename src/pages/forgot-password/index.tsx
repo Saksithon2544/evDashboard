@@ -14,9 +14,6 @@ import CardContent from "@mui/material/CardContent";
 import FormControl from "@mui/material/FormControl";
 import { styled, useTheme } from "@mui/material/styles";
 import MuiCard, { CardProps } from "@mui/material/Card";
-import MuiFormControlLabel, {
-  FormControlLabelProps,
-} from "@mui/material/FormControlLabel";
 
 // ** Configs
 import themeConfig from "src/configs/themeConfig";

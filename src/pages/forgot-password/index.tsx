@@ -36,6 +36,8 @@ import BlankLayout from "src/@core/layouts/BlankLayout";
 // ** Demo Imports
 import FooterIllustrationsV1 from "src/views/pages/auth/FooterIllustration";
 import { Grid } from "@mui/material";
+import axios from "@/libs/Axios";
+import Swal from "sweetalert2";
 
 interface State {
   password: string;
@@ -67,21 +69,48 @@ const FormControlLabel = styled(MuiFormControlLabel)<FormControlLabelProps>(
 const ForgotPasswordPage = () => {
   // ** States
   interface State {
-    password: string;
-    confirmPassword: string;
-    showPassword: boolean;
-    showconfirmPassword: boolean;
+    email: string;
   }
 
   const [values, setValues] = useState<State>({
-    password: "",
-    confirmPassword: "",
-    showPassword: false,
-    showconfirmPassword: false,
+    email: "",
   });
 
   // ** Hook
   const theme = useTheme();
+
+  const handleResetPassword = async () => {
+    try {
+      // ส่งค่าอีเมลไปยัง API สำหรับรีเซ็ตรหัสผ่าน
+      const response = await axios.post('/reset_password/?email=', {
+        email: values.email,
+      });
+
+      // ตรวจสอบว่าส่งคำร้องสำเร็จหรือไม่
+      if (response.status === 200) {
+        // แสดง Swal แจ้งเตือนสำเร็จ
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: "Reset instructions sent successfully.",
+        });
+      } else {
+        // แสดง Swal แจ้งเตือนไม่สำเร็จ
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Something went wrong. Please try again later.",
+        });
+      }
+    } catch (error) {
+      // แสดง Swal แจ้งเตือนเมื่อเกิดข้อผิดพลาดในการส่งคำร้อง
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Something went wrong. Please try again later.",
+      });
+    }
+  };
 
   return (
     <Box className="content-center">
@@ -150,6 +179,10 @@ const ForgotPasswordPage = () => {
                   label="Email"
                   fullWidth
                   sx={{ marginBottom: 4 }}
+                  value={values.email}
+                  onChange={(e) =>
+                    setValues({ ...values, email: e.target.value })
+                  }
                 />
               </Grid>
             </Grid>
@@ -160,9 +193,11 @@ const ForgotPasswordPage = () => {
               type="submit"
               variant="contained"
               sx={{ marginBottom: 7 }}
+              onClick={handleResetPassword}
             >
               Send Reset Instructions
             </Button>
+
             <Box
               sx={{
                 display: "flex",
@@ -188,6 +223,8 @@ const ForgotPasswordPage = () => {
   );
 };
 
-ForgotPasswordPage.getLayout = (page: ReactNode) => <BlankLayout>{page}</BlankLayout>;
+ForgotPasswordPage.getLayout = (page: ReactNode) => (
+  <BlankLayout>{page}</BlankLayout>
+);
 
 export default ForgotPasswordPage;

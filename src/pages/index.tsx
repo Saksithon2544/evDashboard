@@ -338,8 +338,8 @@ const LoginPage = () => {
                 }
                 label="Remember Me"
               />
-              <Link passHref href="/">
-                <LinkStyled onClick={(e) => e.preventDefault()}>
+              <Link passHref href="/forgot-password">
+                <LinkStyled >
                   Forgot Password?
                 </LinkStyled>
               </Link>

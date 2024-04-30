@@ -1,5 +1,6 @@
 // ** React Imports
 import { useState, Fragment, ChangeEvent, MouseEvent, ReactNode } from "react";
+import router from "next/router";
 
 // ** Next Imports
 import Link from "next/link";
@@ -7,25 +8,15 @@ import Link from "next/link";
 // ** MUI Components
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Divider from "@mui/material/Divider";
-import Checkbox from "@mui/material/Checkbox";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import InputLabel from "@mui/material/InputLabel";
-import IconButton from "@mui/material/IconButton";
 import CardContent from "@mui/material/CardContent";
 import FormControl from "@mui/material/FormControl";
-import OutlinedInput from "@mui/material/OutlinedInput";
 import { styled, useTheme } from "@mui/material/styles";
 import MuiCard, { CardProps } from "@mui/material/Card";
-import InputAdornment from "@mui/material/InputAdornment";
 import MuiFormControlLabel, {
   FormControlLabelProps,
 } from "@mui/material/FormControlLabel";
-
-// ** Icons Imports
-import EyeOutline from "mdi-material-ui/EyeOutline";
-import EyeOffOutline from "mdi-material-ui/EyeOffOutline";
 
 // ** Configs
 import themeConfig from "src/configs/themeConfig";
@@ -88,13 +79,20 @@ const ForgotPasswordPage = () => {
 
       // ตรวจสอบว่าส่งคำร้องสำเร็จหรือไม่
       if (response.status === 200) {
-        // แสดง Swal แจ้งเตือนสำเร็จ
+        // If the response status is 200 (success)
         Swal.fire({
+          // Display a SweetAlert with a success icon
           icon: "success",
           title: "Success!",
-          text: "Reset instructions sent successfully.",
+          // Include a message indicating success with styled email
+          html: `Please check the link. Password reset sent to email <span style="color: red;">${values.email}</span>`,
+          confirmButtonColor: "#ff0000", // Set the confirm button color to red
+          confirmButtonText: "OK", // Set the text for the confirm button
+        }).then(() => {
+          router.push("/"); // Redirect the user to the login page
         });
-      } else {
+      }
+       else {
         // แสดง Swal แจ้งเตือนไม่สำเร็จ
         Swal.fire({
           icon: "error",
@@ -228,3 +226,7 @@ ForgotPasswordPage.getLayout = (page: ReactNode) => (
 );
 
 export default ForgotPasswordPage;
+function push(arg0: string) {
+  throw new Error("Function not implemented.");
+}
+

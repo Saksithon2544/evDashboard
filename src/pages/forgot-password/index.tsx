@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState, Fragment, ChangeEvent, MouseEvent, ReactNode } from "react";
+import { useState, ReactNode } from "react";
 import router from "next/router";
 
 // ** Next Imports
@@ -30,11 +30,6 @@ import { Grid } from "@mui/material";
 import axios from "@/libs/Axios";
 import Swal from "sweetalert2";
 
-interface State {
-  password: string;
-  showPassword: boolean;
-}
-
 // ** Styled Components
 const Card = styled(MuiCard)<CardProps>(({ theme }) => ({
   [theme.breakpoints.up("sm")]: { width: "28rem" },
@@ -46,16 +41,6 @@ const LinkStyled = styled("a")(({ theme }) => ({
   color: theme.palette.primary.main,
 }));
 
-const FormControlLabel = styled(MuiFormControlLabel)<FormControlLabelProps>(
-  ({ theme }) => ({
-    marginTop: theme.spacing(1.5),
-    marginBottom: theme.spacing(4),
-    "& .MuiFormControlLabel-label": {
-      fontSize: "0.875rem",
-      color: theme.palette.text.secondary,
-    },
-  })
-);
 
 const ForgotPasswordPage = () => {
   // ** States

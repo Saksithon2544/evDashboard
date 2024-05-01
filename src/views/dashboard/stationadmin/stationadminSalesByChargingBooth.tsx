@@ -39,7 +39,7 @@ const SalesByCountries = () => {
   const { data: chargingData, isLoading: totalSalesIsLoading, refetch: totalSalesRefetch } = useQuery(
     "chargingData",
     async () => {
-      const res1 = (await axios.get("/charging_booth/")).data as ChargingData[];
+      const res1 = (await axios.get("/charging_booth/?limit=1000")).data as ChargingData[];
       const data = res1.map((charging) => {
         return {
           id: charging.booth_id,

@@ -26,7 +26,7 @@ const TransactionsAllTable = () => {
     isLoading,
     refetch,
   } = useQuery<TransactionData[]>("transactions", async () => {
-    const [transactionsRes] = await Promise.all([axios.get("/transaction/all")]);
+    const [transactionsRes] = await Promise.all([axios.get("/transaction/all?limit=1000")]);
 
     const transactionsData = await transactionsRes.data;
 

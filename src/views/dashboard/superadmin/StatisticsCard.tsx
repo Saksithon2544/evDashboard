@@ -86,10 +86,10 @@ const StatisticsCard = () => {
   } = useQuery(
     "salesData",
     async () => {
-      const res1 = (await axios.get("/charging_booth/")).data as ChargingData[];
-      const resUsers = (await axios.get("/super_admin/users"))
+      const res1 = (await axios.get("/charging_booth/?limit=1000")).data as ChargingData[];
+      const resUsers = (await axios.get("/super_admin/users?limit=1000"))
         .data as UserData[];
-      const resStations = (await axios.get("/station/")).data as StationData[];
+      const resStations = (await axios.get("/station/?limit=1000")).data as StationData[];
       const totalSales = res1.reduce(
         (acc, curr) => acc + curr.charging_rate * 10,
         0
@@ -98,9 +98,9 @@ const StatisticsCard = () => {
         (acc, curr) => acc + curr.charging_rate,
         0
       );
-      const totalCustomers = (await axios.get("/super_admin/users")).data
+      const totalCustomers = (await axios.get("/super_admin/users?limit=1000")).data
         .length;
-      const totalStations = (await axios.get("/station/")).data.length;
+      const totalStations = (await axios.get("/station/?limit=1000")).data.length;
       return {
         totalSales,
         totalEnergy,

@@ -22,7 +22,7 @@ const UsersAllTable = () => {
     isLoading,
     refetch,
   } = useQuery<UserData[]>("users", async () => {
-    const res = await axios.get("/super_admin/users");
+    const res = await axios.get("/super_admin/users?limit=1000");
     const data = await res.data;
     const sortedUsers = data.sort((a: UserData, b: UserData) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     const latestUsers = sortedUsers.slice(0, 100); // เลือกข้อมูลเพียง 100 คนล่าสุด 

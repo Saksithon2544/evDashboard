@@ -152,7 +152,7 @@ type Props = {
   callback?: (data: CallBack) => void;
 };
 
-function TableTopup({ Log = [], isLoading, refetch, callback }: Props) {
+function TableLog({ Log = [], isLoading, refetch, callback }: Props) {
   const router = useRouter();
   const [order, setOrder] = React.useState<"asc" | "desc">("asc");
   const [orderBy, setOrderBy] = React.useState<string>("name");
@@ -299,17 +299,20 @@ function TableTopup({ Log = [], isLoading, refetch, callback }: Props) {
             />
           </FormControl>
           <FormControl style={{ marginRight: 50 }}>
-            <InputLabel id="status-filter-label">Topup Type</InputLabel>
+            <InputLabel id="status-filter-label">Log Type</InputLabel>
             <Select
               labelId="status-filter-label"
               id="status-filter"
               value={LogType}
-              label="Topup Type"
+              label="Log Type"
               onChange={handleLogType}
             >
               <MenuItem value="all">All</MenuItem>
-              <MenuItem value="true">Success</MenuItem>
-              <MenuItem value="false">Pending</MenuItem>
+              <MenuItem value="user">User Info</MenuItem>
+              <MenuItem value="station">Station Info</MenuItem>
+              
+
+
             </Select>
           </FormControl>
         </Box>
@@ -392,4 +395,4 @@ function TableTopup({ Log = [], isLoading, refetch, callback }: Props) {
   );
 }
 
-export default TableTopup;
+export default TableLog;

@@ -37,8 +37,8 @@ const TotalEarning = () => {
   const { data: stationData, isLoading: totalSalesIsLoading, refetch: totalSalesRefetch } = useQuery(
     'stationData',
     async () => {
-      const res1 = (await axios.get('/station/')).data as StationData[];
-      const res2 = (await axios.get('/charging_booth/')).data as ChargingData[];
+      const res1 = (await axios.get('/station/?limit=1000')).data as StationData[];
+      const res2 = (await axios.get('/charging_booth/?limit=1000')).data as ChargingData[];
       const totalSales = res2.reduce((acc, curr) => acc + curr.charging_rate * 10, 0);
       const totalEnergy = res2.reduce((acc, curr) => acc + curr.charging_rate, 0);
       const totalCustomers = res1.length;

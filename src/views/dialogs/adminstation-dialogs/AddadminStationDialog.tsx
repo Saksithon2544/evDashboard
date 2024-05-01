@@ -42,13 +42,13 @@ export default function StationDialog({ callback, stationId }: Props) {
   const [open, setOpen] = React.useState(false);
 
   const {data:users} = useQuery<User[]>("users", async () => {
-    const res = await axios.get("/super_admin/users");
+    const res = await axios.get("/super_admin/users?limit=1000");
     return res.data;
   }
   );
 
   const {data:stations} = useQuery<Station[]>("stations", async () => {
-    const res = await axios.get("/station/");
+    const res = await axios.get("/station/?limit=1000");
     return res.data;
   }
   );

@@ -27,7 +27,7 @@ const LogTable = () => {
   } = useQuery<LogData[]>("Logs", async () => {
     
     const [LogsRes] = await Promise.all([
-      axios.get("/log/")
+      axios.get("/log/?limit=1000")
     ]);
 
     const LogsData = await LogsRes.data;

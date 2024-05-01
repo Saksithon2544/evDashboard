@@ -48,7 +48,7 @@ const Trophy = () => {
     isLoading: totalSalesIsLoading,
     refetch: totalSalesRefetch,
   } = useQuery("totalSales", async () => {
-    const res1 = (await axios.get("/charging_booth/")).data as ChargingData[];
+    const res1 = (await axios.get("/charging_booth/?limit=1000")).data as ChargingData[];
 
     const totalSales = res1.reduce(
       (acc, curr) => acc + curr.charging_rate * 10,
@@ -65,7 +65,7 @@ const Trophy = () => {
     isLoading: userIsLoading,
     refetch: userRefetch,
   } = useQuery<UserData>("userme", async () => {
-    const res = await axios.get("/user/me");
+    const res = await axios.get("/user/me?limit=1000");
     const data = await res.data;
 
     return data;

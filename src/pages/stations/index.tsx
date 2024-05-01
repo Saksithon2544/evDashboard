@@ -19,8 +19,8 @@ const StationsAllTable = () => {
   const [selectedStation, setSelectedStation] = useState<StationData>();
 
   const { data: Stations, isLoading, refetch } = useQuery("stations", async () => {
-    const res1 = await (await axios.get(`/station/`)).data as StationData[];
-    const res2 = await (await axios.get(`/charging_booth/`)).data as ChargingData[];
+    const res1 = await (await axios.get(`/station/?limit=1000`)).data as StationData[];
+    const res2 = await (await axios.get(`/charging_booth/?limit=1000`)).data as ChargingData[];
     const data = res1.map((station) => {
       return {
         id: station.id,

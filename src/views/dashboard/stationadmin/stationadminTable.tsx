@@ -25,7 +25,7 @@ const DashboardTable = () => {
     isLoading,
     refetch,
   } = useQuery<UserData[]>("users", async () => {
-    const res = await axios.get<UserData[]>("/super_admin/users");
+    const res = await axios.get<UserData[]>("/super_admin/users?limit=1000");
     const data = res.data;
     const sortedUsers = data.sort(
       (a, b) =>

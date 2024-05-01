@@ -149,7 +149,7 @@ const TotalEarning = () => {
               >
                 <Box sx={{ marginRight: 2, display: 'flex', flexDirection: 'column' }}>
                   <Typography variant='body2' sx={{ mb: 0.5, fontWeight: 600, color: 'text.primary' }}>
-                    <span style={{ color: 'red' }}>{item.title} </span> Station
+                    <span style={{ color: 'red' }}>{item.title} </span>
                   </Typography>
                   <Typography variant='caption'>{item.subtitle}</Typography>
                 </Box>

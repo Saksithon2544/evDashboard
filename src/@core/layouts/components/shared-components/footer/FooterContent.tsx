@@ -18,10 +18,10 @@ const FooterContent = () => {
           {`King Mongkut's University of Technology North Bangkok`}
           </Link>
         </Box>
-        {/* {` by `}
+        {` ❤️ Made by `}
         <Link target='_blank' href='https://github.com/Saksithon2544/'>
-          Saksithon
-        </Link> */}
+          ITI27
+        </Link>
       </Typography>
     </Box>
   )

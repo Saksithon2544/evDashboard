@@ -72,7 +72,6 @@ const TabAccount = ({ User, onSaved }: TabAccountProps) => {
   }, [User, reset]);
 
   React.useEffect(() => {
-
     setImgSrc(axios.defaults.baseURL + `/image/${User?.id}`);
   }, []);
 
@@ -197,9 +196,24 @@ const TabAccount = ({ User, onSaved }: TabAccountProps) => {
           </Grid>
 
           <Grid item xs={12}>
-            <Button type="submit" variant="contained" sx={{ marginRight: 3.5 }}>
-              Save Changes
-            </Button>
+            {loading ? (
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{ marginRight: 3.5 }}
+                disabled
+              >
+                Loading...
+              </Button>
+            ) : (
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{ marginRight: 3.5 }}
+              >
+                Save Changes
+              </Button>
+            )}
           </Grid>
         </Grid>
       </form>

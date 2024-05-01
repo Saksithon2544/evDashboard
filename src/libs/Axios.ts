@@ -18,7 +18,7 @@ Axios.interceptors.request.use((config: any) => {
   const token_type = localStorage.getItem("token_type");
   if (access_token) {
     config.headers.Authorization = `${token_type} ${access_token}`;
-    console.log(config);
+    // console.log(config);
   }
   return config;
 });

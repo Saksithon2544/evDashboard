@@ -1,6 +1,10 @@
 // ** React Imports
 import { SyntheticEvent, useState } from "react";
 
+// @ts-ignore
+import ReactFileReader from 'react-file-reader';
+
+
 // ** MUI Imports
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -64,12 +68,27 @@ const AccountSettings = () => {
     refetch,
   } = useQuery<UserData>("users", async () => {
     const res = await axios.get("/user/me");
-    const data = await res.data;
-
-    return data;
+    const res2 = await axios.get(`/image/`);
+    const user = await res.data;
+    const image = await res2.data;
+    user.avatar_img_b64 = image.avatar_img_b64;
+    return user;
   });
 
   async function handleUpdate(data: UserData) {
+    const imageData = await fetch(data.avatar_img_b64);
+    const imageBlob = await imageData.blob();
+    const base64Image = await new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(imageBlob);
+      reader.onloadend = () => {
+        // Remove "data:image/jpeg;base64," from the beginning of the result
+        const base64WithoutPrefix = (reader.result as string).replace(/^data:image\/(png|jpeg);base64,/, '');
+        resolve(base64WithoutPrefix);
+      };
+    });
+    
+
     try {
       Swal.fire({
         title: "Are you sure?",
@@ -81,6 +100,7 @@ const AccountSettings = () => {
         cancelButtonColor: "red",
       }).then(async (result) => {
         if (result.isConfirmed) {
+          await axios.post(`/image/`, { avatar_img_b64: base64Image });
           await axios.put(`/user/me`, data);
           refetch();
 
@@ -169,7 +189,7 @@ const AccountSettings = () => {
                 <AccountOutline />
                 <TabName>Account</TabName>
               </Box>
-            } 
+            }
           />
           <Tab
             value="security"

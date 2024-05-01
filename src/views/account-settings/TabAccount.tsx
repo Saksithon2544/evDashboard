@@ -1,10 +1,5 @@
 // ** React Imports
-import {
-  useState,
-  ElementType,
-  ChangeEvent,
-  useEffect,
-} from "react";
+import { useState, ElementType, ChangeEvent, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form"; // Import Controller and useForm from react-hook-form
 
 // ** MUI Imports
@@ -17,8 +12,9 @@ import CardContent from "@mui/material/CardContent";
 
 import Button, { ButtonProps } from "@mui/material/Button";
 
-
 import { User as UserData } from "@/interfaces/User.interface";
+import axios from "@/libs/Axios";
+import React from "react";
 
 const ImgStyled = styled("img")(({ theme }) => ({
   width: 120,
@@ -51,39 +47,58 @@ type TabAccountProps = {
   onSaved?: (data: UserData) => void;
 };
 
-const TabAccount = ({ User,onSaved }: TabAccountProps) => {
-  const { control, handleSubmit, reset } = useForm(); // Initialize useForm hook
+const TabAccount = ({ User, onSaved }: TabAccountProps) => {
+  const { control, handleSubmit, reset } = useForm();
+  const [imgSrc, setImgSrc] = React.useState<string | null>(null); // Initialize as null
+  const [loading, setLoading] = React.useState(true); // Initialize as true
 
-  const [imgSrc, setImgSrc] = useState<string>("/images/avatars/1.png");
 
+  
   const onChange = (file: ChangeEvent) => {
     const reader = new FileReader();
     const { files } = file.target as HTMLInputElement;
     if (files && files.length !== 0) {
       reader.onload = () => setImgSrc(reader.result as string);
-
       reader.readAsDataURL(files[0]);
     }
   };
-
+  
   const onSubmit = (data: UserData) => {
-    onSaved(data);
+    onSaved({ ...data, avatar_img_b64: imgSrc }); // เพิ่ม imgSrc เข้าไปในข้อมูลที่ส่งไปยัง API
   };
+  
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (User) {
       reset(User);
     }
-  }, []);
+  }, [User, reset]);
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axios.get(`/image/`); // Add the type parameter <string> to axios.get
+        setImgSrc(res.data); 
+      } catch (error) {
+        console.error("Error fetching image:", error);
+      }
+    };
+
+    fetchData();
+  }, [imgSrc]);
+
 
   return (
     <CardContent>
-      {/* {JSON.stringify(User?.firstName)} */}
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid container spacing={7}>
           <Grid item xs={12} sx={{ marginTop: 4.8, marginBottom: 3 }}>
             <Box sx={{ display: "flex", alignItems: "center" }}>
-              <ImgStyled src={imgSrc} alt="Profile Pic" />
+              {/* <ImgStyled src={imgSrc} alt="Profile Pic" /> */}
+              {imgSrc && <ImgStyled 
+              src={axios.defaults.baseURL + `/image/` + imgSrc}
+              alt="Profile Pic"
+              onLoad={() => setLoading(false)} />}
               <Box>
                 <ButtonStyled
                   component="label"
@@ -93,16 +108,18 @@ const TabAccount = ({ User,onSaved }: TabAccountProps) => {
                   Upload New Photo
                   <input
                     hidden
+                    name="avatar_img_b64"
                     type="file"
-                    onChange={onChange}
+                    onChange={onChange} // เพิ่ม onChange ให้กับ input file
                     accept="image/png, image/jpeg"
                     id="account-settings-upload-image"
                   />
                 </ButtonStyled>
+
                 <ResetButtonStyled
                   color="error"
                   variant="outlined"
-                  onClick={() => setImgSrc("/images/avatars/1.png")}
+                  onClick={() => setImgSrc("/images/avatars/1.png")} 
                 >
                   Reset
                 </ResetButtonStyled>
@@ -178,7 +195,13 @@ const TabAccount = ({ User,onSaved }: TabAccountProps) => {
               name="role"
               control={control}
               render={({ field }) => (
-                <TextField {...field} disabled fullWidth label="Role" placeholder="" />
+                <TextField
+                  {...field}
+                  disabled
+                  fullWidth
+                  label="Role"
+                  placeholder=""
+                />
               )}
             />
           </Grid>

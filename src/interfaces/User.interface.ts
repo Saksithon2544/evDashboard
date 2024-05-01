@@ -16,4 +16,5 @@ export type User = {
     totp_secret?: string
     top_counter?: number
     balance?: number
+    avatar_img_b64?: string
 }

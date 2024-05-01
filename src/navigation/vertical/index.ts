@@ -45,11 +45,6 @@ const navigation = (): VerticalNavItemsType => {
     {
       sectionTitle: 'Station Management'
     },
-    // {
-    //   title : 'Admin Stations',
-    //   icon: AccountChildOutline,
-    //   path: '/admin-stations'
-    // },
     {
       title: 'Station',
       icon: EvStationOutlined,
@@ -71,56 +66,14 @@ const navigation = (): VerticalNavItemsType => {
       icon: CreditCardOutline,
       path: '/top-up',
     },
-    // {
-    //   sectionTitle: 'Pages'
-    // },
-    // {
-    //   title: 'Login',
-    //   icon: Login,
-    //   path: '/',
-    //   openInNewTab: true
-    // },
-    // {
-    //   title: 'Register',
-    //   icon: AccountPlusOutline,
-    //   path: '/register',
-    //   openInNewTab: true
-    // },
-    // {
-    //   title: 'Error',
-    //   icon: AlertCircleOutline,
-    //   path: '/error',
-    //   openInNewTab: true
-    // },
-
-    // {
-    //   sectionTitle: 'User Interface'
-    // },
-    // {
-    //   title: 'Typography',
-    //   icon: FormatLetterCase,
-    //   path: '/typography'
-    // },
-    // {
-    //   title: 'Icons',
-    //   path: '/icons',
-    //   icon: GoogleCirclesExtended
-    // },
-    // {
-    //   title: 'Cards',
-    //   icon: CreditCardOutline,
-    //   path: '/cards'
-    // },
-    // {
-    //   title: 'Tables',
-    //   icon: Table,
-    //   path: '/tables'
-    // },
-    // {
-    //   icon: CubeOutline,
-    //   title: 'Form Layouts',
-    //   path: '/form-layouts'
-    // }
+    {
+      sectionTitle: 'System usage history'
+    },
+    {
+      title: 'System usage history',
+      icon: Table,
+      path: '/system-usage-history',
+    },
   ]
 }
 

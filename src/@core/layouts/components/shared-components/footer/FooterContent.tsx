@@ -12,14 +12,14 @@ const FooterContent = () => {
   return (
     <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
       <Typography sx={{ mr: 2 }}>
-        {`© ${new Date().getFullYear()}, Made with `}
+        {`Copyright © ${new Date().getFullYear()}, `}
         <Box component='span' sx={{ color: 'error.main' }}>
-          ❤️
+          {`King Mongkut's University of Technology North Bangkok`}
         </Box>
-        {` by `}
+        {/* {` by `}
         <Link target='_blank' href='https://github.com/Saksithon2544/'>
           Saksithon
-        </Link>
+        </Link> */}
       </Typography>
     </Box>
   )

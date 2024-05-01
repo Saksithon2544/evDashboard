@@ -52,8 +52,6 @@ const TabAccount = ({ User, onSaved }: TabAccountProps) => {
   const [imgSrc, setImgSrc] = React.useState<string | null>(null); // Initialize as null
   const [loading, setLoading] = React.useState(true); // Initialize as true
 
-
-  
   const onChange = (file: ChangeEvent) => {
     const reader = new FileReader();
     const { files } = file.target as HTMLInputElement;
@@ -62,11 +60,10 @@ const TabAccount = ({ User, onSaved }: TabAccountProps) => {
       reader.readAsDataURL(files[0]);
     }
   };
-  
+
   const onSubmit = (data: UserData) => {
     onSaved({ ...data, avatar_img_b64: imgSrc }); // เพิ่ม imgSrc เข้าไปในข้อมูลที่ส่งไปยัง API
   };
-  
 
   React.useEffect(() => {
     if (User) {
@@ -75,31 +72,23 @@ const TabAccount = ({ User, onSaved }: TabAccountProps) => {
   }, [User, reset]);
 
   React.useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await axios.get(`/image/`); // Add the type parameter <string> to axios.get
-        setImgSrc(res.data); 
-      } catch (error) {
-        console.error("Error fetching image:", error);
-      }
-    };
 
-    fetchData();
-  }, [imgSrc]);
-
+    setImgSrc(axios.defaults.baseURL + `/image/${User?.id}`);
+  }, []);
 
   return (
     <CardContent>
       <form onSubmit={handleSubmit(onSubmit)}>
-        {JSON.stringify(User.id)}
         <Grid container spacing={7}>
           <Grid item xs={12} sx={{ marginTop: 4.8, marginBottom: 3 }}>
             <Box sx={{ display: "flex", alignItems: "center" }}>
-              {/* <ImgStyled src={imgSrc} alt="Profile Pic" /> */}
-              {imgSrc && <ImgStyled 
-              src={axios.defaults.baseURL + `/image/${User?.id}`}
-              alt="Profile Pic"
-              onLoad={() => setLoading(false)} />}
+              {imgSrc && (
+                <ImgStyled
+                  src={imgSrc}
+                  alt="Profile Pic"
+                  onLoad={() => setLoading(false)}
+                />
+              )}
               <Box>
                 <ButtonStyled
                   component="label"
@@ -120,7 +109,7 @@ const TabAccount = ({ User, onSaved }: TabAccountProps) => {
                 <ResetButtonStyled
                   color="error"
                   variant="outlined"
-                  onClick={() => setImgSrc("/images/avatars/1.png")} 
+                  onClick={() => setImgSrc("/images/avatars/1.png")}
                 >
                   Reset
                 </ResetButtonStyled>

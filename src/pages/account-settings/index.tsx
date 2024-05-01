@@ -68,10 +68,7 @@ const AccountSettings = () => {
     refetch,
   } = useQuery<UserData>("users", async () => {
     const res = await axios.get("/user/me");
-    const res2 = await axios.get(`/image/`);
     const user = await res.data;
-    const image = await res2.data;
-    user.avatar_img_b64 = image.avatar_img_b64;
     return user;
   });
 

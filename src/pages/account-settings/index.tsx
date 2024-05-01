@@ -87,42 +87,27 @@ const AccountSettings = () => {
     
 
     try {
-      const confirmationResult = await Swal.fire({
+      Swal.fire({
         title: "Are you sure?",
-        text: "You are about to update your account",
+        text: "You are about to update your data",
         icon: "question",
         showCancelButton: true,
         confirmButtonText: "Yes",
         cancelButtonText: "No",
         cancelButtonColor: "red",
-      });
-
-      if (confirmationResult.isConfirmed) {
-        // Show loading modal
-        Swal.fire({
-          title: "Please wait...",
-          text: "Updating account",
-          allowOutsideClick: false,
-          showConfirmButton: false,
-          willOpen: () => {
-            Swal.showLoading();
-          },
-        });
-
-        // Make the account update request
-        await axios.post(`/image/`, { avatar_img_b64: base64Image });
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          await axios.post(`/image/`, { avatar_img_b64: base64Image });
           await axios.put(`/user/me`, data);
           refetch();
-        // Hide loading modal
-        Swal.close();
 
-        // Show success message
-        Swal.fire({
-          icon: "success",
-          title: "Success",
-          text: "Account updated successfully!",
-        });
-      }
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: "Data has been updated successfully!",
+          });
+        }
+      });
     } catch (error) {
       console.log(error);
       Swal.fire({

@@ -14,7 +14,9 @@ const FooterContent = () => {
       <Typography sx={{ mr: 2 }}>
         {`Copyright © ${new Date().getFullYear()}, `}
         <Box component='span' sx={{ color: 'error.main' }}>
+          <Link href='https://www.kmutnb.ac.th/' target='_blank'>
           {`King Mongkut's University of Technology North Bangkok`}
+          </Link>
         </Box>
         {/* {` by `}
         <Link target='_blank' href='https://github.com/Saksithon2544/'>

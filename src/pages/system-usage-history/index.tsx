@@ -7,59 +7,54 @@ import CardHeader from "@mui/material/CardHeader";
 import TableLog, {
   type CallBack,
 } from "src/views/tables/TableLog";
-import AddTransactionDialog from "@/views/dialogs/transaction-dialogs/AddTransactionDialog";
 
 import { useQuery } from "react-query";
-import { Transaction as TransactionData } from "@/interfaces/Transaction.interface";
+import { Log as LogData } from "@/interfaces/Log.interface";
 import { User as UserData } from "@/interfaces/User.interface";
 import { useState } from "react";
 import axios from "@/libs/Axios";
 import { Typography } from "@mui/material";
 
 const LogTable = () => {
-  const [selectedTransaction, setSelectedTransaction] =
-    useState<TransactionData>();
+  const [selectedLog, setSelectedLog] =
+    useState<LogData>();
   const [selectedUser, setSelectedUser] = useState<UserData>();
 
   const {
-    data: TransactionsData,
+    data: LogsData,
     isLoading,
     refetch,
-  } = useQuery<TransactionData[]>("transactions", async () => {
+  } = useQuery<LogData[]>("Logs", async () => {
     
-    const [transactionsRes] = await Promise.all([
+    const [LogsRes] = await Promise.all([
       axios.get("/log/")
     ]);
 
-    const transactionsData = await transactionsRes.data;
+    const LogsData = await LogsRes.data;
 
     // Check if data is not an array and return empty array
-    if (!Array.isArray(transactionsData)) {
+    if (!Array.isArray(LogsData)) {
       return [];
     }
 
-    // Sort transactions by created_at from newest to oldest
-    const sortedTransactions = transactionsData.sort(
+    // Sort Logs by created_at from newest to oldest
+    const sortedLogs = LogsData.sort(
       (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
 
-    // Select the latest 100 transactions
-    const latestTransactions = sortedTransactions.slice(0, 100);
+    // Select the latest 100 Logs
+    const latestLogs = sortedLogs.slice(0, 100);
 
-    return latestTransactions;
+    return latestLogs;
   });
 
   function handleCloseMoadal() {
-    setSelectedTransaction(undefined);
+    setSelectedLog(undefined);
   }
 
 
   return (
     <Grid container>
-      <Grid item xs={12}>
-        {/* {JSON.stringify(selectedTransaction)} */}
-        <AddTransactionDialog callback={refetch} />
-      </Grid>
       <Grid item xs={12}>
         <Card>
           <CardHeader
@@ -67,13 +62,13 @@ const LogTable = () => {
             titleTypographyProps={{ variant: "h6" }}
           />
           {/* <TableLog /> */}
-          {!isLoading && TransactionsData && TransactionsData.length > 0 ? (
+          {!isLoading && LogsData && LogsData.length > 0 ? (
             <TableLog
-              Topups={TransactionsData}
+              Log={LogsData}
               // callback={handleTable}
               refetch={() => refetch()}
             />
-          ) : TransactionsData && TransactionsData.length === 0 ? (
+          ) : LogsData && LogsData.length === 0 ? (
             <Typography variant="h6" align="center">
               No Data
             </Typography>

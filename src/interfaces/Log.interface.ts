@@ -4,5 +4,6 @@ export type Log = {
     user_id: string
     id: string
     station_id: string
+    type_log: string
     created_at: string
 }

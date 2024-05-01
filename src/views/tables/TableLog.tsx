@@ -31,9 +31,6 @@ import { DatePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 
-import Button from "@mui/material/Button";
-import ReceiptDialog from "@/views/dialogs/receipt-dialogs/ReceiptDialog";
-
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -149,20 +146,20 @@ export type CallBack = {
 };
 
 type Props = {
-  Topups: LogData[];
+  Log: LogData[];
   isLoading?: boolean;
   refetch?: (data: boolean) => void;
   callback?: (data: CallBack) => void;
 };
 
-function TableTopup({ Topups = [], isLoading, refetch, callback }: Props) {
+function TableTopup({ Log = [], isLoading, refetch, callback }: Props) {
   const router = useRouter();
   const [order, setOrder] = React.useState<"asc" | "desc">("asc");
   const [orderBy, setOrderBy] = React.useState<string>("name");
   const [page, setPage] = React.useState<number>(0);
   const [dense, setDense] = React.useState<boolean>(false);
   const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
-  const [TopupType, setTopupType] = React.useState<"all" | true | false>("all");
+  const [LogType, setLogType] = React.useState<"all" | string >("all");
   const [searchValue, setSearchValue] = React.useState<string>("");
   const [startDate, setStartDate] = React.useState<Date | null>(null);
   const [endDate, setEndDate] = React.useState<Date | null>(null);
@@ -186,9 +183,9 @@ function TableTopup({ Topups = [], isLoading, refetch, callback }: Props) {
     setDense(event.target.checked);
   };
 
-  const handleTopupType = (event) => {
+  const handleLogType = (event) => {
     const value = event.target.value;
-    setTopupType(value === "true" ? true : value === "false" ? false : "all");
+    setLogType(value);
   };
 
   const handleSearch = (event) => {
@@ -217,28 +214,21 @@ function TableTopup({ Topups = [], isLoading, refetch, callback }: Props) {
 
   const emptyRows =
     page > 0
-      ? Math.max(0, (1 + page) * rowsPerPage - (Topups ? Topups.length : 0))
+      ? Math.max(0, (1 + page) * rowsPerPage - (Log ? Log.length : 0))
       : 0;
 
-  const filteredRows = Topups
-    ? Topups.filter((row) => {
+  const filteredRows = Log
+    ? Log.filter((row) => {
         if (searchValue === "") {
           return true;
         }
         return (
-          row.firstName.toLowerCase().includes(searchValue.toLowerCase()) ||
-          row.lastName.toLowerCase().includes(searchValue.toLowerCase()) ||
-          row.email.toLowerCase().includes(searchValue.toLowerCase()) ||
-          row.amount
-            .toString()
-            .toLowerCase()
-            .includes(searchValue.toLowerCase())
+          row.message.toLowerCase().includes(searchValue.toLowerCase())
         );
       })
         .filter((row) => {
-          if (TopupType === "all") return true;
-          if (TopupType === row.status_approved) return true;
-          return false;
+          if (LogType === "all") return true;
+          if (LogType === row.type_log) return true;
         })
         .filter((row) => {
           if (!startDate && !endDate) return true;
@@ -313,9 +303,9 @@ function TableTopup({ Topups = [], isLoading, refetch, callback }: Props) {
             <Select
               labelId="status-filter-label"
               id="status-filter"
-              value={TopupType}
+              value={LogType}
               label="Topup Type"
-              onChange={handleTopupType}
+              onChange={handleLogType}
             >
               <MenuItem value="all">All</MenuItem>
               <MenuItem value="true">Success</MenuItem>

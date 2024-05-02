@@ -74,7 +74,7 @@ const VerifyPage = () => {
   // ** Hook
   const theme = useTheme();
 
-  const handVerify = () => {
+  const handVerify = async () => {
     console.log("Verify");
     try {
       const response = axios.post("/verify-otp/", {
@@ -82,11 +82,20 @@ const VerifyPage = () => {
         email: email,
       });
 
-      Swal.fire({
-        icon: "success",
-        title: "Success",
-        text: "Email verified successfully",
-      });
+      if ((await response).status === 200) {
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "Email verified successfully",
+        });
+        router.push("/");
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: `${(await response).data.detail}`,
+        });
+      }
 
     } catch (error) {
       console.error("Error signing up:", error);
@@ -97,7 +106,6 @@ const VerifyPage = () => {
       });
     }
 
-    // router.push("/");
   };
 
   return (
@@ -210,7 +218,7 @@ const VerifyPage = () => {
                 color: theme.palette.text.secondary,
               }}
             >
-              We have sent an OTP to your email "{email}". Please enter the OTP
+              We have sent an OTP to your email "<span style={{ color: 'red' }}>{email}</span>". Please enter the OTP
               to verify your email.
             </Typography>
 

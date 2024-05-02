@@ -26,6 +26,7 @@ import {
   MenuItem,
   Select,
   TextField,
+  Tooltip,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -61,22 +62,16 @@ function stableSort(array, comparator) {
 
 const headCells = [
   {
-    id: "name",
+    id: "message",
     numeric: false,
     disablePadding: true,
-    label: "Name",
+    label: "Log Message",
   },
   {
-    id: "email",
+    id: "type_log",
     numeric: false,
     disablePadding: false,
-    label: "Email",
-  },
-  {
-    id: "amount",
-    numeric: false,
-    disablePadding: false,
-    label: "Amount",
+    label: "Type Log",
   },
   {
     id: "created",
@@ -84,18 +79,6 @@ const headCells = [
     disablePadding: false,
     label: "Created",
   },
-  {
-    id: "Status",
-    numeric: false,
-    disablePadding: false,
-    label: "Status",
-  },
-  {
-    id:"Receipt Image",
-    numeric: false,
-    disablePadding: false,
-    label: "Receipt Image",
-  }
 ];
 
 function EnhancedTableHead(props) {
@@ -159,7 +142,7 @@ function TableLog({ Log = [], isLoading, refetch, callback }: Props) {
   const [page, setPage] = React.useState<number>(0);
   const [dense, setDense] = React.useState<boolean>(false);
   const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
-  const [LogType, setLogType] = React.useState<"all" | string >("all");
+  const [LogType, setLogType] = React.useState<"all" | string>("all");
   const [searchValue, setSearchValue] = React.useState<string>("");
   const [startDate, setStartDate] = React.useState<Date | null>(null);
   const [endDate, setEndDate] = React.useState<Date | null>(null);
@@ -222,9 +205,7 @@ function TableLog({ Log = [], isLoading, refetch, callback }: Props) {
         if (searchValue === "") {
           return true;
         }
-        return (
-          row.message.toLowerCase().includes(searchValue.toLowerCase())
-        );
+        return row.message.toLowerCase().includes(searchValue.toLowerCase());
       })
         .filter((row) => {
           if (LogType === "all") return true;
@@ -310,9 +291,8 @@ function TableLog({ Log = [], isLoading, refetch, callback }: Props) {
               <MenuItem value="all">All</MenuItem>
               <MenuItem value="user">User Info</MenuItem>
               <MenuItem value="station">Station Info</MenuItem>
-              
-
-
+              <MenuItem value="charging_booth">Charging Booth Info</MenuItem>
+              <MenuItem value="topup">Topup Info</MenuItem>
             </Select>
           </FormControl>
         </Box>
@@ -356,11 +336,24 @@ function TableLog({ Log = [], isLoading, refetch, callback }: Props) {
                   return (
                     <TableRow key={row.id}>
                       <TableCell>
-                        {row.message}
+                        <Tooltip title={row.message}>
+                          <span>{row.message.length > 50 ? `${row.message.substring(0, 50)}...` : row.message}</span>
+                        </Tooltip>
                       </TableCell>
-                    
+                      <TableCell>
+                        {row.type_log === "user" ? (
+                          <Chip label="User Info" color="primary" />
+                        ) : row.type_log === "station" ? (
+                          <Chip label="Station Info" color="warning" />
+                        ) : row.type_log === "charging_booth" ? (
+                          <Chip label="Charging Booth Info" color="info" />
+                        ) : row.type_log === "topup" ? (
+                          <Chip label="Topup Info" color="success" />
+                        ) : (
+                          <Chip label="Unknown" color="error" />
+                        )}
+                      </TableCell>
                       <TableCell>{dateFormate(row.created_at)}</TableCell>
-                      
                     </TableRow>
                   );
                 })}

@@ -9,12 +9,13 @@ export type User = {
     email: string,
     phoneNumber: string,
     role: string,
-    is_deleted?: boolean
-    is_active?: boolean
+    is_deleted?: boolean,
+    is_active?: boolean,
+    is_verify?: boolean,
     created_at: string,
     updated: string,
-    totp_secret?: string
-    top_counter?: number
-    balance?: number
+    totp_secret?: string,
+    top_counter?: number,
+    balance?: number,
     avatar_img_b64?: string
 }

@@ -43,7 +43,7 @@ const LogTable = () => {
     );
 
     // Select the latest 100 Logs
-    const latestLogs = sortedLogs.slice(0, 100);
+    const latestLogs = sortedLogs.slice(0, 1000);
 
     return latestLogs;
   });
@@ -58,7 +58,7 @@ const LogTable = () => {
       <Grid item xs={12}>
         <Card>
           <CardHeader
-            title="Top-up"
+            title={`System Usage History ${LogsData && LogsData.length > 0 ? `(${LogsData.length} tems in total)` : ""} `}
             titleTypographyProps={{ variant: "h6" }}
           />
           {/* <TableLog /> */}

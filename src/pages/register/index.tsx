@@ -3,6 +3,9 @@ import { useState, Fragment, ChangeEvent, MouseEvent, ReactNode } from "react";
 
 // ** Next Imports
 import Link from "next/link";
+import Image from "next/image";
+import { Router, useRouter } from "next/router";
+import axios from "@/libs/Axios";
 
 // ** MUI Components
 import Box from "@mui/material/Box";
@@ -36,6 +39,7 @@ import BlankLayout from "src/@core/layouts/BlankLayout";
 // ** Demo Imports
 import FooterIllustrationsV1 from "src/views/pages/auth/FooterIllustration";
 import { Grid } from "@mui/material";
+import Swal from "sweetalert2";
 
 interface State {
   password: string;
@@ -64,24 +68,70 @@ const FormControlLabel = styled(MuiFormControlLabel)<FormControlLabelProps>(
   })
 );
 
-const RegisterPage = () => {
-  // ** States
-  interface State {
-    password: string;
-    confirmPassword: string;
-    showPassword: boolean;
-    showconfirmPassword: boolean;
-  }
+// ** States
+interface State {
+  email: string;
+  password: string;
+  confirmPassword: string;
+  showPassword: boolean;
+  showconfirmPassword: boolean;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+}
 
+const RegisterPage = () => {
+  
   const [values, setValues] = useState<State>({
+    email: "",
     password: "",
     confirmPassword: "",
     showPassword: false,
     showconfirmPassword: false,
+    firstName: "",
+    lastName: "",
+    phoneNumber: "",
   });
 
   // ** Hook
   const theme = useTheme();
+  const router = useRouter();
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setValues({
+      ...values,
+      [e.target.id]: e.target.value,
+    });
+  }
+
+  const handleSignUp = async (e: MouseEvent) => {
+    e.preventDefault();
+
+    try {
+      const registerResponse = await axios.post("/register", { ...values });
+      const sentOtpResponse = await axios.post("/send-otp/", { email: values.email });
+
+      router.push({
+        pathname: "/verify-email",
+        query: { email: values.email },
+      });
+
+      Swal.fire({
+        icon: "success",
+        title: "Sign Up Success",
+        text: "Please check your email for verification code.",
+        showConfirmButton: false,
+        timer: 3000,
+      });
+    } catch (error) {
+      console.error("Error signing up:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: `${error.response.data.detail}`,
+      });
+    }
+  };
 
   return (
     <Box className="content-center">
@@ -89,6 +139,34 @@ const RegisterPage = () => {
         <CardContent
           sx={{ padding: (theme) => `${theme.spacing(12, 9, 7)} !important` }}
         >
+          <Box
+            sx={{
+              mb: 8,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Image
+              src="/images/logos/kmutnb.png"
+              alt="Logo"
+              width={200}
+              height={196}
+              priority
+            />
+
+            <Typography
+              variant="h6"
+              sx={{
+                ml: 3,
+                lineHeight: 1,
+                fontWeight: 600,
+                textTransform: "uppercase",
+                fontSize: "1.5rem !important",
+              }}
+            ></Typography>
+          </Box>
+
           <Box
             sx={{
               mb: 8,
@@ -149,6 +227,8 @@ const RegisterPage = () => {
                   label="First Name"
                   fullWidth
                   sx={{ marginBottom: 4 }}
+                  value={values.firstName}
+                  onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={6}>
@@ -157,6 +237,8 @@ const RegisterPage = () => {
                   label="Last Name"
                   fullWidth
                   sx={{ marginBottom: 4 }}
+                  value={values.lastName}
+                  onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -166,6 +248,8 @@ const RegisterPage = () => {
                   label="Email"
                   fullWidth
                   sx={{ marginBottom: 4 }}
+                  value={values.email}
+                  onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -174,6 +258,8 @@ const RegisterPage = () => {
                   label="Phone Number"
                   fullWidth
                   sx={{ marginBottom: 4 }}
+                  value={values.phoneNumber}
+                  onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -204,6 +290,8 @@ const RegisterPage = () => {
                     ),
                   }}
                   sx={{ marginBottom: 4 }}
+                  value={values.password}
+                  onChange={handleChange}      
                 />
 
                 <TextField
@@ -233,6 +321,8 @@ const RegisterPage = () => {
                     ),
                   }}
                   sx={{ marginBottom: 4 }}
+                  value={values.confirmPassword}
+                  onChange={handleChange}
                 />
               </Grid>
             </Grid>
@@ -243,13 +333,7 @@ const RegisterPage = () => {
                 <Fragment>
                   <span>I agree to </span>
                   <Link href="/" passHref>
-                    <LinkStyled
-                      onClick={(e: MouseEvent<HTMLElement>) =>
-                        e.preventDefault()
-                      }
-                    >
-                      privacy policy & terms
-                    </LinkStyled>
+                    <LinkStyled>privacy policy & terms</LinkStyled>
                   </Link>
                 </Fragment>
               }
@@ -260,6 +344,7 @@ const RegisterPage = () => {
               type="submit"
               variant="contained"
               sx={{ marginBottom: 7 }}
+              onClick={handleSignUp}
             >
               Sign up
             </Button>

@@ -10,11 +10,19 @@ import EditUserDialog from "@/views/dialogs/user-dialogs/EditUserDialog";
 
 import { useQuery } from "react-query";
 import { User as UserData } from "@/interfaces/User.interface";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "@/libs/Axios";
 import { Typography } from "@mui/material";
+import router from "next/router";
 
 const UsersAllTable = () => {
+  useEffect(() => {
+    const accessToken = localStorage.getItem('access_token');
+    if (!accessToken) {
+      router.push('/');
+    }
+  }, []);
+  
   const [selectedUser, setSelectedUser] = useState<UserData>();
 
   const {

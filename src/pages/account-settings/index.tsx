@@ -1,5 +1,5 @@
 // ** React Imports
-import { SyntheticEvent, useState } from "react";
+import { SyntheticEvent, useEffect, useState } from "react";
 
 // @ts-ignore
 import ReactFileReader from "react-file-reader";
@@ -34,6 +34,7 @@ import axios from "@/libs/Axios";
 // Axios get user
 import { useQuery } from "react-query";
 import { User as UserData } from "@/interfaces/User.interface";
+import router from "next/router";
 
 const Tab = styled(MuiTab)<TabProps>(({ theme }) => ({
   [theme.breakpoints.down("md")]: {
@@ -54,6 +55,14 @@ const TabName = styled("span")(({ theme }) => ({
 }));
 
 const AccountSettings = () => {
+
+  useEffect(() => {
+    const accessToken = localStorage.getItem('access_token');
+    if (!accessToken) {
+      router.push('/');
+    }
+  }, []);
+  
   // ** State
   const [value, setValue] = useState<string>("account");
 

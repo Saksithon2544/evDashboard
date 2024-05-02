@@ -246,6 +246,7 @@ const LoginPage = () => {
               alt="Logo"
               width={200}
               height={196}
+              priority
             />
 
             <Typography

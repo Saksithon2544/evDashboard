@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useQuery } from "react-query";
 import axios from "@/libs/Axios";
@@ -22,6 +22,13 @@ import {
 import { Typography } from "@mui/material";
 
 export default function ViewStation() {
+  useEffect(() => {
+    const accessToken = localStorage.getItem('access_token');
+    if (!accessToken) {
+      router.push('/');
+    }
+  }, []);
+  
   const router = useRouter();
   const { id } = router.query;
 

@@ -9,7 +9,6 @@ import Table from "@/views/dashboard/superadmin/Table";
 import Trophy from "@/views/dashboard/superadmin/Trophy";
 import TotalEarning from "@/views/dashboard/superadmin/TotalEarning";
 import StatisticsCard from "@/views/dashboard/superadmin/StatisticsCard";
-import WeeklyOverview from '@/views/dashboard/superadmin/WeeklyOverview'
 import ChargerStatus from "@/views/dashboard/superadmin/ChargerStatus";
 import SalesByCountries from "@/views/dashboard/superadmin/SalesByChargingBooth";
 
@@ -18,15 +17,23 @@ import StationadminTable from "@/views/dashboard/stationadmin/stationadminTable"
 import StationadminTrophy from "@/views/dashboard/stationadmin/stationadminTrophy";
 import StationadminTotalEarning from "@/views/dashboard/stationadmin/stationadminTotalEarning";
 import StationadminStatisticsCard from "@/views/dashboard/stationadmin/stationadminStatisticsCard";
-import StationadminWeeklyOverview from '@/views/dashboard/stationadmin/stationadminWeeklyOverview'
 import StationadminChargerStatus from "@/views/dashboard/stationadmin/stationadminChargerStatus";
 import StationadminSalesByCountries from "@/views/dashboard/stationadmin/stationadminSalesByChargingBooth";
 
+import { useEffect } from 'react';
 
 import { useQuery } from "react-query";
 import axios from "@/libs/Axios";
+import router from "next/router";
 
 const Dashboard = () => {
+  useEffect(() => {
+    const accessToken = localStorage.getItem('access_token');
+    if (!accessToken) {
+      router.push('/');
+    }
+  }, []);
+
   const { data: userRole } = useQuery("userRole", async () => {
     const res = await axios.get("/user/me");
     const data = res.data;

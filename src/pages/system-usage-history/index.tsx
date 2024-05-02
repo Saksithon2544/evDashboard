@@ -11,11 +11,19 @@ import TableLog, {
 import { useQuery } from "react-query";
 import { Log as LogData } from "@/interfaces/Log.interface";
 import { User as UserData } from "@/interfaces/User.interface";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "@/libs/Axios";
 import { Typography } from "@mui/material";
+import router from "next/router";
 
 const LogTable = () => {
+  useEffect(() => {
+    const accessToken = localStorage.getItem('access_token');
+    if (!accessToken) {
+      router.push('/');
+    }
+  }, []);
+  
   const [selectedLog, setSelectedLog] =
     useState<LogData>();
   const [selectedUser, setSelectedUser] = useState<UserData>();

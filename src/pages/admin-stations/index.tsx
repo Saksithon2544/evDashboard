@@ -10,11 +10,19 @@ import EditStationDialog from "@/views/dialogs/station-dialogs/EditStationDialog
 
 import { useQuery } from "react-query";
 import { Station as StationData } from "@/interfaces/Station.interface";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "@/libs/Axios";
+import router from "next/router";
 
 const StationsAllTable = () => {
   const [selectedStation, setSelectedStation] = useState<StationData>();
+
+  useEffect(() => {
+    const accessToken = localStorage.getItem('access_token');
+    if (!accessToken) {
+      router.push('/');
+    }
+  }, []);
 
   const {
     data: Stations,

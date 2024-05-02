@@ -9,6 +9,7 @@ import EditStationDialog from "@/views/dialogs/station-dialogs/EditStationDialog
 import { useQuery } from "react-query";
 import axios from "@/libs/Axios";
 import { Typography } from "@mui/material";
+import router from "next/router";
 
 interface StationProps {
   latestStations: StationData[];
@@ -16,6 +17,13 @@ interface StationProps {
 }
 
 const StationsAllTable = () => {
+  React.useEffect(() => {
+    const accessToken = localStorage.getItem('access_token');
+    if (!accessToken) {
+      router.push('/');
+    }
+  }, []);
+
   const [selectedStation, setSelectedStation] = useState<StationData>();
 
   const { data: Stations, isLoading, refetch } = useQuery("stations", async () => {

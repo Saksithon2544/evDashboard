@@ -88,7 +88,6 @@ const VerifyPage = () => {
         text: "Email verified successfully",
       });
 
-      router.push("/");
     } catch (error) {
       console.error("Error signing up:", error);
       Swal.fire({
@@ -97,6 +96,8 @@ const VerifyPage = () => {
         text: `${error.response.data.detail}`,
       });
     }
+
+    // router.push("/");
   };
 
   return (

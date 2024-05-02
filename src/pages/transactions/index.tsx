@@ -12,11 +12,19 @@ import AddTransactionDialog from "@/views/dialogs/transaction-dialogs/AddTransac
 import { useQuery } from "react-query";
 import { Transaction as TransactionData } from "@/interfaces/Transaction.interface";
 import { User as UserData } from "@/interfaces/User.interface";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "@/libs/Axios";
 import { Typography } from "@mui/material";
+import router from "next/router";
 
 const TransactionsAllTable = () => {
+  useEffect(() => {
+    const accessToken = localStorage.getItem('access_token');
+    if (!accessToken) {
+      router.push('/');
+    }
+  }, []);
+  
   const [selectedTransaction, setSelectedTransaction] =
     useState<TransactionData>();
   const [selectedUser, setSelectedUser] = useState<UserData>();

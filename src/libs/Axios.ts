@@ -1,9 +1,9 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 
 // Define API URL
-// const API_URL = "https://ecocharge-backend-production-0bb7.up.railway.app";
+const API_URL = "https://ecocharge-backend-production-0bb7.up.railway.app";
 // const API_URL = "https://ecocharge.azurewebsites.net";
-const API_URL = "http://localhost:8000";
+// const API_URL = "http://localhost:8000";
 
 const Axios = axios.create({
   baseURL: API_URL,

@@ -70,7 +70,7 @@ const TopupTable = () => {
       <Grid item xs={12}>
         <Card>
           <CardHeader
-            title="Top-up"
+            title={`Top-up ${TransactionsData?.length} Transactions`} 
             titleTypographyProps={{ variant: "h6" }}
           />
           {/* <TableTopup /> */}

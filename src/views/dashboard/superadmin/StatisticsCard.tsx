@@ -37,6 +37,7 @@ import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import { dateFormate } from "@/libs/date";
 import { PieChart, Pie, Cell } from 'recharts';
+import router from "next/router";
 
 
 interface DataType {
@@ -53,7 +54,9 @@ const StatisticsCard = () => {
   const itemsPerPage = 5; // จำนวนรายการต่อหน้า
 
   const handleOpenDialogUser = () => {
-    setOpenDialogUserg(true);
+    // setOpenDialogUserg(true);
+    router.push('/users');
+
   };
 
   const handleCloseDialog = () => {
@@ -61,7 +64,8 @@ const StatisticsCard = () => {
   };
 
   const handleOpenDialogStation = () => {
-    setOpenDialogStation(true);
+    // setOpenDialogStation(true);
+    router.push('/stations');
   };
 
   const handleCloseDialogStation = () => {
@@ -98,13 +102,13 @@ const StatisticsCard = () => {
         (acc, curr) => acc + curr.charging_rate,
         0
       );
-      const totalCustomers = (await axios.get("/super_admin/users?limit=1000")).data
+      const totalMembers = (await axios.get("/super_admin/users?limit=1000")).data
         .length;
       const totalStations = (await axios.get("/station/?limit=1000")).data.length;
       return {
         totalSales,
         totalEnergy,
-        totalCustomers,
+        totalMembers,
         totalStations,
         resUsers,
         resStations,
@@ -122,18 +126,18 @@ const StatisticsCard = () => {
 
   const renderStats = () => {
     if (salesData) {
-      const { totalSales, totalEnergy, totalCustomers, totalStations } =
+      const { totalSales, totalEnergy, totalMembers, totalStations } =
         salesData;
       const stats: DataType[] = [
         {
           stats: `${totalEnergy} kWh`,
           title: "Energy usage",
           color: "primary",
-          icon: <TrendingUp sx={{ fontSize: "1.75rem" }} />,
+          icon: <TrendingUp sx={{ fontSize: "1.75rem" }} onClick={handleOpenDialogStation} />,
         },
         {
-          stats: `👤 ${totalCustomers}`,
-          title: "Customers",
+          stats: `👤 ${totalMembers}`,
+          title: "Members",
           color: "success",
           icon: (
             <AccountOutline
@@ -157,7 +161,7 @@ const StatisticsCard = () => {
           stats: `฿ ${totalSales}`,
           color: "info",
           title: "Revenue",
-          icon: <CurrencyUsd sx={{ fontSize: "1.75rem" }} />,
+          icon: <CurrencyUsd sx={{ fontSize: "1.75rem" }} onClick={handleOpenDialogStation} />,
         },
       ];
 
@@ -252,7 +256,7 @@ const StatisticsCard = () => {
         </Grid>
       </CardContent>
       {/* Dialog เพื่อแสดงข้อมูลผู้ใช้งาน */}
-      <Dialog
+      {/* <Dialog
         open={OpenDialogUser}
         onClose={handleCloseDialog}
         maxWidth="md"
@@ -363,10 +367,10 @@ const StatisticsCard = () => {
             Close
           </Button>
         </DialogActions>
-      </Dialog>
+      </Dialog> */}
 
       {/* Dialog เพื่อแสดงข้อมูลสถานีชาร์จ */}
-      <Dialog
+      {/* <Dialog
         open={OpenDialogStation}
         onClose={handleCloseDialogStation}
         maxWidth="md"
@@ -440,7 +444,7 @@ const StatisticsCard = () => {
             Close
           </Button>
         </DialogActions>
-      </Dialog>
+      </Dialog> */}
     </Card>
   );
 };

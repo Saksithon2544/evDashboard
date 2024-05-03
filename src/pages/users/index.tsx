@@ -33,7 +33,7 @@ const UsersAllTable = () => {
     const res = await axios.get("/super_admin/users?limit=1000");
     const data = await res.data;
     const sortedUsers = data.sort((a: UserData, b: UserData) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-    const latestUsers = sortedUsers.slice(0, 100); // เลือกข้อมูลเพียง 100 คนล่าสุด 
+    const latestUsers = sortedUsers.slice(0, 1000); // เลือกข้อมูลเพียง 100 คนล่าสุด 
 
     return latestUsers;
   });
@@ -68,7 +68,7 @@ const UsersAllTable = () => {
       </Grid>
       <Grid item xs={12}>
         <Card>
-          <CardHeader title="Member" titleTypographyProps={{ variant: "h6" }} />
+          <CardHeader title={`Member Total ${Users?.length} Person`} titleTypographyProps={{ variant: "h6" }} />
           {isLoading && (
             <Typography variant="h6" align="center">
               Loading...

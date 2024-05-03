@@ -81,7 +81,7 @@ const TransactionsAllTable = () => {
       <Grid item xs={12}>
         <Card>
           <CardHeader
-            title="Transaction"
+            title={`Transaction Total ${TransactionsData?.length} list`}
             titleTypographyProps={{ variant: "h6" }}
           />
           {/* <TableTransactions /> */}

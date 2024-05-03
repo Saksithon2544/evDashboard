@@ -73,7 +73,7 @@ const StationsAllTable = () => {
       <Grid item xs={12}>
         <Card>
           <CardHeader
-            title="Station"
+            title={`Station Total ${Stations?.data.length} Station`}
             titleTypographyProps={{ variant: "h6" }}
           />
           {!isLoading && Stations && Stations.data.length > 0 ? (

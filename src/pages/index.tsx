@@ -153,11 +153,15 @@ const LoginPage = () => {
         });
 
         console.log(userResponse.data.role);
+        console.log(userResponse.data.is_verify);
 
         // Find user with 'admin' or 'superadmin' role from the response
         const adminUser =
           userResponse.data.role === "stationadmin" ||
           userResponse.data.role === "superadmin";
+        
+      
+
 
         // Check if adminUser is found
         if (!adminUser) {
@@ -167,7 +171,7 @@ const LoginPage = () => {
             text: "You do not have permission to access this page.",
           });
           return; // Exit function if role is not appropriate
-        }
+        } 
 
         // Store the token in local storage
         localStorage.setItem("access_token", access_token);
@@ -188,9 +192,15 @@ const LoginPage = () => {
       Swal.fire({
         icon: "error",
         title: "Login Error",
-        // text: `${error.response.data.detail}`,
-        text: "Username or password is incorrect.",
+        text: `${error.response.data.detail}`,
       });
+
+      if (error.response.data.detail === "User not verified") {
+        axios.post("/send-otp/", {
+          email: values.username,
+        });
+        router.push("/verify-email?email=" + values.username);
+      }
     }
   };
 

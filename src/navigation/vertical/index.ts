@@ -2,79 +2,126 @@
 import Login from 'mdi-material-ui/Login'
 import HomeOutline from 'mdi-material-ui/HomeOutline'
 import AccountCogOutline from 'mdi-material-ui/AccountCogOutline'
-import AccountPlusOutline from 'mdi-material-ui/AccountPlusOutline'
-import AlertCircleOutline from 'mdi-material-ui/AlertCircleOutline'
 import AccountGroupOutline from 'mdi-material-ui/AccountGroupOutline'
-import AccountChildOutline from 'mdi-material-ui/AccountChildOutline'
 import { EvStationOutlined } from '@mui/icons-material'
 import { HistoryEduOutlined } from '@mui/icons-material'
-
-import FormatLetterCase from 'mdi-material-ui/FormatLetterCase'
-import GoogleCirclesExtended from 'mdi-material-ui/GoogleCirclesExtended'
 import CreditCardOutline from 'mdi-material-ui/CreditCardOutline'
 import Table from 'mdi-material-ui/Table'
-import CubeOutline from 'mdi-material-ui/CubeOutline'
-
 
 // ** Type import
 import { VerticalNavItemsType } from 'src/@core/layouts/types'
-import { Logout } from 'mdi-material-ui'
-
-import Swal from 'sweetalert2'
+import { useQuery } from 'react-query'
+import axios from '@/libs/Axios'
 
 const navigation = (): VerticalNavItemsType => {
-  return [
+  const { data: userRole } = useQuery("userRole", async () => {
+    const res = await axios.get("/user/me");
+    const data = res.data;
+    return data.role;
+  });
+
+  const menuItems = [
     {
       title: 'Dashboard',
       icon: HomeOutline,
-      path: '/dashboard'
+      path: '/dashboard',
+      visible: userRole === "superadmin"
     },
     {
       title: 'Account Settings',
       icon: AccountCogOutline,
-      path: '/account-settings'
+      path: '/account-settings',
+      visible: userRole === "superadmin"
     },
     {
-      sectionTitle: 'User Management'
+      sectionTitle: 'User Management',
+      visible: userRole === "superadmin"
     },
     {
       title: 'User',
       icon: AccountGroupOutline,
       path: '/users',
+      visible: userRole === "superadmin"
     },
     {
-      sectionTitle: 'Station Management'
+      sectionTitle: 'Station Management',
+      visible: userRole === "superadmin"
     },
     {
       title: 'Station',
       icon: EvStationOutlined,
       path: '/stations',
+      visible: userRole === "superadmin"
     },
     {
-      sectionTitle: 'Transactions Management'
+      sectionTitle: 'Transactions Management',
+      visible: userRole === "superadmin"
     },
     {
       title: 'Transactions',
       icon: HistoryEduOutlined,
       path: '/transactions',
+      visible: userRole === "superadmin"
     },
     {
-      sectionTitle: 'Top-up Management'
+      sectionTitle: 'Top-up Management',
+      visible: userRole === "superadmin"
     },
     {
       title: 'Top-up',
       icon: CreditCardOutline,
       path: '/top-up',
+      visible: userRole === "superadmin"
     },
     {
-      sectionTitle: 'System usage history'
+      sectionTitle: 'System usage history',
+      visible: userRole === "superadmin"
     },
     {
       title: 'System usage history',
       icon: Table,
       path: '/system-usage-history',
+      visible: userRole === "superadmin"
     },
-  ]
+
+    //////////////////////////////////////////////////
+
+    {
+      title: 'Dashboard',
+      icon: HomeOutline,
+      path: '/dashboard',
+      visible: userRole === "stationadmin"
+    },
+    {
+      title: 'Account Settings',
+      icon: AccountCogOutline,
+      path: '/account-settings',
+      visible: userRole === "stationadmin"
+    },
+    {
+      sectionTitle: 'User Management',
+      visible: userRole === "stationadmin"
+    },
+    {
+      title: 'Station',
+      icon: EvStationOutlined,
+      path: '/stations',
+      visible: userRole === "stationadmin"
+    },
+    {
+      sectionTitle: 'System usage history',
+      visible: userRole === "stationadmin"
+    },
+    {
+      title: 'System usage history',
+      icon: Table,
+      path: '/system-usage-history',
+      visible: userRole === "stationadmin"
+    },
+  ];
+  
+
+  return menuItems.filter(item => item.visible !== false);
 }
 
-export default navigation
+export default navigation;

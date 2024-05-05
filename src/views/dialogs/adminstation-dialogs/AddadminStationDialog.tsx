@@ -32,7 +32,7 @@ type Props = {
 type FormData = {
   user_id: string;
   station_id: string;
-}
+};
 
 export default function StationDialog({ callback, stationId }: Props) {
   const { control, reset, handleSubmit, watch, setValue } = useForm();
@@ -41,17 +41,15 @@ export default function StationDialog({ callback, stationId }: Props) {
 
   const [open, setOpen] = React.useState(false);
 
-  const {data:users} = useQuery<User[]>("users", async () => {
+  const { data: users } = useQuery<User[]>("users", async () => {
     const res = await axios.get("/super_admin/users?limit=1000");
     return res.data;
-  }
-  );
+  });
 
-  const {data:stations} = useQuery<Station[]>("stations", async () => {
+  const { data: stations } = useQuery<Station[]>("stations", async () => {
     const res = await axios.get("/station/?limit=1000");
     return res.data;
-  }
-  );
+  });
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -78,7 +76,6 @@ export default function StationDialog({ callback, stationId }: Props) {
           Swal.showLoading();
         },
       });
-
 
       await axios.post(`/station_admin/${stationId}/admins/${data.user_id}`);
 
@@ -127,9 +124,15 @@ export default function StationDialog({ callback, stationId }: Props) {
                   variant="outlined"
                   {...field}
                 >
-                  {users?.map((user) => (
-                    <MenuItem value={user.id}>{user.email} [{user.firstName} {user.lastName}]</MenuItem>
-                  ))}
+                  {users?.map(
+                    (user) =>
+                      (user?.role === "adminstation" || user?.role === "stationadmin" ||
+                        user?.role === "superadmin") && (
+                        <MenuItem key={user.id} value={user.id}>
+                          {`${user.email} [${user.firstName} ${user.lastName}]`}
+                        </MenuItem>
+                      )
+                  )}
                 </Select>
               </FormControl>
             )}
@@ -155,7 +158,6 @@ export default function StationDialog({ callback, stationId }: Props) {
               </FormControl>
             )}
           /> */}
-          
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>

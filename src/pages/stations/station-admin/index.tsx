@@ -3,7 +3,7 @@ import { useState } from "react";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
-import TableStation, { CallBack, StationData,ChargingData  } from "src/views/tables/TableStation";
+import TableStation, { CallBack, StationData,ChargingData, AdminData  } from "src/views/tables/TableStation";
 import AddStationDialog from "@/views/dialogs/station-dialogs/AddStationDialog";
 import EditStationDialog from "@/views/dialogs/station-dialogs/EditStationDialog";
 import { useQuery } from "react-query";
@@ -13,7 +13,7 @@ import router from "next/router";
 
 interface StationProps {
   latestStations: StationData[];
-  data: StationData[] & ChargingData[]; // Use the ChargingData type
+  data: StationData[] & ChargingData[] & AdminData[]; // Use the ChargingData type
 }
 
 const StationsAllTable = () => {

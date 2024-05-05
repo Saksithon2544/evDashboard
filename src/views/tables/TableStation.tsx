@@ -158,6 +158,11 @@ export interface ChargingData {
   created_at: string;
 }
 
+export interface AdminData {
+  user_id: string;
+  station_id: string;
+}
+
 export type CallBack = {
   action: "edit" | "delete";
   station: StationData | null | any;

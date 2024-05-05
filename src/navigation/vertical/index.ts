@@ -103,9 +103,19 @@ const navigation = (): VerticalNavItemsType => {
       visible: userRole === "stationadmin"
     },
     {
+      title: 'User',
+      icon: AccountGroupOutline,
+      path: '/users/station-admin',
+      visible: userRole === "stationadmin"
+    },
+    {
+      sectionTitle: 'Station Management',
+      visible: userRole === "stationadmin"
+    },
+    {
       title: 'Station',
       icon: EvStationOutlined,
-      path: '/stations',
+      path: '/stations/station-admin',
       visible: userRole === "stationadmin"
     },
     {

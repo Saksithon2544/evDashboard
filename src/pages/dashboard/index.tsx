@@ -86,9 +86,9 @@ const Dashboard = () => {
         <Grid item xs={12} md={4} lg={4}>
           <StationadminSalesByCountries />
         </Grid>
-        <Grid item xs={12}>
+        {/* <Grid item xs={12}>
           <StationadminTable />
-        </Grid>
+        </Grid> */}
       </Grid>
       )}
       {userRole === "user" && (

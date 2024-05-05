@@ -36,9 +36,8 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import { dateFormate } from "@/libs/date";
-import { PieChart, Pie, Cell } from 'recharts';
+import { PieChart, Pie, Cell } from "recharts";
 import router from "next/router";
-
 
 interface DataType {
   stats: string;
@@ -55,8 +54,7 @@ const stationadminStatisticsCard = () => {
 
   const handleOpenDialogUser = () => {
     // setOpenDialogUserg(true);
-    router.push('/users');
-
+    router.push("/users");
   };
 
   const handleCloseDialog = () => {
@@ -65,7 +63,7 @@ const stationadminStatisticsCard = () => {
 
   const handleOpenDialogStation = () => {
     // setOpenDialogStation(true);
-    router.push('/stations');
+    router.push("/stations");
   };
 
   const handleCloseDialogStation = () => {
@@ -90,10 +88,12 @@ const stationadminStatisticsCard = () => {
   } = useQuery(
     "salesData",
     async () => {
-      const res1 = (await axios.get("/charging_booth/?limit=1000")).data as ChargingData[];
+      const res1 = (await axios.get("/charging_booth/?limit=1000"))
+        .data as ChargingData[];
       const resUsers = (await axios.get("/super_admin/users?limit=1000"))
         .data as UserData[];
-      const resStations = (await axios.get("/station/?limit=1000")).data as StationData[];
+      const resStations = (await axios.get("/station/?limit=1000"))
+        .data as StationData[];
       const totalSales = res1.reduce(
         (acc, curr) => acc + curr.charging_rate * 10,
         0
@@ -102,9 +102,14 @@ const stationadminStatisticsCard = () => {
         (acc, curr) => acc + curr.charging_rate,
         0
       );
-      const totalMembers = (await axios.get("/super_admin/users?limit=1000")).data
+      // const totalMembers = (await axios.get("/super_admin/users?limit=1000")).data
+      //   .length;
+      const totalMembers = resUsers.filter(
+        (user) => user.role === "stationadmin"
+      ).length;
+      const totalStations = (await axios.get("/station/?limit=1000")).data
         .length;
-      const totalStations = (await axios.get("/station/?limit=1000")).data.length;
+
       return {
         totalSales,
         totalEnergy,
@@ -119,7 +124,7 @@ const stationadminStatisticsCard = () => {
     }
   );
 
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28'];
+  const COLORS = ["#0088FE", "#00C49F", "#FFBB28"];
 
   // State สำหรับข้อมูล role และสีของ Pie Chart
   const [roleData, setRoleData] = useState([]);
@@ -133,7 +138,12 @@ const stationadminStatisticsCard = () => {
           stats: `${totalEnergy} kWh`,
           title: "Energy usage",
           color: "primary",
-          icon: <TrendingUp sx={{ fontSize: "1.75rem" }} onClick={handleOpenDialogStation} />,
+          icon: (
+            <TrendingUp
+              sx={{ fontSize: "1.75rem" }}
+              onClick={handleOpenDialogStation}
+            />
+          ),
         },
         {
           stats: `👤 ${totalMembers}`,
@@ -161,7 +171,12 @@ const stationadminStatisticsCard = () => {
           stats: `฿ ${totalSales}`,
           color: "info",
           title: "Revenue",
-          icon: <CurrencyUsd sx={{ fontSize: "1.75rem" }} onClick={handleOpenDialogStation} />,
+          icon: (
+            <CurrencyUsd
+              sx={{ fontSize: "1.75rem" }}
+              onClick={handleOpenDialogStation}
+            />
+          ),
         },
       ];
 
@@ -193,17 +208,17 @@ const stationadminStatisticsCard = () => {
     }
 
     // สร้างข้อมูลสำหรับ Pie Chart
-      const roles = salesData.resUsers.map((user) => user.role);
-      const roleCounts = roles.reduce((acc, role) => {
-        acc[role] = (acc[role] || 0) + 1;
-        return acc;
-      }, {});
-      const roleData = Object.keys(roleCounts).map((role) => ({
-        name: role,
-        value: roleCounts[role],
-      }));
+    const roles = salesData.resUsers.map((user) => user.role);
+    const roleCounts = roles.reduce((acc, role) => {
+      acc[role] = (acc[role] || 0) + 1;
+      return acc;
+    }, {});
+    const roleData = Object.keys(roleCounts).map((role) => ({
+      name: role,
+      value: roleCounts[role],
+    }));
 
-      setRoleData(roleData);
+    setRoleData(roleData);
   };
 
   const [filterText, setFilterText] = useState("");

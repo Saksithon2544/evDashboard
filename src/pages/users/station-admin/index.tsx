@@ -42,9 +42,12 @@ const UsersAllTable = () => {
       return users.find((user: UserData) => user.id === admin.user_id);
     }
     );
-    const latestUsers = sortedUsers.slice(0, 1000); // เลือกข้อมูลเพียง 100 คนล่าสุด
 
-    return latestUsers;
+    const latestUsers = sortedUsers.slice(0, 1000); // เลือกข้อมูลเพียง 100 คนล่าสุด
+    const filteredUsers = latestUsers.filter((user: UserData) => user.role === "stationadmin");
+
+
+    return filteredUsers;
 
 
   });

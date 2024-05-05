@@ -158,7 +158,8 @@ const LoginPage = () => {
         // Find user with 'admin' or 'superadmin' role from the response
         const adminUser =
           userResponse.data.role === "stationadmin" ||
-          userResponse.data.role === "superadmin";
+          userResponse.data.role === "superadmin" ||
+          userResponse.data.role === "user";
         
       
 
@@ -218,7 +219,7 @@ const LoginPage = () => {
             },
           });
           const { role } = response.data;
-          const isAdmin = role === "stationadmin" || role === "superadmin";
+          const isAdmin = role === "stationadmin" || role === "superadmin" ;
           if (isAdmin) {
             router.push("/dashboard");
           }

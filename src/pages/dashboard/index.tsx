@@ -20,6 +20,8 @@ import StationadminStatisticsCard from "@/views/dashboard/stationadmin/stationad
 import StationadminChargerStatus from "@/views/dashboard/stationadmin/stationadminChargerStatus";
 import StationadminSalesByCountries from "@/views/dashboard/stationadmin/stationadminSalesByChargingBooth";
 
+// ** Custom Components User Imports
+import PermissionRequestForm from "@/views/dashboard/user/permissionRequest";
 import { useEffect } from 'react';
 
 import { useQuery } from "react-query";
@@ -88,6 +90,13 @@ const Dashboard = () => {
           <StationadminTable />
         </Grid>
       </Grid>
+      )}
+      {userRole === "user" && (
+        <Grid container spacing={6}>
+          <Grid item xs={12}>
+            <PermissionRequestForm />
+          </Grid>
+        </Grid>
       )}
     </ApexChartWrapper>
   );

@@ -118,6 +118,22 @@ const navigation = (): VerticalNavItemsType => {
       path: '/system-usage-history',
       visible: userRole === "stationadmin"
     },
+
+    //////////////////////////////////////////////////
+
+    {
+      title: 'Dashboard',
+      icon: HomeOutline,
+      path: '/dashboard',
+      visible: userRole === "user"
+    },
+    {
+      title: 'Account Settings',
+      icon: AccountCogOutline,
+      path: '/account-settings',
+      visible: userRole === "user"
+    },
+   
   ];
   
 

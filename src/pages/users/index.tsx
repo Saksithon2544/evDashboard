@@ -17,8 +17,9 @@ import router from "next/router";
 
 const UsersAllTable = () => {
   useEffect(() => {
+    const role = localStorage.getItem('role');
     const accessToken = localStorage.getItem('access_token');
-    if (!accessToken) {
+    if (!accessToken || role !== "superadmin") {
       router.push('/');
     }
   }, []);

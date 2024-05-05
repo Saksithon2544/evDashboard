@@ -54,7 +54,7 @@ const stationadminStatisticsCard = () => {
 
   const handleOpenDialogUser = () => {
     // setOpenDialogUserg(true);
-    router.push("/users");
+    router.push("/users/station-admin");
   };
 
   const handleCloseDialog = () => {
@@ -63,7 +63,7 @@ const stationadminStatisticsCard = () => {
 
   const handleOpenDialogStation = () => {
     // setOpenDialogStation(true);
-    router.push("/stations");
+    router.push("/stations/station-admin");
   };
 
   const handleCloseDialogStation = () => {

@@ -40,6 +40,7 @@ function logout() {
     // Destroy token here (example: remove from localStorage)
     localStorage.removeItem("access_token");
     localStorage.removeItem("token_type");
+    localStorage.removeItem("role");
     // Redirect or do other actions as necessary
     location.href = "/";
   } catch (error) {

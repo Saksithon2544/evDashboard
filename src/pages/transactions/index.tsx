@@ -19,8 +19,9 @@ import router from "next/router";
 
 const TransactionsAllTable = () => {
   useEffect(() => {
+    const role = localStorage.getItem('role');
     const accessToken = localStorage.getItem('access_token');
-    if (!accessToken) {
+    if (!accessToken || role !== "superadmin") {
       router.push('/');
     }
   }, []);
@@ -34,7 +35,7 @@ const TransactionsAllTable = () => {
     isLoading,
     refetch,
   } = useQuery<TransactionData[]>("transactions", async () => {
-    const [transactionsRes] = await Promise.all([axios.get("/transaction/all?limit=1000")]);
+    const [transactionsRes] = await Promise.all([axios.get("/transaction/?limit=1000")]);
 
     const transactionsData = await transactionsRes.data;
 

@@ -18,8 +18,9 @@ interface StationProps {
 
 const StationsAllTable = () => {
   React.useEffect(() => {
+    const role = localStorage.getItem('role');
     const accessToken = localStorage.getItem('access_token');
-    if (!accessToken) {
+    if (!accessToken || role !== "superadmin") {
       router.push('/');
     }
   }, []);

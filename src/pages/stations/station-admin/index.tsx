@@ -3,7 +3,7 @@ import { useState } from "react";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
-import TableStation, { CallBack, StationData,ChargingData, AdminData  } from "src/views/tables/TableStation";
+import TableStation, { CallBack, StationData, ChargingData, AdminData } from "src/views/tables/TableStation";
 import AddStationDialog from "@/views/dialogs/station-dialogs/AddStationDialog";
 import EditStationDialog from "@/views/dialogs/station-dialogs/EditStationDialog";
 import { useQuery } from "react-query";
@@ -11,12 +11,10 @@ import axios from "@/libs/Axios";
 import { Typography } from "@mui/material";
 import router from "next/router";
 
-interface StationProps {
-  latestStations: StationData[];
-  data: StationData[] & ChargingData[] & AdminData[]; // Use the ChargingData type
-}
-
 const StationsAllTable = () => {
+  const [selectedStation, setSelectedStation] = useState<StationData | undefined>();
+  
+  // Check for access token on component mount
   React.useEffect(() => {
     const accessToken = localStorage.getItem('access_token');
     if (!accessToken) {
@@ -24,8 +22,7 @@ const StationsAllTable = () => {
     }
   }, []);
 
-  const [selectedStation, setSelectedStation] = useState<StationData>();
-
+  // Fetch data using React Query
   const { data: Stations, isLoading, refetch } = useQuery("stations", async () => {
     const res1 = await (await axios.get(`/station/?limit=1000`)).data as StationData[];
     const res2 = await (await axios.get(`/charging_booth/?limit=1000`)).data as ChargingData[];
@@ -44,7 +41,8 @@ const StationsAllTable = () => {
     return { latestStations, data };
   });
 
-  function handleCloseMoadal() {
+  // Dialog handlers
+  function handleCloseModal() {
     setSelectedStation(undefined);
   }
 
@@ -66,14 +64,14 @@ const StationsAllTable = () => {
         <AddStationDialog callback={refetch} />
         <EditStationDialog
           station={selectedStation}
-          onClose={handleCloseMoadal}
+          onClose={handleCloseModal}
           onSave={() => refetch()}
         />
       </Grid>
       <Grid item xs={12}>
         <Card>
           <CardHeader
-            title={`Station Total ${Stations?.data.length} Station`}
+            title={`Station Total ${Stations?.data.length ?? 0} Station`}
             titleTypographyProps={{ variant: "h6" }}
           />
           {!isLoading && Stations && Stations.data.length > 0 ? (
@@ -82,13 +80,9 @@ const StationsAllTable = () => {
               callback={handleTable}
               refetch={() => refetch()}
             />
-          ) : Stations && Stations.data.length === 0 ? (
-            <Typography variant="h6" align="center">
-              No Data
-            </Typography>
           ) : (
-            <Typography variant="h6" align="center">
-              Loading...
+            <Typography variant="body1" align="center">
+              No data available
             </Typography>
           )}
         </Card>

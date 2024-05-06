@@ -143,6 +143,7 @@ EnhancedTableHead.propTypes = {
 };
 
 export interface StationData {
+  [x: string]: any;
   id: string;
   name: string;
   location: [number, number];

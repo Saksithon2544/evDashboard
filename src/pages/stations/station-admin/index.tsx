@@ -41,6 +41,8 @@ const StationsAllTable = () => {
     return { latestStations, data };
   });
 
+
+
   // Dialog handlers
   function handleCloseModal() {
     setSelectedStation(undefined);

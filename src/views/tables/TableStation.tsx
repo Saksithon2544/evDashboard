@@ -162,6 +162,8 @@ export interface ChargingData {
 export interface AdminData {
   user_id: string;
   station_id: string;
+
+  [x: string]: any;
 }
 
 export type CallBack = {

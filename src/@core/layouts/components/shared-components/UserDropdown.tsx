@@ -41,6 +41,7 @@ function logout() {
     localStorage.removeItem("access_token");
     localStorage.removeItem("token_type");
     localStorage.removeItem("role");
+    localStorage.removeItem("user_id");
     // Redirect or do other actions as necessary
     location.href = "/";
   } catch (error) {

@@ -88,8 +88,7 @@ const stationadminStatisticsCard = () => {
   } = useQuery(
     "salesData",
     async () => {
-      const res1 = (await axios.get("/charging_booth/?limit=1000"))
-        .data as ChargingData[];
+      const res1 = (await axios.get(`/station/provider/${localStorage.getItem("user_id")}`)).data.charging_booth as ChargingData[];
       const resUsers = (await axios.get("/super_admin/users?limit=1000"))
         .data as UserData[];
       const resStations = (await axios.get("/station/?limit=1000"))
@@ -102,13 +101,11 @@ const stationadminStatisticsCard = () => {
         (acc, curr) => acc + curr.charging_rate,
         0
       );
-      // const totalMembers = (await axios.get("/super_admin/users?limit=1000")).data
-      //   .length;
       const totalMembers = resUsers.filter(
         (user) => user.role === "stationadmin"
       ).length;
-      const totalStations = (await axios.get("/station/?limit=1000")).data
-        .length;
+      const totalStations = (await axios.get(`/station/provider/${localStorage.getItem("user_id")}`)).data.charging_booth.length;
+
 
       return {
         totalSales,

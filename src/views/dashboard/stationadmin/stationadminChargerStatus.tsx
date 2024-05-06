@@ -43,9 +43,10 @@ const ChargerStatus = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("/charging_booth/?limit=1000");
+        // const response = await axios.get("/charging_booth/?limit=1000");
+        const response = await axios.get(`/station/provider/${localStorage.getItem("user_id")}`);
         // เรียงลำดับข้อมูลตามวันที่
-        const sortedData = response.data.sort((olddate:any, newdate:any) => new Date(newdate.updated_at).getTime() - new Date(olddate.updated_at).getTime());
+        const sortedData = response.data.charging_booth.sort((olddate:any, newdate:any) => new Date(newdate.updated_at).getTime() - new Date(olddate.updated_at).getTime());
         setChargerStatus(sortedData);
       } catch (error) {
         console.error(error);

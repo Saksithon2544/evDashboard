@@ -178,6 +178,7 @@ const LoginPage = () => {
         localStorage.setItem("access_token", access_token);
         localStorage.setItem("token_type", token_type);
         localStorage.setItem("role", userResponse.data.role);
+        localStorage.setItem("user_id", userResponse.data.id);
 
         Swal.fire({
           icon: "success",

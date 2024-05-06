@@ -156,7 +156,7 @@ const stationadminStatisticsCard = () => {
         {
           stats: `⛽️ ${totalStations}`,
           color: "warning",
-          title: "Stations",
+          title: "Charger",
           icon: (
             <CellphoneLink
               sx={{ fontSize: "1.75rem" }}
